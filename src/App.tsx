@@ -1,25 +1,35 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import QuestionPage from './pages/QuestionPage';
+import { ThemeProvider, createTheme, ThemeOptions } from '@mui/material/styles';
 
 function App() {
+  // Define the theme options with correct type for 'mode'
+  const themeOptions: ThemeOptions = {
+    palette: {
+      mode: 'dark', // Explicitly use 'dark' instead of a general string type
+      primary: {
+        main: '#EEEEEE',
+      },
+      secondary: {
+        main: '#00ADB5',
+      },
+      background: {
+        default: '#222831',
+        paper: '#222831',
+      },
+      text: {
+        primary: '#FFFFFF',
+        secondary: '#FFFFFF',
+      },
+    },
+  };
+
+  const theme = createTheme(themeOptions);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <ThemeProvider theme={theme}>
+      <QuestionPage />
+    </ThemeProvider>
   );
 }
 
