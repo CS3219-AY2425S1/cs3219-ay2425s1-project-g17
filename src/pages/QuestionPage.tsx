@@ -6,6 +6,7 @@ import { styled, alpha } from '@mui/material/styles';
 import SearchIcon from '@mui/icons-material/Search';
 import InputBase from '@mui/material/InputBase';
 import QuestionCard from '../components/QuestionCard';
+import { getAllQuestions } from '../backend/question-service/QuestionService';
 
 interface ComplexityOption {
     label: string;
@@ -13,19 +14,32 @@ interface ComplexityOption {
 }
 
 interface QuestionProps {
-    id: number;
-    title: string;
-    description: string;
-    category: string;
-    complexity: string;
-    popularity: number;
+    _id: string;
+    question_id: number;
+    question_title: string;
+    question_description: string;
+    question_categories: string[];
+    question_complexity: string;
+    question_popularity: number;
 }
 
 function QuestionPage() {
 
     // TODO: Fetch questions from API
-    const [questions, setQuestions] = React.useState<QuestionProps[]>([{ id: 1, title: 'Two Sum', description: 'Given an array of integers, return indices of the two numbers such that they add up to a specific target.', category: 'String', complexity: 'Easy', popularity: 100 }, { id: 2, title: 'Reverse Integer', description: 'Given a 32-bit signed integer, reverse digits of an integer.', category: 'Algorithms', complexity: 'Medium', popularity: 70 }, { id: 3, title: 'Palindrome Number', description: 'Determine whether an integer is a palindrome. An integer is a palindrome when it reads the same backward as forward.', category: 'Algorithms', complexity: 'Hard', popularity: 50 }]);
+    const [questions, setQuestions] = React.useState<QuestionProps[]>([]);
     const categories = ['String', 'Algorithms', 'Databases', 'Brainteaser'];
+
+    React.useEffect(() => {
+        async function fetchQuestions() {
+            try {
+                const data = await getAllQuestions();
+                setQuestions(data);
+            } catch (error) {
+                console.error('Failed to fetch questions:', error);
+            }
+        }
+        fetchQuestions();
+    }, []);
 
     const Search = styled('div')(({ theme }) => ({
         position: 'relative',
@@ -168,7 +182,13 @@ function QuestionPage() {
                                 </TableHead>
                                 <TableBody>
                                     {questions.map((question) => (
-                                        <QuestionCard key={question.id} {...question} />
+                                        <QuestionCard key={question._id}
+                                            id={question.question_id}
+                                            title={question.question_title}
+                                            description={question.question_description}
+                                            categories={question.question_categories}
+                                            complexity={question.question_complexity}
+                                            popularity={question.question_popularity}/>
                                     ))}
                                 </TableBody>
                             </Table>

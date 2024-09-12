@@ -3,17 +3,17 @@ import { TableCell, TableRow, Typography, Modal, Box, IconButton } from '@mui/ma
 import CloseIcon from '@mui/icons-material/Close';
 
 // Explicitly define the type for complexityColors to ensure safe indexing
-const complexityColors: Record<'Easy' | 'Medium' | 'Hard', string> = {
-    Easy: '#2C6B6D',
-    Medium: '#F3A32D',
-    Hard: '#C73D4C',
+const complexityColors: Record<'EASY' | 'MEDIUM' | 'HARD', string> = {
+    EASY: '#2C6B6D',
+    MEDIUM: '#F3A32D',
+    HARD: '#C73D4C',
 };
 
 interface QuestionCardProps {
     id: number;
     title: string;
     description: string;
-    category: string;
+    categories: string[];
     complexity: string;
     popularity: number;
 }
@@ -22,7 +22,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
     id,
     title,
     description,
-    category,
+    categories,
     complexity,
     popularity,
 }) => {
@@ -53,7 +53,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
                 >
                     {title}
                 </TableCell>
-                <TableCell>{category}</TableCell>
+                <TableCell>{categories.join(", ")}</TableCell>
                 <TableCell
                     sx={{
                         color: getComplexityColor(complexity as keyof typeof complexityColors),
