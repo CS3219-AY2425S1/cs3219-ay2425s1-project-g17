@@ -38,7 +38,7 @@ function Navbar() {
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
           </Box>
           <Box sx={{ flexGrow: 0, display: "flex", alignItems: "center" }}>
-            <Typography variant="h6" sx={{ paddingRight: "10px" }} >
+            <Typography variant="h6" sx={{ paddingRight: "15px" }} >
               Hello {username}!
             </Typography>
             <Tooltip title="Open settings">

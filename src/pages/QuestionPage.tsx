@@ -1,12 +1,12 @@
 import * as React from 'react';
 import Navbar from '../components/Navbar';
-import AddBoxIcon from '@mui/icons-material/AddBox';
 import { Container, Box, Button, Autocomplete, TextField, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import { styled, alpha } from '@mui/material/styles';
 import SearchIcon from '@mui/icons-material/Search';
 import InputBase from '@mui/material/InputBase';
 import QuestionCard from '../components/QuestionCard';
 import { getAllQuestions } from '../backend/question-service/QuestionService';
+import AddQuestionButton from '../components/AddQuestionButton';
 
 interface ComplexityOption {
     label: string;
@@ -25,9 +25,82 @@ interface QuestionProps {
 
 function QuestionPage() {
 
-    // TODO: Fetch questions from API
     const [questions, setQuestions] = React.useState<QuestionProps[]>([]);
-    const categories = ['String', 'Algorithms', 'Databases', 'Brainteaser'];
+    const categories = [
+        "Array",
+        "String",
+        "Hash Table",
+        "Dynamic Programming",
+        "Math",
+        "Sorting",
+        "Greedy",
+        "Depth-First Search",
+        "Database",
+        "Binary Search",
+        "Matrix",
+        "Tree",
+        "Breadth-First Search",
+        "Bit Manipulation",
+        "Two Pointers",
+        "Binary Tree",
+        "Heap (Priority Queue)",
+        "Prefix Sum",
+        "Simulation",
+        "Stack",
+        "Graph",
+        "Counting",
+        "Sliding Window",
+        "Design",
+        "Backtracking",
+        "Enumeration",
+        "Union Find",
+        "Linked List",
+        "Ordered Set",
+        "Monotonic Stack",
+        "Number Theory",
+        "Trie",
+        "Segment Tree",
+        "Bitmask",
+        "Divide and Conquer",
+        "Queue",
+        "Recursion",
+        "Binary Search Tree",
+        "Combinatorics",
+        "Binary Indexed Tree",
+        "Geometry",
+        "Memoization",
+        "Hash Function",
+        "Topological Sort",
+        "String Matching",
+        "Shortest Path",
+        "Game Theory",
+        "Rolling Hash",
+        "Interactive",
+        "Data Stream",
+        "Brainteaser",
+        "Monotonic Queue",
+        "Randomized",
+        "Merge Sort",
+        "Doubly-Linked List",
+        "Iterator",
+        "Concurrency",
+        "Probability and Statistics",
+        "Counting Sort",
+        "Quickselect",
+        "Suffix Array",
+        "Bucket Sort",
+        "Minimum Spanning Tree",
+        "Shell",
+        "Line Sweep",
+        "Reservoir Sampling",
+        "Strongly Connected Component",
+        "Eulerian Circuit",
+        "Radix Sort",
+        "Rejection Sampling",
+        "Biconnected Component",
+        "Data Structure"
+    ];
+    const [isEditMode, setIsEditMode] = React.useState(false);
 
     React.useEffect(() => {
         async function fetchQuestions() {
@@ -110,20 +183,14 @@ function QuestionPage() {
 
                     <Box
                         sx={{ paddingTop: '20px', display: 'flex', gap: 2, alignItems: 'center' }}>
+                        <AddQuestionButton />
                         <Button
                             variant="contained"
                             color="secondary"
-                            startIcon={<AddBoxIcon />}
-                            sx={{ color: 'white' }}
+                            sx={{ color: 'white', fontWeight: isEditMode ? 'bold' : 'normal' }}
+                            onClick={() => setIsEditMode(!isEditMode)}
                         >
-                            Add Question
-                        </Button>
-                        <Button
-                            variant="contained"
-                            color="secondary"
-                            sx={{ color: 'white' }}
-                        >
-                            Edit
+                            {isEditMode ? 'Done' : 'Edit'}
                         </Button>
 
                         <Autocomplete
@@ -188,7 +255,8 @@ function QuestionPage() {
                                             description={question.question_description}
                                             categories={question.question_categories}
                                             complexity={question.question_complexity}
-                                            popularity={question.question_popularity}/>
+                                            popularity={question.question_popularity} 
+                                            isEditMode={isEditMode}/>
                                     ))}
                                 </TableBody>
                             </Table>
