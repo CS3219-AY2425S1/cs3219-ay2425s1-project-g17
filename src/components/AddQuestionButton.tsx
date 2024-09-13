@@ -2,7 +2,7 @@ import * as React from 'react';
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import { Button, Modal, Box, Typography, TextField, MenuItem, Select, FormControl, InputLabel, ListItemText } from '@mui/material';
 import Chip from '@mui/material/Chip';
-import { addQuestion } from '../backend/question-service/QuestionService';
+import { addQuestion, checkTitle } from '../backend/question-service/QuestionService';
 
 const categories = [
     "Array", "Algorithms", "Strings", "Hash Table", "Dynamic Programming", "Math", "Sorting", "Greedy", 
@@ -61,16 +61,11 @@ const AddQuestionButton: React.FC = () => {
             return;
         } 
 
-        console.log({
-            title,
-            description,
-            category,
-            complexity,
-            popularity
-        });
-
-        // TODO: Add error handling (duplicates)
-
+        const titleExists = await checkTitle(title);
+        if (titleExists) {
+            alert('Question title already exists. Please enter a different title.');
+            return;
+        }
         const newQuestion = await addQuestion(title, description, category, complexity, popularity);
 
         if (newQuestion) {

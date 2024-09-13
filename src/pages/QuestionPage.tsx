@@ -256,7 +256,8 @@ function QuestionPage() {
                                             categories={question.question_categories}
                                             complexity={question.question_complexity}
                                             popularity={question.question_popularity} 
-                                            isEditMode={isEditMode}/>
+                                            isEditMode={isEditMode}
+                                            allCategories={categories}/>
                                     ))}
                                 </TableBody>
                             </Table>

@@ -104,9 +104,20 @@ function handleAxiosError(error: any) {
     return null;
 }
 
+// Function to check if title already exists
+async function checkTitle(title: string) {
+    try {
+        const questions = await getAllQuestions();
+        return questions.some((question: any) => question.question_title === title);
+    } catch (error) {
+        handleAxiosError(error);
+    }
+}
+
 export {
     getAllQuestions,
     addQuestion,
     updateQuestion,
-    deleteQuestion
+    deleteQuestion,
+    checkTitle
 }

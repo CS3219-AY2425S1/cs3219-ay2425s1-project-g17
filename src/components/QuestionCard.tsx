@@ -16,26 +16,8 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { updateQuestion, deleteQuestion } from '../backend/question-service/QuestionService';
+import { updateQuestion, deleteQuestion, checkTitle } from '../backend/question-service/QuestionService';
 import Chip from '@mui/material/Chip';
-
-const allCategories = [
-    "Array", "Algorithms", "Strings", "Hash Table", "Dynamic Programming", "Math", "Sorting", "Greedy",
-    "Depth-First Search", "Database", "Binary Search", "Matrix", "Tree",
-    "Breadth-First Search", "Bit Manipulation", "Two Pointers", "Binary Tree",
-    "Heap (Priority Queue)", "Prefix Sum", "Simulation", "Stack", "Graph",
-    "Counting", "Sliding Window", "Design", "Backtracking", "Enumeration",
-    "Union Find", "Linked List", "Ordered Set", "Monotonic Stack", "Number Theory",
-    "Trie", "Segment Tree", "Bitmask", "Divide and Conquer", "Queue", "Recursion",
-    "Binary Search Tree", "Combinatorics", "Binary Indexed Tree", "Geometry",
-    "Memoization", "Hash Function", "Topological Sort", "String Matching",
-    "Shortest Path", "Game Theory", "Rolling Hash", "Interactive", "Data Stream",
-    "Brainteaser", "Monotonic Queue", "Randomized", "Merge Sort", "Doubly-Linked List",
-    "Iterator", "Concurrency", "Probability and Statistics", "Counting Sort",
-    "Quickselect", "Suffix Array", "Bucket Sort", "Minimum Spanning Tree", "Shell",
-    "Line Sweep", "Reservoir Sampling", "Strongly Connected Component",
-    "Eulerian Circuit", "Radix Sort", "Rejection Sampling", "Biconnected Component", "Data Structures"
-];
 
 const complexityColors: Record<'EASY' | 'MEDIUM' | 'HARD', string> = {
     EASY: '#2C6B6D',
@@ -51,6 +33,7 @@ interface QuestionCardProps {
     complexity: string;
     popularity: number;
     isEditMode: boolean;
+    allCategories: string[];
 }
 
 const QuestionCard: React.FC<QuestionCardProps> = ({
@@ -61,9 +44,11 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
     complexity,
     popularity,
     isEditMode,
+    allCategories
 }) => {
     const [open, setOpen] = React.useState(false);
     const [editOpen, setEditOpen] = React.useState(false);
+    const [deleteOpen, setDeleteOpen] = React.useState(false);
     const [editedTitle, setEditedTitle] = React.useState(title);
     const [editedDescription, setEditedDescription] = React.useState(description);
     const [editedCategories, setEditedCategories] = React.useState<string[]>(categories);
@@ -76,39 +61,45 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
     const handleEditOpen = () => setEditOpen(true);
     const handleEditClose = () => setEditOpen(false);
 
+    const handleDeleteOpen = () => setDeleteOpen(true);
+    const handleDeleteClose = () => setDeleteOpen(false);
+
     const getComplexityColor = (complexity: keyof typeof complexityColors) => {
         return complexityColors[complexity] || 'black';
     };
 
     const handleEditSubmit = async () => {
         try {
-            await updateQuestion(
-                id,
-                editedTitle,
-                editedDescription,
-                editedCategories,
-                editedComplexity,
-                editedPopularity,
-            );
-            console.log('Question updated successfully');
-            setEditOpen(false);
-            window.location.reload();
+            const doesTitleExist = await checkTitle(editedTitle.trim());
+            if (doesTitleExist) {
+                alert('Title already exists. Please choose a different title.');
+                return;
+            } else {
+                await updateQuestion(
+                    id,
+                    editedTitle,
+                    editedDescription,
+                    editedCategories,
+                    editedComplexity,
+                    editedPopularity,
+                );
+                console.log('Question updated successfully');
+                setEditOpen(false);
+                window.location.reload();
+            }
         } catch (error) {
             console.error('Failed to update the question:', error);
         }
     };
 
-    // TODO: Change window confirm to modal
     const handleDelete = async () => {
-        const confirmDelete = window.confirm('Are you sure you want to delete this question?');
-        if (confirmDelete) {
-            try {
-                await deleteQuestion(id);
-                alert('Question deleted successfully.');
-                window.location.reload();
-            } catch (error) {
-                alert('Failed to delete the question.');
-            }
+        try {
+            await deleteQuestion(id);
+            alert('Question deleted successfully.');
+            setDeleteOpen(false);
+            window.location.reload();
+        } catch (error) {
+            alert('Failed to delete the question.');
         }
     };
 
@@ -151,7 +142,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
                         <IconButton color="primary" size="small" onClick={handleEditOpen}>
                             <EditIcon fontSize="small" />
                         </IconButton>
-                        <IconButton color="error" size="small" onClick={handleDelete}>
+                        <IconButton color="error" size="small" onClick={handleDeleteOpen}>
                             <DeleteIcon fontSize="small" />
                         </IconButton>
                     </TableCell>
@@ -228,46 +219,51 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
                         sx={{ mb: 2 }}
                     />
                     <FormControl fullWidth sx={{ mb: 2 }}>
-    <InputLabel>Categories</InputLabel>
-    <Select
-        multiple
-        value={editedCategories}
-        onChange={(e) => setEditedCategories(e.target.value as string[])}
-        renderValue={(selected) => (
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                {selected.map((value) => (
-                    <Chip key={value} label={value} />
-                ))}
-            </Box>
-        )}
-        label="Categories"
-        MenuProps={{
-            PaperProps: {
-                sx: {
-                    maxHeight: 200,
-                },
-            },
-        }}
-    >
-        {
-            // Sort categories with selected ones at the top
-            [...allCategories]
-                .sort((a, b) => {
-                    const aSelected = editedCategories.includes(a);
-                    const bSelected = editedCategories.includes(b);
-                    if (aSelected && !bSelected) return -1;
-                    if (!aSelected && bSelected) return 1;
-                    return a.localeCompare(b);
-                })
-                .map((cat) => (
-                    <MenuItem key={cat} value={cat}>
-                        {cat}
-                    </MenuItem>
-                ))
-        }
-    </Select>
-</FormControl>
+                        <InputLabel>Categories</InputLabel>
+                        <Select
+                            multiple
+                            value={editedCategories}
+                            onChange={(e) => setEditedCategories(e.target.value as string[])}
+                            renderValue={(selected) => (
+                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                    {selected.map((value) => (
+                                        <Chip key={value} label={value} />
+                                    ))}
+                                </Box>
+                            )}
+                            label="Categories"
+                            MenuProps={{
+                                PaperProps: {
+                                    sx: {
+                                        maxHeight: 200,
+                                    },
+                                },
+                            }}
+                        >
+                            {editedCategories.map((cat) => (
+                                <MenuItem key={cat} value={cat}>
+                                    {cat}
+                                </MenuItem>
+                            ))}
 
+                            {
+                                // Sort categories with selected ones at the top
+                                [...allCategories]
+                                    .sort((a, b) => {
+                                        const aSelected = editedCategories.includes(a);
+                                        const bSelected = editedCategories.includes(b);
+                                        if (aSelected && !bSelected) return -1;
+                                        if (!aSelected && bSelected) return 1;
+                                        return a.localeCompare(b);
+                                    })
+                                    .map((cat) => (
+                                        <MenuItem key={cat} value={cat}>
+                                            {cat}
+                                        </MenuItem>
+                                    ))
+                            }
+                        </Select>
+                    </FormControl>
 
                     <FormControl fullWidth sx={{ mb: 2 }}>
                         <InputLabel>Complexity</InputLabel>
@@ -311,6 +307,38 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
                 </Box>
             </Modal>
 
+            {/* Delete Confirmation Modal */}
+            <Modal open={deleteOpen} onClose={handleDeleteClose}>
+                <Box
+                    sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: 400,
+                        bgcolor: 'background.paper',
+                        boxShadow: 24,
+                        p: 4,
+                        borderRadius: 3,
+                        textAlign: 'center',
+                    }}
+                >
+                    <Typography variant="h6" component="h2" sx={{ mb: 2, color: "white" }}>
+                        Confirm Deletion
+                    </Typography>
+                    <Typography sx={{ mb: 3, color: "white" }}>
+                        Are you sure you want to delete this question?
+                    </Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
+                        <Button variant="contained" color="error" onClick={handleDelete}>
+                            Delete
+                        </Button>
+                        <Button variant="outlined" onClick={handleDeleteClose}>
+                            Cancel
+                        </Button>
+                    </Box>
+                </Box>
+            </Modal>
         </>
     );
 };
