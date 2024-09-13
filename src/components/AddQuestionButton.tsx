@@ -4,24 +4,6 @@ import { Button, Modal, Box, Typography, TextField, MenuItem, Select, FormContro
 import Chip from '@mui/material/Chip';
 import { addQuestion, checkTitle } from '../backend/question-service/QuestionService';
 
-const categories = [
-    "Array", "Algorithms", "Strings", "Hash Table", "Dynamic Programming", "Math", "Sorting", "Greedy", 
-    "Depth-First Search", "Database", "Binary Search", "Matrix", "Tree", 
-    "Breadth-First Search", "Bit Manipulation", "Two Pointers", "Binary Tree", 
-    "Heap (Priority Queue)", "Prefix Sum", "Simulation", "Stack", "Graph", 
-    "Counting", "Sliding Window", "Design", "Backtracking", "Enumeration", 
-    "Union Find", "Linked List", "Ordered Set", "Monotonic Stack", "Number Theory", 
-    "Trie", "Segment Tree", "Bitmask", "Divide and Conquer", "Queue", "Recursion", 
-    "Binary Search Tree", "Combinatorics", "Binary Indexed Tree", "Geometry", 
-    "Memoization", "Hash Function", "Topological Sort", "String Matching", 
-    "Shortest Path", "Game Theory", "Rolling Hash", "Interactive", "Data Stream", 
-    "Brainteaser", "Monotonic Queue", "Randomized", "Merge Sort", "Doubly-Linked List", 
-    "Iterator", "Concurrency", "Probability and Statistics", "Counting Sort", 
-    "Quickselect", "Suffix Array", "Bucket Sort", "Minimum Spanning Tree", "Shell", 
-    "Line Sweep", "Reservoir Sampling", "Strongly Connected Component", 
-    "Eulerian Circuit", "Radix Sort", "Rejection Sampling", "Biconnected Component", "Data Structures"
-];
-
 const complexities = ['Easy', 'Medium', 'Hard'];
 
 const dropdownMenuProps = {
@@ -32,7 +14,11 @@ const dropdownMenuProps = {
     },
 };
 
-const AddQuestionButton: React.FC = () => {
+interface AddQuestionButtonProps {
+    categories: string[];
+}
+
+const AddQuestionButton: React.FC<AddQuestionButtonProps> = ({categories}) => {
     const [open, setOpen] = React.useState(false);
     const [title, setTitle] = React.useState('');
     const [description, setDescription] = React.useState('');
@@ -61,7 +47,7 @@ const AddQuestionButton: React.FC = () => {
             return;
         } 
 
-        const titleExists = await checkTitle(title);
+        const titleExists = await checkTitle(title.trim());
         if (titleExists) {
             alert('Question title already exists. Please enter a different title.');
             return;
@@ -148,7 +134,7 @@ const AddQuestionButton: React.FC = () => {
                                 onChange={(e) => setCategory(e.target.value as string[])}
                                 renderValue={(selected) => (
                                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                        {selected.map((value) => (
+                                        {selected?.map((value) => (
                                             <Chip key={value} label={value} />
                                         ))}
                                     </Box>
@@ -156,7 +142,7 @@ const AddQuestionButton: React.FC = () => {
                                 MenuProps={dropdownMenuProps}
                                 label="Category"
                             >
-                                {categories.map((cat) => (
+                                {categories?.map((cat) => (
                                     <MenuItem key={cat} value={cat}>
                                         <ListItemText primary={cat} />
                                     </MenuItem>
@@ -172,8 +158,8 @@ const AddQuestionButton: React.FC = () => {
                                 label="Complexity"
                                 MenuProps={dropdownMenuProps}
                             >
-                                {complexities.map((comp) => (
-                                    <MenuItem key={comp.toUpperCase()} value={comp}>
+                                {complexities?.map((comp) => (
+                                    <MenuItem key={comp} value={comp.toUpperCase()}>
                                         {comp}
                                     </MenuItem>
                                 ))}

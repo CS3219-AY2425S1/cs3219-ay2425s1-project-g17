@@ -1,6 +1,20 @@
 import * as React from 'react';
 import Navbar from '../components/Navbar';
-import { Container, Box, Button, Autocomplete, TextField, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import {
+    Container,
+    Box,
+    Button,
+    Autocomplete,
+    TextField,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Paper,
+    TablePagination
+} from '@mui/material';
 import { styled, alpha } from '@mui/material/styles';
 import SearchIcon from '@mui/icons-material/Search';
 import InputBase from '@mui/material/InputBase';
@@ -24,11 +38,28 @@ interface QuestionProps {
 }
 
 function QuestionPage() {
-
     const [questions, setQuestions] = React.useState<QuestionProps[]>([]);
+    const [filteredQuestions, setFilteredQuestions] = React.useState<QuestionProps[]>([]);
+    const [selectedCategories, setSelectedCategories] = React.useState<string[]>([]);
+    const [selectedComplexity, setSelectedComplexity] = React.useState<ComplexityOption | null>(null);
+    const [searchQuery, setSearchQuery] = React.useState('');
+    const [isEditMode, setIsEditMode] = React.useState(false);
+    const [page, setPage] = React.useState(0);
+    const [rowsPerPage, setRowsPerPage] = React.useState(10);
+
+    const handleChangePage = (event: unknown, newPage: number) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0); // Reset to first page whenever rows per page change
+    };
+
     const categories = [
         "Array",
-        "String",
+        "Algorithms",
+        "Strings",
         "Hash Table",
         "Dynamic Programming",
         "Math",
@@ -98,21 +129,61 @@ function QuestionPage() {
         "Radix Sort",
         "Rejection Sampling",
         "Biconnected Component",
-        "Data Structure"
+        "Data Structures"
+    ].sort();
+
+    const complexities: ComplexityOption[] = [
+        { label: 'None', color: '#FFFFFF' },
+        { label: 'Easy', color: '#2C6B6D' },
+        { label: 'Medium', color: '#F3A32D' },
+        { label: 'Hard', color: '#C73D4C' },
     ];
-    const [isEditMode, setIsEditMode] = React.useState(false);
 
     React.useEffect(() => {
         async function fetchQuestions() {
             try {
                 const data = await getAllQuestions();
                 setQuestions(data);
+                setFilteredQuestions(data); // Initialize filtered questions with all data
             } catch (error) {
                 console.error('Failed to fetch questions:', error);
             }
         }
         fetchQuestions();
     }, []);
+
+    React.useEffect(() => {
+        const filterQuestions = () => {
+            let filtered = questions;
+
+            // Filter by categories: Only show questions that have all selected categories
+            if (selectedCategories.length > 0) {
+                filtered = filtered?.filter((question) =>
+                    selectedCategories.every((category) =>
+                        question.question_categories.includes(category)
+                    )
+                );
+            }
+
+            // Filter by complexity, excluding "None" from the filter
+            if (selectedComplexity && selectedComplexity.label !== 'None') {
+                filtered = filtered?.filter(
+                    (question) => question.question_complexity.toUpperCase() === selectedComplexity.label.toUpperCase()
+                );
+            }
+
+            // Filter by search query: Match question title or description
+            if (searchQuery.trim()) {
+                filtered = filtered?.filter((question) =>
+                    question.question_title.toLowerCase().includes(searchQuery.toLowerCase())
+                );
+            }
+
+            setFilteredQuestions(filtered);
+        };
+
+        filterQuestions();
+    }, [questions, selectedCategories, selectedComplexity, searchQuery]);
 
     const Search = styled('div')(({ theme }) => ({
         position: 'relative',
@@ -152,15 +223,6 @@ function QuestionPage() {
         },
     }));
 
-    const complexities: ComplexityOption[] = [
-        { label: 'Easy', color: '#2C6B6D' },
-        { label: 'Medium', color: '#F3A32D' },
-        { label: 'Hard', color: '#C73D4C' }
-    ];
-
-    const [selectedCategories, setSelectedCategories] = React.useState<string[]>([]);
-    const [selectedComplexities, setSelectedComplexities] = React.useState<ComplexityOption[]>([]);
-
     return (
         <>
             <Navbar />
@@ -171,7 +233,8 @@ function QuestionPage() {
                     minHeight: '100vh',
                     display: 'flex',
                     flexDirection: 'column',
-                }}>
+                }}
+            >
                 <Container
                     maxWidth="xl"
                     sx={{
@@ -179,11 +242,10 @@ function QuestionPage() {
                         minHeight: '100vh',
                         display: 'flex',
                         flexDirection: 'column',
-                    }}>
-
-                    <Box
-                        sx={{ paddingTop: '20px', display: 'flex', gap: 2, alignItems: 'center' }}>
-                        <AddQuestionButton />
+                    }}
+                >
+                    <Box sx={{ paddingTop: '20px', display: 'flex', gap: 2, alignItems: 'center' }}>
+                        <AddQuestionButton categories={categories}/>
                         <Button
                             variant="contained"
                             color="secondary"
@@ -199,22 +261,17 @@ function QuestionPage() {
                             options={categories}
                             value={selectedCategories}
                             onChange={(event, newValue) => setSelectedCategories(newValue)}
-                            renderInput={(params) => (
-                                <TextField {...params} label="Category" />
-                            )}
+                            renderInput={(params) => <TextField {...params} label="Category" />}
                             sx={{ minWidth: 150, maxWidth: 400 }}
                         />
 
                         <Autocomplete
-                            multiple
                             size="small"
                             options={complexities}
-                            value={selectedComplexities}
-                            onChange={(event, newValue) => setSelectedComplexities(newValue)}
+                            value={selectedComplexity}
+                            onChange={(event, newValue) => setSelectedComplexity(newValue)}
                             getOptionLabel={(option) => option.label}
-                            renderInput={(params) => (
-                                <TextField {...params} label="Complexity" />
-                            )}
+                            renderInput={(params) => <TextField {...params} label="Complexity" />}
                             sx={{ minWidth: 150, maxWidth: 400 }}
                             renderOption={(props, option) => (
                                 <li {...props} style={{ color: option.color }}>
@@ -225,12 +282,15 @@ function QuestionPage() {
 
                         <Search>
                             <SearchIconWrapper>
-                                <SearchIcon sx={{ color: "white" }} />
+                                <SearchIcon sx={{ color: 'white' }} />
                             </SearchIconWrapper>
                             <StyledInputBase
                                 placeholder="Search…"
                                 inputProps={{ 'aria-label': 'search' }}
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)} // Update searchQuery state on input change
                                 sx={{ color: 'white' }}
+                                autoFocus
                             />
                         </Search>
                     </Box>
@@ -248,22 +308,36 @@ function QuestionPage() {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {questions.map((question) => (
-                                        <QuestionCard key={question._id}
-                                            id={question.question_id}
-                                            title={question.question_title}
-                                            description={question.question_description}
-                                            categories={question.question_categories}
-                                            complexity={question.question_complexity}
-                                            popularity={question.question_popularity} 
-                                            isEditMode={isEditMode}
-                                            allCategories={categories}/>
-                                    ))}
+                                    {filteredQuestions
+                                        ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                        .map((question) => (
+                                            <QuestionCard
+                                                key={question._id}
+                                                id={question.question_id}
+                                                title={question.question_title}
+                                                description={question.question_description}
+                                                categories={question.question_categories}
+                                                complexity={question.question_complexity}
+                                                popularity={question.question_popularity}
+                                                isEditMode={isEditMode}
+                                                allCategories={categories}
+                                            />
+                                        ))}
                                 </TableBody>
                             </Table>
                         </TableContainer>
-                    </Box>
 
+                        {/* Pagination controls */}
+                        <TablePagination
+                            rowsPerPageOptions={[5, 10, 25]}
+                            component="div"
+                            count={filteredQuestions.length}
+                            rowsPerPage={rowsPerPage}
+                            page={page}
+                            onPageChange={handleChangePage}
+                            onRowsPerPageChange={handleChangeRowsPerPage}
+                        />
+                    </Box>
                 </Container>
             </Container>
         </>

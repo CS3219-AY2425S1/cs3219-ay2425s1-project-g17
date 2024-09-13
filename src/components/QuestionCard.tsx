@@ -12,6 +12,7 @@ import {
     MenuItem,
     FormControl,
     InputLabel,
+    Autocomplete
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
@@ -71,7 +72,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
     const handleEditSubmit = async () => {
         try {
             const doesTitleExist = await checkTitle(editedTitle.trim());
-            if (doesTitleExist) {
+            if (doesTitleExist && editedTitle !== title) {
                 alert('Title already exists. Please choose a different title.');
                 return;
             } else {
@@ -199,7 +200,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
                         flexDirection: 'column',
                     }}
                 >
-                    <Typography variant="h6" component="h2" sx={{ mb: 2 }}>
+                    <Typography variant="h6" component="h2" sx={{ mb: 2, color: "white" }}>
                         Edit Question
                     </Typography>
                     <TextField
@@ -219,51 +220,27 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
                         sx={{ mb: 2 }}
                     />
                     <FormControl fullWidth sx={{ mb: 2 }}>
-                        <InputLabel>Categories</InputLabel>
-                        <Select
+                        <Autocomplete
                             multiple
+                            options={allCategories}
                             value={editedCategories}
-                            onChange={(e) => setEditedCategories(e.target.value as string[])}
-                            renderValue={(selected) => (
+                            onChange={(event, newValue) => setEditedCategories(newValue)}
+                            filterSelectedOptions
+                            getOptionLabel={(option) => option}
+                            renderInput={(params) => (
+                                <TextField {...params} label="Categories" placeholder="Search or select" />
+                            )}
+                            renderTags={(selected, getTagProps) => (
                                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                    {selected.map((value) => (
-                                        <Chip key={value} label={value} />
+                                    {selected.map((value, index) => (
+                                        <Chip label={value} {...getTagProps({ index })} />
                                     ))}
                                 </Box>
                             )}
-                            label="Categories"
-                            MenuProps={{
-                                PaperProps: {
-                                    sx: {
-                                        maxHeight: 200,
-                                    },
-                                },
-                            }}
-                        >
-                            {editedCategories.map((cat) => (
-                                <MenuItem key={cat} value={cat}>
-                                    {cat}
-                                </MenuItem>
-                            ))}
-
-                            {
-                                // Sort categories with selected ones at the top
-                                [...allCategories]
-                                    .sort((a, b) => {
-                                        const aSelected = editedCategories.includes(a);
-                                        const bSelected = editedCategories.includes(b);
-                                        if (aSelected && !bSelected) return -1;
-                                        if (!aSelected && bSelected) return 1;
-                                        return a.localeCompare(b);
-                                    })
-                                    .map((cat) => (
-                                        <MenuItem key={cat} value={cat}>
-                                            {cat}
-                                        </MenuItem>
-                                    ))
-                            }
-                        </Select>
+                            sx={{ maxHeight: 200 }} // You can control the height here
+                        />
                     </FormControl>
+
 
                     <FormControl fullWidth sx={{ mb: 2 }}>
                         <InputLabel>Complexity</InputLabel>
