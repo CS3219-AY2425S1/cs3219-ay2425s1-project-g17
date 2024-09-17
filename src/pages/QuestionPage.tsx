@@ -6,21 +6,11 @@ import {
     Button,
     Autocomplete,
     TextField,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    Paper,
-    TablePagination
 } from '@mui/material';
-import { styled, alpha } from '@mui/material/styles';
-import SearchIcon from '@mui/icons-material/Search';
-import InputBase from '@mui/material/InputBase';
-import QuestionCard from '../components/QuestionCard';
-import { getAllQuestions } from '../backend/question-service/QuestionService';
-import AddQuestionButton from '../components/AddQuestionButton';
+import { getAllQuestions, getFilteredQuestions } from '../controller/question-service/QuestionService';
+import AddQuestionButton from '../components/QuestionPageComponents/AddQuestionButton';
+import SearchBar from '../components/QuestionPageComponents/SearchBar';
+import QuestionTable from '../components/QuestionPageComponents/QuestionTable';
 
 interface ComplexityOption {
     label: string;
@@ -39,7 +29,6 @@ interface QuestionProps {
 
 function QuestionPage() {
     const [questions, setQuestions] = React.useState<QuestionProps[]>([]);
-    const [filteredQuestions, setFilteredQuestions] = React.useState<QuestionProps[]>([]);
     const [selectedCategories, setSelectedCategories] = React.useState<string[]>([]);
     const [selectedComplexity, setSelectedComplexity] = React.useState<ComplexityOption | null>(null);
     const [searchQuery, setSearchQuery] = React.useState('');
@@ -53,7 +42,7 @@ function QuestionPage() {
 
     const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
         setRowsPerPage(parseInt(event.target.value, 10));
-        setPage(0); // Reset to first page whenever rows per page change
+        setPage(0);
     };
 
     const categories = [
@@ -140,88 +129,31 @@ function QuestionPage() {
     ];
 
     React.useEffect(() => {
+
         async function fetchQuestions() {
             try {
                 const data = await getAllQuestions();
                 setQuestions(data);
-                setFilteredQuestions(data); // Initialize filtered questions with all data
+            } catch (error) {
+                console.error('Failed to fetch questions:', error);
+            }
+        }
+
+        async function fetchFilteredQuestions() {
+            try {
+                const data = await getFilteredQuestions(
+                    selectedCategories,
+                    selectedComplexity ? selectedComplexity.label : null,
+                    searchQuery
+                );
+                setQuestions(data);
             } catch (error) {
                 console.error('Failed to fetch questions:', error);
             }
         }
         fetchQuestions();
-    }, []);
-
-    React.useEffect(() => {
-        const filterQuestions = () => {
-            let filtered = questions;
-
-            // Filter by categories: Only show questions that have all selected categories
-            if (selectedCategories.length > 0) {
-                filtered = filtered?.filter((question) =>
-                    selectedCategories.every((category) =>
-                        question.question_categories.includes(category)
-                    )
-                );
-            }
-
-            // Filter by complexity, excluding "None" from the filter
-            if (selectedComplexity && selectedComplexity.label !== 'None') {
-                filtered = filtered?.filter(
-                    (question) => question.question_complexity.toUpperCase() === selectedComplexity.label.toUpperCase()
-                );
-            }
-
-            // Filter by search query: Match question title or description
-            if (searchQuery.trim()) {
-                filtered = filtered?.filter((question) =>
-                    question.question_title.toLowerCase().includes(searchQuery.toLowerCase())
-                );
-            }
-
-            setFilteredQuestions(filtered);
-        };
-
-        filterQuestions();
-    }, [questions, selectedCategories, selectedComplexity, searchQuery]);
-
-    const Search = styled('div')(({ theme }) => ({
-        position: 'relative',
-        borderRadius: theme.shape.borderRadius,
-        backgroundColor: alpha(theme.palette.common.white, 0.15),
-        '&:hover': {
-            backgroundColor: alpha(theme.palette.common.white, 0.25),
-        },
-        marginRight: theme.spacing(2),
-        marginLeft: 0,
-        width: '100%',
-        [theme.breakpoints.up('sm')]: {
-            width: 'auto',
-        },
-    }));
-
-    const SearchIconWrapper = styled('div')(({ theme }) => ({
-        padding: theme.spacing(0, 2),
-        height: '100%',
-        position: 'absolute',
-        pointerEvents: 'none',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-    }));
-
-    const StyledInputBase = styled(InputBase)(({ theme }) => ({
-        color: 'inherit',
-        '& .MuiInputBase-input': {
-            padding: theme.spacing(1, 1, 1, 0),
-            paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-            transition: theme.transitions.create('width'),
-            width: '100%',
-            [theme.breakpoints.up('md')]: {
-                width: '30ch',
-            },
-        },
-    }));
+        fetchFilteredQuestions();
+    }, [selectedCategories, selectedComplexity, searchQuery]);
 
     return (
         <>
@@ -245,7 +177,7 @@ function QuestionPage() {
                     }}
                 >
                     <Box sx={{ paddingTop: '20px', display: 'flex', gap: 2, alignItems: 'center' }}>
-                        <AddQuestionButton categories={categories}/>
+                        <AddQuestionButton categories={categories} />
                         <Button
                             variant="contained"
                             color="secondary"
@@ -280,62 +212,20 @@ function QuestionPage() {
                             )}
                         />
 
-                        <Search>
-                            <SearchIconWrapper>
-                                <SearchIcon sx={{ color: 'white' }} />
-                            </SearchIconWrapper>
-                            <StyledInputBase
-                                placeholder="Search…"
-                                inputProps={{ 'aria-label': 'search' }}
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)} // Update searchQuery state on input change
-                                sx={{ color: 'white' }}
-                                autoFocus
-                            />
-                        </Search>
+                        {/* Search Bar Component */}
+                        <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
                     </Box>
 
+                    {/* Question Table Component */}
                     <Box sx={{ paddingTop: '20px' }}>
-                        <TableContainer component={Paper}>
-                            <Table sx={{ minWidth: 650 }} aria-label="simple table">
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell sx={{ fontWeight: 'bold' }}>No</TableCell>
-                                        <TableCell sx={{ fontWeight: 'bold' }}>Title</TableCell>
-                                        <TableCell sx={{ fontWeight: 'bold' }}>Category</TableCell>
-                                        <TableCell sx={{ fontWeight: 'bold' }}>Complexity</TableCell>
-                                        <TableCell sx={{ fontWeight: 'bold' }}>Popularity</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {filteredQuestions
-                                        ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                        .map((question) => (
-                                            <QuestionCard
-                                                key={question._id}
-                                                id={question.question_id}
-                                                title={question.question_title}
-                                                description={question.question_description}
-                                                categories={question.question_categories}
-                                                complexity={question.question_complexity}
-                                                popularity={question.question_popularity}
-                                                isEditMode={isEditMode}
-                                                allCategories={categories}
-                                            />
-                                        ))}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-
-                        {/* Pagination controls */}
-                        <TablePagination
-                            rowsPerPageOptions={[5, 10, 25]}
-                            component="div"
-                            count={filteredQuestions.length}
-                            rowsPerPage={rowsPerPage}
+                        <QuestionTable
+                            filteredQuestions={questions}
+                            categories={categories}
                             page={page}
-                            onPageChange={handleChangePage}
-                            onRowsPerPageChange={handleChangeRowsPerPage}
+                            rowsPerPage={rowsPerPage}
+                            isEditMode={isEditMode}
+                            handleChangePage={handleChangePage}
+                            handleChangeRowsPerPage={handleChangeRowsPerPage}
                         />
                     </Box>
                 </Container>

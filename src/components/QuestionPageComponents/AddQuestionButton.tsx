@@ -2,7 +2,7 @@ import * as React from 'react';
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import { Button, Modal, Box, Typography, TextField, MenuItem, Select, FormControl, InputLabel, ListItemText } from '@mui/material';
 import Chip from '@mui/material/Chip';
-import { addQuestion, checkTitle } from '../backend/question-service/QuestionService';
+import { addQuestion, checkTitle } from '../../controller/question-service/QuestionService';
 
 const complexities = ['Easy', 'Medium', 'Hard'];
 

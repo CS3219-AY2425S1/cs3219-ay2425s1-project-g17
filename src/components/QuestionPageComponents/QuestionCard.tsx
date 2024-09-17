@@ -17,7 +17,7 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { updateQuestion, deleteQuestion, checkTitle } from '../backend/question-service/QuestionService';
+import { updateQuestion, deleteQuestion, checkTitle } from '../../controller/question-service/QuestionService';
 import Chip from '@mui/material/Chip';
 
 const complexityColors: Record<'EASY' | 'MEDIUM' | 'HARD', string> = {
@@ -123,7 +123,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
                 </TableCell>
                 <TableCell>
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                        {categories.map((category) => (
+                        {categories?.map((category) => (
                             <Chip key={category} label={category} />
                         ))}
                     </Box>
@@ -232,7 +232,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
                             )}
                             renderTags={(selected, getTagProps) => (
                                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                    {selected.map((value, index) => (
+                                    {selected?.map((value, index) => (
                                         <Chip label={value} {...getTagProps({ index })} />
                                     ))}
                                 </Box>

@@ -5,16 +5,6 @@ const api = axios.create({
     timeout: 5000, // Timeout after 5 seconds
 });
 
-//   api.interceptors.request.use(
-//     (config) => {
-//       config.headers["x-api-key"] = process.env.REACT_APP_API_KEY; 
-//       return config;
-//     },
-//     (error) => {
-//       return Promise.reject(error);
-//     }
-//   );
-
 // Function to get all questions from the API
 async function getAllQuestions() {
     try {
@@ -27,6 +17,7 @@ async function getAllQuestions() {
         handleAxiosError(error);
     }
 }
+
 // Function to find the highest id in the questions array
 async function getMaxId() {
     try {
@@ -114,7 +105,45 @@ async function checkTitle(title: string) {
     }
 }
 
+// Function to filter questions based on categories, complexity, and search query
+async function getFilteredQuestions(
+    selectedCategories: string[] = [],
+    selectedComplexity: string | null = null,
+    searchQuery: string = ''
+) {
+    try {
+        const questions = await getAllQuestions();
+        let filteredQuestions = questions;
+
+        // Filter by categories: Only show questions that have all selected categories
+        if (selectedCategories.length > 0) {
+            filteredQuestions = filteredQuestions.filter((question: any) =>
+                selectedCategories.every((category) => question.question_categories.includes(category))
+            );
+        }
+
+        // Filter by complexity, excluding "None" from the filter
+        if (selectedComplexity && selectedComplexity.toUpperCase() !== 'NONE') {
+            filteredQuestions = filteredQuestions.filter(
+                (question: any) => question.question_complexity.toUpperCase() === selectedComplexity.toUpperCase()
+            );
+        }
+
+        // Filter by search query: Match question title or description
+        if (searchQuery.trim()) {
+            filteredQuestions = filteredQuestions.filter((question: any) =>
+                question.question_title.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+        }
+
+        return filteredQuestions;
+    } catch (error) {
+        handleAxiosError(error);
+    }
+}
+
 export {
+    getFilteredQuestions,
     getAllQuestions,
     addQuestion,
     updateQuestion,
