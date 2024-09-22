@@ -1,3 +1,5 @@
 node_modules
 question-service/.env
 question-service/dist
+collaboration-service/.env
+collaboration-service/dist
