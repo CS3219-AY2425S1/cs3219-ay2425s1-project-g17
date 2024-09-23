@@ -5,6 +5,11 @@ const api = axios.create({
     timeout: 5000, // Timeout after 5 seconds
 });
 
+const jsonApi = axios.create({
+    baseURL: "http://localhost:4000/questions/upload",
+    timeout: 5000, // Timeout after 5 seconds
+});
+
 // Function to get all questions from the API
 async function getAllQuestions() {
     try {
@@ -142,11 +147,22 @@ async function getFilteredQuestions(
     }
 }
 
+// Function to upload JSON file with FormData
+async function uploadJson(formData: FormData) {
+    try {
+        const response = await jsonApi.post("/", formData);
+        return response.data;
+    } catch (error) {
+        handleAxiosError(error);
+    }
+}
+
 export {
     getFilteredQuestions,
     getAllQuestions,
     addQuestion,
     updateQuestion,
     deleteQuestion,
-    checkTitle
+    checkTitle,
+    uploadJson
 }

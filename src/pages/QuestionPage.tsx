@@ -178,6 +178,9 @@ function QuestionPage() {
                     }}
                 >
                     <Box sx={{ paddingTop: '20px', display: 'flex', gap: 2, alignItems: 'center' }}>
+                        {/* Upload JSON Button Component */}
+                        <UploadJsonButton />
+
                         <AddQuestionButton categories={categories} />
                         <Button
                             variant="contained"
@@ -216,8 +219,6 @@ function QuestionPage() {
                         {/* Search Bar Component */}
                         <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
                         
-                        {/* Upload JSON Button Component */}
-                        <UploadJsonButton />
                     </Box>
 
                     {/* Question Table Component */}
