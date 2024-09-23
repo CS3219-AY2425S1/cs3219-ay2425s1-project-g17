@@ -179,7 +179,16 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
                     <Typography variant="h6" component="h2" sx={{ color: 'white' }}>
                         {id + '. ' + editedTitle}
                     </Typography>
-                    <Typography sx={{ mt: 2, color: 'white' }}>{editedDescription}</Typography>
+                    <div style={{ maxHeight: "500px", overflowY: 'auto' }}>
+                        <Typography sx={{ mt: 2, color: 'white' }}>
+                            {editedDescription?.split('\n').map((line, index) => (
+                                <React.Fragment key={index}>
+                                    {line}
+                                    <br />
+                                </React.Fragment>
+                            ))}
+                        </Typography>
+                    </div>
                 </Box>
             </Modal>
 
