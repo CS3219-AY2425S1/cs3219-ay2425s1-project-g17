@@ -10,7 +10,7 @@ const codeBlockProps = {
     showLineNumbers: true,
     wrapLongLines: false,
     theme: dracula,
-    code: '{\n  "questions": [\n        {\n         "question_id": 1,\n            "question_title": "Add Binary",\n            "question_description": "Given two binary strings a and b, return their sum as a binary string.",\n            "question_categories": ["Bit Manipulation", "Algorithms"],\n            "question_complexity": "Easy",\n            "popularity": 10\n        },\n        {\n            "question_id": 2,\n            "question_title": "LRU Cache Design",\n            "question_description": "Design and implement an LRU (Least Recently Used) cache.",\n            "question_categories": ["Data Structures"],\n            "question_complexity": "Medium",\n            "popularity": 25\n        }\n    ]\n}',
+    code: '{\n  "questions": [\n        {\n            "question_title": "Add Binary",\n            "question_description": "Given two binary strings a and b, return their sum as a binary string.",\n            "question_categories": ["Bit Manipulation", "Algorithms"],\n            "question_complexity": "EASY",\n            "popularity": 10\n        },\n        {\n            "question_title": "LRU Cache Design",\n            "question_description": "Design and implement an LRU (Least Recently Used) cache.",\n            "question_categories": ["Data Structures"],\n            "question_complexity": "MEDIUM",\n            "popularity": 25\n        }\n    ]\n}',
 }
 
 const UploadJsonButton = () => {
