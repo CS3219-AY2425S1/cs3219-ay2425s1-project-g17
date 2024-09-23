@@ -31,14 +31,12 @@ const UploadJsonButton = () => {
         if (file) {
             formData.append('file', file);
         }
-        console.log(formData);
 
         try {
             await uploadJson(formData);
             alert('JSON file uploaded successfully.');
             handleClose();
         } catch (error) {
-            console.log(file?.name);
             alert('Failed to upload JSON file.');
         }
     }
