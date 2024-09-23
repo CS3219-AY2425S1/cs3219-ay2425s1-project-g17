@@ -15,14 +15,20 @@ const codeBlockProps = {
 
 const UploadJsonButton = () => {
     const [open, setOpen] = React.useState(false);
+    const [show, setShow] = React.useState(false);
     const [file, setFile] = React.useState<File | null>(null);
 
     const handleOpen = () => setOpen(true);
-    const handleClose = () => setOpen(false);
+    const handleClose = () => {
+        setOpen(false);
+        setShow(false);
+    }
+    const handleShow = () => setShow(true);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
             setFile(e.target.files[0]);
+            handleShow();
         }
     };
 
@@ -33,8 +39,12 @@ const UploadJsonButton = () => {
         }
 
         try {
-            await uploadJson(formData);
-            alert('JSON file uploaded successfully.');
+            const jsonUpload = await uploadJson(formData);
+            if (jsonUpload) { 
+                alert('JSON file uploaded successfully.');
+            } else {
+                alert('Error with JSON file, please try again with another JSON file.');
+            }
             handleClose();
         } catch (error) {
             alert('Failed to upload JSON file.');
@@ -97,7 +107,7 @@ const UploadJsonButton = () => {
                                 style={{ color: 'white' }}
                                 onChange={ handleFileChange }
                             />
-                            <Button
+                            {file && show && <Button
                                 component="label"
                                 variant="contained"
                                 color="secondary"
@@ -106,7 +116,7 @@ const UploadJsonButton = () => {
                                 onClick={ handleUpload }
                             >
                                 Upload File
-                            </Button>
+                            </Button>}
                         </Stack>
                     </Box>
                 </Box>
