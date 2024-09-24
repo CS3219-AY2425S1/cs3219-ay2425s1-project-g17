@@ -306,21 +306,20 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
                         boxShadow: 24,
                         p: 4,
                         borderRadius: 3,
-                        textAlign: 'center',
                     }}
                 >
                     <Typography variant="h6" component="h2" sx={{ mb: 2, color: "white" }}>
-                        Confirm Deletion
+                        Delete question?
                     </Typography>
                     <Typography sx={{ mb: 3, color: "white" }}>
-                        Are you sure you want to delete this question?
+                        This action can't be undone.
                     </Typography>
-                    <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
-                        <Button variant="contained" color="error" onClick={handleDelete}>
-                            Delete
-                        </Button>
+                    <Box sx={{ display: 'flex', justifyContent: 'right', gap: 2 }}>
                         <Button variant="outlined" onClick={handleDeleteClose}>
                             Cancel
+                        </Button>
+                        <Button variant="contained" color="error" onClick={handleDelete}>
+                            Delete
                         </Button>
                     </Box>
                 </Box>
