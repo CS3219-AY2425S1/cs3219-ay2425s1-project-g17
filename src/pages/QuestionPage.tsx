@@ -11,6 +11,7 @@ import { getAllQuestions, getFilteredQuestions } from '../controller/question-se
 import AddQuestionButton from '../components/QuestionPageComponents/AddQuestionButton';
 import SearchBar from '../components/QuestionPageComponents/SearchBar';
 import QuestionTable from '../components/QuestionPageComponents/QuestionTable';
+import UploadJsonButton from '../components/QuestionPageComponents/UploadJsonButton';
 
 interface ComplexityOption {
     label: string;
@@ -177,6 +178,9 @@ function QuestionPage() {
                     }}
                 >
                     <Box sx={{ paddingTop: '20px', display: 'flex', gap: 2, alignItems: 'center' }}>
+                        {/* Upload JSON Button Component */}
+                        <UploadJsonButton />
+
                         <AddQuestionButton categories={categories} />
                         <Button
                             variant="contained"
@@ -214,6 +218,7 @@ function QuestionPage() {
 
                         {/* Search Bar Component */}
                         <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+                        
                     </Box>
 
                     {/* Question Table Component */}
