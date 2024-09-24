@@ -1,8 +1,13 @@
 import { Request, Response } from 'express';
 import Question from '../model/questionModel';
+import multer from 'multer';
+import fs from 'fs';
 
 // Utility function to convert string to number
 const toNumber = (id: string): number => parseInt(id, 10);
+
+// Middleware to support multiform-data
+const upload = multer({ dest: 'data/' });
 
 export const createQuestion = async (req: Request, res: Response) => {
     try {
@@ -74,3 +79,36 @@ export const deleteQuestionById = async (req: Request, res: Response) => {
         res.status(400).json({ error: (error as Error).message });
     }
 };
+
+export const uploadQuestions = async (req: Request, res: Response) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ error: 'No file uploaded' });
+        }
+
+        const jsonData = fs.readFileSync(req.file.path, 'utf-8');
+        const questions = JSON.parse(jsonData);
+
+        // Process and save each question
+        for (const questionData of questions.questions) {
+            // Find the maximum question_id in the database to ensure unique IDs
+            const maxIdQuestion = await Question.findOne({}, {}, { sort: { question_id: -1 } });
+            const newQuestionId = maxIdQuestion ? maxIdQuestion.question_id + 1 : 1;
+
+            const question = new Question({
+                ...questionData,
+                question_id: newQuestionId // Assign a unique question_id
+            });
+            await question.save();
+        }
+
+        fs.unlinkSync(req.file.path); // Clean up the uploaded file
+
+        res.status(200).json({ message: 'Questions uploaded successfully', questions });
+    } catch (error) {
+        console.error('Error uploading the question with JSON file', error);
+        res.status(400).json({ error: (error as Error).message });
+    }
+};
+
+export const uploadMiddleware = upload.single('file');
