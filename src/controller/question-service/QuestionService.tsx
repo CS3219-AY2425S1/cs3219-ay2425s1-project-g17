@@ -10,6 +10,25 @@ const jsonApi = axios.create({
     timeout: 5000, // Timeout after 5 seconds
 });
 
+interface ExampleProps {
+    id: number;
+    input: string;
+    output: string;
+    explanation: string;
+
+}
+
+interface QuestionProps {
+    _id: string;
+    question_id: number;
+    question_title: string;
+    question_description: string;
+    question_example: ExampleProps[];
+    question_categories: string[];
+    question_complexity: string;
+    question_popularity: number;
+}
+
 // Function to get all questions from the API
 async function getAllQuestions() {
     try {
@@ -35,13 +54,14 @@ async function getMaxId() {
 }
 
 // Function to add question to the API
-async function addQuestion(title: string, description: string, categories: string[], complexity: string, popularity: number) {
+async function addQuestion(title: string, description: string, example: ExampleProps[], categories: string[], complexity: string, popularity: number) {
     try {
         const maxId = await getMaxId();
         const questionData = {
             question_id: maxId ? maxId + 1 : 0,
             question_title: title,
             question_description: description,
+            question_example: example,
             question_categories: categories,
             question_complexity: complexity,
             question_popularity: popularity,
@@ -54,12 +74,13 @@ async function addQuestion(title: string, description: string, categories: strin
 }
 
 // Function to update question to API
-async function updateQuestion(id: number, title: string, description: string, categories: string[], complexity: string, popularity: number) {
+async function updateQuestion(id: number, title: string, description: string, example: ExampleProps[], categories: string[], complexity: string, popularity: number) {
     try {
         const questionData = {
             question_id: id,
             question_title: title,
             question_description: description,
+            question_example: example,
             question_categories: categories,
             question_complexity: complexity,
             question_popularity: popularity,
@@ -104,7 +125,7 @@ function handleAxiosError(error: any) {
 async function checkTitle(title: string) {
     try {
         const questions = await getAllQuestions();
-        return questions.some((question: any) => question.question_title === title);
+        return questions.some((question: any) => question.question_title.toLowerCase() === title.toLowerCase());
     } catch (error) {
         handleAxiosError(error);
     }
@@ -147,6 +168,41 @@ async function getFilteredQuestions(
     }
 }
 
+async function sortQuestion(questions: QuestionProps[], sortDirection: String, sortField: String): Promise<QuestionProps[]> {
+    const complexityOrder: { [key: string]: number } = {
+        EASY: 1,
+        MEDIUM: 2,
+        HARD: 3,
+    };
+
+    try {
+        const sortedQuestions = [...questions].sort((a, b) => {
+            const isAsc = sortDirection === 'asc';
+            switch (sortField) {
+                case 'question_id':
+                    return isAsc ? a.question_id - b.question_id : b.question_id - a.question_id;
+                case 'question_title':
+                    return isAsc ? a.question_title.localeCompare(b.question_title) : b.question_title.localeCompare(a.question_title);
+                case 'question_complexity':
+                    return isAsc
+                        ? (complexityOrder[a.question_complexity] || 0) - (complexityOrder[b.question_complexity] || 0)
+                        : (complexityOrder[b.question_complexity] || 0) - (complexityOrder[a.question_complexity] || 0);
+                case 'question_popularity':
+                    return isAsc ? a.question_popularity - b.question_popularity : b.question_popularity - a.question_popularity;
+                default:
+                    return 0;
+            }
+        });
+        return sortedQuestions;
+
+    } catch (error) {
+        handleAxiosError(error);
+        return [];
+    }
+
+
+}
+
 // Function to upload JSON file with FormData
 async function uploadJson(formData: FormData) {
     try {
@@ -164,5 +220,6 @@ export {
     updateQuestion,
     deleteQuestion,
     checkTitle,
-    uploadJson
+    uploadJson,
+    sortQuestion
 }

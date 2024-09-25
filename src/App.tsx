@@ -1,12 +1,15 @@
 import React from 'react';
 import QuestionPage from './pages/QuestionPage';
 import { ThemeProvider, createTheme, ThemeOptions } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
 
 function App() {
-  // Define the theme options with correct type for 'mode'
   const themeOptions: ThemeOptions = {
+    typography: {
+      fontFamily: 'Roboto, sans-serif, Arial, JetBrains Mono',
+    },
     palette: {
-      mode: 'dark', // Explicitly use 'dark' instead of a general string type
+      mode: 'dark',
       primary: {
         main: '#EEEEEE',
       },
@@ -28,6 +31,7 @@ function App() {
 
   return (
     <ThemeProvider theme={theme}>
+      <CssBaseline />
       <QuestionPage />
     </ThemeProvider>
   );

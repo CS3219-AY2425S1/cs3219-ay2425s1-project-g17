@@ -45,7 +45,7 @@ const UploadJsonButton = () => {
                 window.location.reload();
                 handleClose();
             } else {
-                alert('Error with JSON file, please double check the format.');
+                alert('Error with JSON file, please double check the format or for any duplicates.');
             }
         } catch (error) {
             alert('Failed to upload JSON file.');

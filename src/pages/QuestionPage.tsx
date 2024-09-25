@@ -18,11 +18,20 @@ interface ComplexityOption {
     color: string;
 }
 
+interface ExampleProps {
+    id: number;
+    input: string;
+    output: string;
+    explanation: string;
+
+}
+
 interface QuestionProps {
     _id: string;
     question_id: number;
     question_title: string;
     question_description: string;
+    question_example: ExampleProps[];
     question_categories: string[];
     question_complexity: string;
     question_popularity: number;
