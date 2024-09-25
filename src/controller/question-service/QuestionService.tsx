@@ -18,6 +18,17 @@ interface ExampleProps {
 
 }
 
+interface QuestionProps {
+    _id: string;
+    question_id: number;
+    question_title: string;
+    question_description: string;
+    question_example: ExampleProps[];
+    question_categories: string[];
+    question_complexity: string;
+    question_popularity: number;
+}
+
 // Function to get all questions from the API
 async function getAllQuestions() {
     try {
@@ -157,6 +168,41 @@ async function getFilteredQuestions(
     }
 }
 
+async function sortQuestion(questions: QuestionProps[], sortDirection: String, sortField: String): Promise<QuestionProps[]> {
+    const complexityOrder: { [key: string]: number } = {
+        EASY: 1,
+        MEDIUM: 2,
+        HARD: 3,
+    };
+
+    try {
+        const sortedQuestions = [...questions].sort((a, b) => {
+            const isAsc = sortDirection === 'asc';
+            switch (sortField) {
+                case 'question_id':
+                    return isAsc ? a.question_id - b.question_id : b.question_id - a.question_id;
+                case 'question_title':
+                    return isAsc ? a.question_title.localeCompare(b.question_title) : b.question_title.localeCompare(a.question_title);
+                case 'question_complexity':
+                    return isAsc
+                        ? (complexityOrder[a.question_complexity] || 0) - (complexityOrder[b.question_complexity] || 0)
+                        : (complexityOrder[b.question_complexity] || 0) - (complexityOrder[a.question_complexity] || 0);
+                case 'question_popularity':
+                    return isAsc ? a.question_popularity - b.question_popularity : b.question_popularity - a.question_popularity;
+                default:
+                    return 0;
+            }
+        });
+        return sortedQuestions;
+
+    } catch (error) {
+        handleAxiosError(error);
+        return [];
+    }
+
+
+}
+
 // Function to upload JSON file with FormData
 async function uploadJson(formData: FormData) {
     try {
@@ -174,5 +220,6 @@ export {
     updateQuestion,
     deleteQuestion,
     checkTitle,
-    uploadJson
+    uploadJson,
+    sortQuestion
 }
