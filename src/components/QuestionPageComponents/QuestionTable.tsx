@@ -12,11 +12,20 @@ import {
 } from '@mui/material';
 import QuestionCard from './QuestionCard';
 
+interface ExampleProps {
+    id: number;
+    input: string;
+    output: string;
+    explanation: string;
+
+}
+
 interface QuestionProps {
     _id: string;
     question_id: number;
     question_title: string;
     question_description: string;
+    question_example: ExampleProps[];
     question_categories: string[];
     question_complexity: string;
     question_popularity: number;
@@ -63,6 +72,7 @@ const QuestionTable: React.FC<QuestionTableProps> = ({
                                     id={question.question_id}
                                     title={question.question_title}
                                     description={question.question_description}
+                                    example={question.question_example}
                                     categories={question.question_categories}
                                     complexity={question.question_complexity}
                                     popularity={question.question_popularity}

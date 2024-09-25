@@ -10,6 +10,14 @@ const jsonApi = axios.create({
     timeout: 5000, // Timeout after 5 seconds
 });
 
+interface ExampleProps {
+    id: number;
+    input: string;
+    output: string;
+    explanation: string;
+
+}
+
 // Function to get all questions from the API
 async function getAllQuestions() {
     try {
@@ -35,13 +43,14 @@ async function getMaxId() {
 }
 
 // Function to add question to the API
-async function addQuestion(title: string, description: string, categories: string[], complexity: string, popularity: number) {
+async function addQuestion(title: string, description: string, example: ExampleProps[], categories: string[], complexity: string, popularity: number) {
     try {
         const maxId = await getMaxId();
         const questionData = {
             question_id: maxId ? maxId + 1 : 0,
             question_title: title,
             question_description: description,
+            question_example: example,
             question_categories: categories,
             question_complexity: complexity,
             question_popularity: popularity,
@@ -54,12 +63,13 @@ async function addQuestion(title: string, description: string, categories: strin
 }
 
 // Function to update question to API
-async function updateQuestion(id: number, title: string, description: string, categories: string[], complexity: string, popularity: number) {
+async function updateQuestion(id: number, title: string, description: string, example: ExampleProps[], categories: string[], complexity: string, popularity: number) {
     try {
         const questionData = {
             question_id: id,
             question_title: title,
             question_description: description,
+            question_example: example,
             question_categories: categories,
             question_complexity: complexity,
             question_popularity: popularity,
@@ -104,7 +114,7 @@ function handleAxiosError(error: any) {
 async function checkTitle(title: string) {
     try {
         const questions = await getAllQuestions();
-        return questions.some((question: any) => question.question_title === title);
+        return questions.some((question: any) => question.question_title.toLowerCase() === title.toLowerCase());
     } catch (error) {
         handleAxiosError(error);
     }
