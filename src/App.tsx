@@ -1,5 +1,6 @@
 import React from 'react';
 import QuestionPage from './pages/QuestionPage';
+import CodeEditor from './components/CodeEditor';
 import { ThemeProvider, createTheme, ThemeOptions } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 
@@ -33,6 +34,7 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <QuestionPage />
+      <CodeEditor />
     </ThemeProvider>
   );
 }
