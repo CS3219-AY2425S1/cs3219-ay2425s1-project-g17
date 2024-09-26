@@ -7,6 +7,12 @@ export enum DIFFICULTY {
     HARD = 'HARD',
 }
 
+type Example = {
+    input: string;
+    output: string;
+    explanation: string;
+};
+
 interface IQuestion extends Document {
     question_id: number;
     question_title: string;
@@ -14,6 +20,7 @@ interface IQuestion extends Document {
     question_categories: string[];
     question_complexity: DIFFICULTY;
     question_popularity: number;
+    question_examples?: Example[];
 }
 
 // Define the schema for the Question
@@ -25,7 +32,8 @@ const QuestionSchema: Schema = new Schema({
     },
     question_title: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     question_description: {
         type: String,
@@ -43,6 +51,16 @@ const QuestionSchema: Schema = new Schema({
     question_popularity: {
         type: Number,
         required: true
+    },
+    question_example: {
+        type: [
+            {
+                input: { type : String, required: true },
+                output: { type : String, required: true },
+                explanation: { type : String }
+            }
+        ],
+        default: []
     }
 }, {
     timestamps: true // Adds createdAt and updatedAt fields

@@ -17,6 +17,7 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from '@mui/icons-material/Add';
 import { updateQuestion, deleteQuestion, checkTitle } from '../../controller/question-service/QuestionService';
 import Chip from '@mui/material/Chip';
 
@@ -26,10 +27,19 @@ const complexityColors: Record<'EASY' | 'MEDIUM' | 'HARD', string> = {
     HARD: '#C73D4C',
 };
 
+interface ExampleProps {
+    id: number;
+    input: string;
+    output: string;
+    explanation: string;
+
+}
+
 interface QuestionCardProps {
     id: number;
     title: string;
     description: string;
+    example: ExampleProps[];
     categories: string[];
     complexity: string;
     popularity: number;
@@ -41,6 +51,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
     id,
     title,
     description,
+    example,
     categories,
     complexity,
     popularity,
@@ -52,9 +63,13 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
     const [deleteOpen, setDeleteOpen] = React.useState(false);
     const [editedTitle, setEditedTitle] = React.useState(title);
     const [editedDescription, setEditedDescription] = React.useState(description);
+    const [editedExample, setEditedExample] = React.useState<ExampleProps[]>(example);
     const [editedCategories, setEditedCategories] = React.useState<string[]>(categories);
     const [editedComplexity, setEditedComplexity] = React.useState(complexity);
     const [editedPopularity, setEditedPopularity] = React.useState(popularity);
+    const [exampleDeleteOpen, setExampleDeleteOpen] = React.useState(false);
+    const [exampleToDelete, setExampleToDelete] = React.useState<number | null>(null);
+
 
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
@@ -80,16 +95,17 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
                     id,
                     editedTitle,
                     editedDescription,
+                    editedExample,
                     editedCategories,
                     editedComplexity,
                     editedPopularity,
                 );
-                console.log('Question updated successfully');
+                alert('Question updated successfully');
                 setEditOpen(false);
                 window.location.reload();
             }
         } catch (error) {
-            console.error('Failed to update the question:', error);
+            alert('Failed to update question. Error: ' + error);
         }
     };
 
@@ -100,8 +116,37 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
             setDeleteOpen(false);
             window.location.reload();
         } catch (error) {
-            alert('Failed to delete the question.');
+            alert('Failed to delete the question. Error: ' + error);
         }
+    };
+
+    const handleExampleDeleteOpen = (index: number) => {
+        setExampleToDelete(index);
+        setExampleDeleteOpen(true);
+    };
+
+    const handleExampleDeleteClose = () => {
+        setExampleToDelete(null);
+        setExampleDeleteOpen(false);
+    };
+
+    const handleConfirmExampleDelete = () => {
+        if (exampleToDelete !== null) {
+            const updatedExamples = editedExample.filter((_, i) => i !== exampleToDelete);
+            setEditedExample(updatedExamples);
+            handleExampleDeleteClose();
+        }
+    };
+
+    const handleExampleChange = (index: number, field: keyof ExampleProps, value: string) => {
+        const updatedExamples = [...editedExample];
+        updatedExamples[index] = { ...updatedExamples[index], [field]: value };
+        setEditedExample(updatedExamples);
+    };
+
+    const handleAddExample = () => {
+        const newExample: ExampleProps = { id: Date.now(), input: '', output: '', explanation: '' };
+        setEditedExample([...editedExample, newExample]);
     };
 
     return (
@@ -158,11 +203,13 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
                         top: '50%',
                         left: '50%',
                         transform: 'translate(-50%, -50%)',
-                        width: 400,
+                        width: 550,
                         bgcolor: 'background.paper',
                         boxShadow: 24,
                         p: 4,
                         borderRadius: 3,
+                        maxHeight: '80vh',
+                        overflowY: 'auto',
                     }}
                 >
                     <IconButton
@@ -177,27 +224,61 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
                         <CloseIcon />
                     </IconButton>
                     <Typography variant="h6" component="h2" sx={{ color: 'white' }}>
-                        {id + '. ' + editedTitle}
+                        {id + '. ' + title}
                     </Typography>
-                    <Typography sx={{ mt: 2, color: 'white' }}>{editedDescription}</Typography>
+                    <div>
+                        <Typography sx={{ mt: 2, color: 'white' }}>
+                            {editedDescription?.split('\n').map((line, index) => (
+                                <React.Fragment key={index}>
+                                    {line}
+                                    <br />
+                                </React.Fragment>
+                            ))}
+                        </Typography>
+                        <Typography sx={{ mt: 2, color: 'white' }}>
+                            {example?.map((example, index) => (
+                                <div key={index}>
+                                    <Typography sx={{ mt: 2, color: 'white', fontFamily: 'JetBrains Mono, monospace' }}>
+                                        Example {index + 1}
+                                    </Typography>
+                                    <Typography sx={{ color: 'white', fontFamily: 'JetBrains Mono, monospace' }}>
+                                        Input: {example.input}
+                                    </Typography>
+                                    <Typography sx={{ color: 'white', fontFamily: 'JetBrains Mono, monospace' }}>
+                                        Output: {example.output}
+                                    </Typography>
+                                    {example.explanation && <Typography sx={{ color: 'white', fontFamily: 'JetBrains Mono, monospace' }}>
+                                        Explanation: {example.explanation}
+                                    </Typography>}
+                                </div>
+                            ))}
+                        </Typography>
+                    </div>
                 </Box>
             </Modal>
 
             {/* Edit Modal */}
             <Modal open={editOpen} onClose={handleEditClose}>
                 <Box
+                component="form"
                     sx={{
                         position: 'absolute',
                         top: '50%',
                         left: '50%',
                         transform: 'translate(-50%, -50%)',
-                        width: 500,
+                        width: 550,
                         bgcolor: 'background.paper',
                         boxShadow: 24,
                         p: 4,
                         borderRadius: 3,
                         display: 'flex',
                         flexDirection: 'column',
+                        maxHeight: '80vh',
+                        overflowY: 'auto',
+                    }}
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        handleEditSubmit();
                     }}
                 >
                     <Typography variant="h6" component="h2" sx={{ mb: 2, color: "white" }}>
@@ -228,30 +309,20 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
                             filterSelectedOptions
                             getOptionLabel={(option) => option}
                             renderInput={(params) => (
-                                <TextField {...params} label="Categories" placeholder="Search or select" />
+                                <TextField {...params} label="Categories" placeholder="Categories" />
                             )}
-                            renderTags={(selected, getTagProps) => (
-                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                    {selected?.map((value, index) => (
-                                        <Chip label={value} {...getTagProps({ index })} />
-                                    ))}
-                                </Box>
-                            )}
-                            sx={{ maxHeight: 200 }} // You can control the height here
                         />
                     </FormControl>
-
-
                     <FormControl fullWidth sx={{ mb: 2 }}>
                         <InputLabel>Complexity</InputLabel>
                         <Select
-                            value={editedComplexity}
                             label="Complexity"
-                            onChange={(e) => setEditedComplexity(e.target.value as string)}
+                            value={editedComplexity}
+                            onChange={(e) => setEditedComplexity(e.target.value)}
                         >
-                            <MenuItem value="EASY">Easy</MenuItem>
-                            <MenuItem value="MEDIUM">Medium</MenuItem>
-                            <MenuItem value="HARD">Hard</MenuItem>
+                            <MenuItem value="EASY">EASY</MenuItem>
+                            <MenuItem value="MEDIUM">MEDIUM</MenuItem>
+                            <MenuItem value="HARD">HARD</MenuItem>
                         </Select>
                     </FormControl>
                     <TextField
@@ -259,32 +330,77 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
                         type="number"
                         label="Popularity"
                         value={editedPopularity}
-                        onChange={(e) => setEditedPopularity(Number(e.target.value))}
+                        onChange={(e) => setEditedPopularity(Number(e.target.value))}/>
+
+                    {editedExample?.map((ex, index) => (
+                        <Box key={index} sx={{ mt: 2 }}>
+                            <Typography sx={{ mb: 1, color: "white" }}>
+                                Edit Example {index + 1}
+                            </Typography>
+                            <TextField
+                            required
+                                fullWidth
+                                label="Input"
+                                value={ex.input}
+                                onChange={(e) => handleExampleChange(index, 'input', e.target.value)}
+                                sx={{ mb: 2 }}
+                            />
+                            <TextField
+                            required
+                                fullWidth
+                                label="Output"
+                                value={ex.output}
+                                onChange={(e) => handleExampleChange(index, 'output', e.target.value)}
+                                sx={{ mb: 2 }}
+                            />
+                            <TextField
+                                fullWidth
+                                label="Explanation"
+                                value={ex.explanation}
+                                onChange={(e) => handleExampleChange(index, 'explanation', e.target.value)}
+                                sx={{ mb: 2 }}
+                            />
+                            <Box sx={{ display: "flex", justifyContent: "right" }}>
+                                <Button
+                                    color="error"
+                                    onClick={() => handleExampleDeleteOpen(index)}
+                                    startIcon={<DeleteIcon />}
+                                >
+                                    Delete
+                                </Button>
+
+                            </Box>
+
+                        </Box>
+                    ))}
+
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        startIcon={<AddIcon />}
+                        onClick={handleAddExample}
                         sx={{ mb: 2 }}
-                    />
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            justifyContent: 'flex-end',
-                            mt: 3,
-                        }}
                     >
+                        Add Example
+                    </Button>
+
+                    <Box sx={{ display: 'flex', justifyContent: 'right', gap: 2 }}>
+                        <Button variant="outlined" onClick={handleEditClose}>
+                            Cancel
+                        </Button>
                         <Button
+                        type="submit"
                             variant="contained"
                             color="secondary"
-                            onClick={handleEditSubmit}
                             sx={{ mr: 2, color: 'white' }}
                         >
                             Save Changes
-                        </Button>
-                        <Button variant="outlined" onClick={handleEditClose}>
-                            Cancel
                         </Button>
                     </Box>
                 </Box>
             </Modal>
 
-            {/* Delete Confirmation Modal */}
+            {/* Delete Modal */}
             <Modal open={deleteOpen} onClose={handleDeleteClose}>
                 <Box
                     sx={{
@@ -297,25 +413,56 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
                         boxShadow: 24,
                         p: 4,
                         borderRadius: 3,
-                        textAlign: 'center',
                     }}
                 >
                     <Typography variant="h6" component="h2" sx={{ mb: 2, color: "white" }}>
-                        Confirm Deletion
+                        Delete question?
                     </Typography>
                     <Typography sx={{ mb: 3, color: "white" }}>
-                        Are you sure you want to delete this question?
+                        This action can't be undone.
                     </Typography>
-                    <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
-                        <Button variant="contained" color="error" onClick={handleDelete}>
-                            Delete
-                        </Button>
+                    <Box sx={{ display: 'flex', justifyContent: 'right', gap: 2 }}>
                         <Button variant="outlined" onClick={handleDeleteClose}>
                             Cancel
+                        </Button>
+                        <Button variant="contained" color="error" onClick={handleDelete}>
+                            Delete
                         </Button>
                     </Box>
                 </Box>
             </Modal>
+
+            <Modal open={exampleDeleteOpen} onClose={handleExampleDeleteClose}>
+                <Box
+                    sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: 400,
+                        bgcolor: 'background.paper',
+                        boxShadow: 24,
+                        p: 4,
+                        borderRadius: 3,
+                    }}
+                >
+                    <Typography variant="h6" sx={{ mb: 2 }}>
+                        Delete example?
+                    </Typography>
+                    <Typography sx={{ mb: 4 }}>
+                        Are you sure you want to delete this example? It will only take effect after clicking "save changes".
+                    </Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'right', gap: 2 }}>
+                        <Button variant="outlined" onClick={handleExampleDeleteClose}>
+                            Cancel
+                        </Button>
+                        <Button variant="contained" color="error" onClick={handleConfirmExampleDelete}>
+                            Delete
+                        </Button>
+                    </Box>
+                </Box>
+            </Modal>
+
         </>
     );
 };

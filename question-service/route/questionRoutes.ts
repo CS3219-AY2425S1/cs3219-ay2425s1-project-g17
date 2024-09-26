@@ -1,10 +1,12 @@
 import { Router } from 'express';
-import { 
+import {
     createQuestion, 
     getAllQuestions, 
     getQuestionById, 
     updateQuestionById, 
-    deleteQuestionById 
+    deleteQuestionById,
+    uploadQuestions,
+    uploadMiddleware
 } from '../controller/questionController';
 
 const router = Router();
@@ -14,5 +16,6 @@ router.get('/', getAllQuestions);
 router.get('/:id', getQuestionById);
 router.put('/:id', updateQuestionById);
 router.delete('/:id', deleteQuestionById);
+router.post('/upload', uploadMiddleware, uploadQuestions);
 
 export default router;
