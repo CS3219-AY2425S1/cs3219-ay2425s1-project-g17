@@ -1,0 +1,4 @@
+node_modules
+question-service/.env
+question-service/dist
+question-service/data
