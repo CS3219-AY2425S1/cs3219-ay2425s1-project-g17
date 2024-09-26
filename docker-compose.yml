@@ -1,0 +1,84 @@
+# Setting the project name
+name: PeerPrep
+
+# Define the services and applications that make up your application.
+services:
+  frontend:
+    build: 
+      context: ./src # Path to the directory containing the Dockerfile for building the frontend image.
+    container_name: frontend # Defining the name of the container.
+    ports:
+      - "3000:3000" # Maps port 3000 on the host to port 3000 in the container, making the app accessible on the host.
+    volumes:
+      - ./src:/app # Mounts the host directory './src' to '/app' in the container.
+      - /app/node_modules # Anonymous Volume
+    restart: unless-stopped # Restarts the container irrespective of the exit code but stops restarting when the service is stopped or removed.
+    networks:
+      - frontend-network # Connects the frontend to the 'frontend-network' network.
+
+  question-service:
+    build:
+      context: ./question-service # Path to the directory containing the Dockerfile for building the question-service image.
+    container_name: question-service # Defining the name of the container.
+    ports:
+      - "4000:4000" # Maps port 4000 on the host to port 4000 in the container, making the app accessible on the host.
+    volumes:
+      - ./question-service:/app # Mounts the host directory './question-service' to '/app' in the container.
+      - /app/node_modules # Anonymous Volume
+    env_file:
+      - ./question-service/.env # Specifying the .env file for question-service
+    restart: unless-stopped # Restarts the container irrespective of the exit code but stops restarting when the service is stopped or removed.
+    networks:
+      - backend-network # Connects the question-service to the 'backend-network' network.
+
+  user-service:
+    build: 
+      context: ./user-service # Path to the directory containing the Dockerfile for building the user-service image.
+    container_name: user-service # Defining the name of the container.
+    ports:
+      - "4001:4001" # Maps port 4001 on the host to port 4001 in the container, making the app accessible on the host.
+    volumes:
+      - ./user-service:/app # Mounts the host directory './user-service' to '/app' in the container.
+      - /app/node_modules # Anonymous Volume
+    env_file:
+      - ./user-service/.env # Specifying the .env file for user-service
+    restart: unless-stopped # Restarts the container irrespective of the exit code but stops restarting when the service is stopped or removed.
+    networks:
+      - backend-network # Connects the user-service to the 'backend-network' network.
+      
+  # matching-service:
+  #   build: 
+  #     context: ./matching-service # Path to the directory containing the Dockerfile for building the matching-service image.
+  #   container_name: matching-service # Defining the name of the container.
+  #   ports:
+  #     - "TODO:TODO" # Maps port TODO on the host to port TODO in the container, making the app accessible on the host.
+  #   volumes:
+  #     - ./matching-service:/app # Mounts the host directory './matching-service' to '/app' in the container.
+  #     - /app/node_modules # Anonymous Volume
+  #   env_file:
+  #     - ./matching-service/.env # Specifying the .env file for matching-service
+  #   restart: unless-stopped # Restarts the container irrespective of the exit code but stops restarting when the service is stopped or removed.
+  #   networks:
+  #     - backend-network # Connects the matching-service to the 'backend-network' network.
+      
+  # collaboration-service:
+  #   build: 
+  #     context: ./collaboration-service # Path to the directory containing the Dockerfile for building the collaboration-service image.
+  #   container_name: collaboration-service # Defining the name of the container.
+  #   ports:
+  #     - "TODO:TODO" # Maps port TODO on the host to port TODO in the container, making the app accessible on the host.
+  #   volumes:
+  #     - ./collaboration-service:/app # Mounts the host directory './collaboration-service' to '/app' in the container.
+  #     - /app/node_modules # Anonymous Volume
+  #   env_file:
+  #     - ./collaboration-service/.env # Specifying the .env file for collaboration-service
+  #   restart: unless-stopped # Restarts the container irrespective of the exit code but stops restarting when the service is stopped or removed.
+  #   networks:
+  #     - backend-network # Connects the collaboration-service to the 'backend-network' network.
+      
+networks:
+  frontend-network: # Defines a network named 'frontend-network'
+    driver: bridge # Uses the bridge driver for the network, which is the default and most common network type in Docker.
+
+  backend-network: # Defines a network named 'backend-network'
+    driver: bridge # Uses the bridge driver for the network, which is the default and most common network type in Docker.
