@@ -1,5 +1,4 @@
 import * as React from 'react';
-import Navbar from '../components/Navbar';
 import {
     Container,
     Box,
@@ -7,11 +6,11 @@ import {
     Autocomplete,
     TextField,
 } from '@mui/material';
-import { getAllQuestions, getFilteredQuestions } from '../controller/question-service/QuestionService';
-import AddQuestionButton from '../components/QuestionPageComponents/AddQuestionButton';
-import SearchBar from '../components/QuestionPageComponents/SearchBar';
-import QuestionTable from '../components/QuestionPageComponents/QuestionTable';
-import UploadJsonButton from '../components/QuestionPageComponents/UploadJsonButton';
+import { getAllQuestions, getFilteredQuestions } from '../../controller/question-service/QuestionService';
+import AddQuestionButton from '../../components/questionpage/AddQuestionButton';
+import SearchBar from '../../components/questionpage/SearchBar';
+import QuestionTable from '../../components/questionpage/QuestionTable';
+import UploadJsonButton from '../../components/questionpage/UploadJsonButton';
 
 interface ComplexityOption {
     label: string;
@@ -167,7 +166,6 @@ function QuestionPage() {
 
     return (
         <>
-            <Navbar />
             <Container
                 maxWidth={false}
                 sx={{
