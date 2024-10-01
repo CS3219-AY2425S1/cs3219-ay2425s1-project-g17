@@ -1,9 +1,14 @@
 import React from 'react';
-import QuestionPage from './pages/QuestionPage';
 import { ThemeProvider, createTheme, ThemeOptions } from '@mui/material/styles';
+import { BrowserRouter } from 'react-router-dom';
 import CssBaseline from '@mui/material/CssBaseline';
+import { AuthenticatedRoutes, PublicRoutes } from './routes/';
 
 function App() {
+
+  // TODO: Implement authentication
+  const isAuth = false;
+
   const themeOptions: ThemeOptions = {
     typography: {
       fontFamily: 'Roboto, sans-serif, Arial, JetBrains Mono',
@@ -30,9 +35,12 @@ function App() {
   const theme = createTheme(themeOptions);
 
   return (
+
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <QuestionPage />
+      <BrowserRouter>
+        {isAuth ? <AuthenticatedRoutes /> : <PublicRoutes />}
+      </BrowserRouter>
     </ThemeProvider>
   );
 }
