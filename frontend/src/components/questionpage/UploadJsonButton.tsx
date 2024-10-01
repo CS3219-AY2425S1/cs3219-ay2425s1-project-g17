@@ -3,7 +3,7 @@ import UploadFileIcon from '@mui/icons-material/UploadFile';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { Box, Button, Modal, Stack, Typography } from '@mui/material';
 import { CopyBlock, dracula } from 'react-code-blocks';
-import { uploadJson } from '../../controller/question-service/QuestionService';
+import { uploadJson } from '../../services/question-service/QuestionService';
 
 const codeBlockProps = {
     language: "json",

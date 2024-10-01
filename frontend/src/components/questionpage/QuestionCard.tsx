@@ -18,7 +18,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
-import { updateQuestion, deleteQuestion, checkTitle } from '../../controller/question-service/QuestionService';
+import { updateQuestion, deleteQuestion, checkTitle } from '../../services/question-service/QuestionService';
 import Chip from '@mui/material/Chip';
 
 const complexityColors: Record<'EASY' | 'MEDIUM' | 'HARD', string> = {

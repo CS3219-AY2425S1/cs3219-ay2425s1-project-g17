@@ -7,34 +7,54 @@ import Link from '@mui/material/Link';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { Container } from '@mui/material';
+import { createUser } from '../../services/user-service/UserService';
+import { useNavigate } from 'react-router-dom';
 
 const RegisterPage = () => {
+    const [usernameError, setUsernameError] = React.useState(false);
+    const [usernameErrorMessage, setUsernameErrorMessage] = React.useState('');
     const [emailError, setEmailError] = React.useState(false);
     const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
     const [passwordError, setPasswordError] = React.useState(false);
     const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
     const [confirmPasswordError, setConfirmPasswordError] = React.useState(false);
     const [confirmPasswordErrorMessage, setConfirmPasswordErrorMessage] = React.useState('');
+    const navigate = useNavigate();
 
     // TODO: Handle registration logic (User Service)
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         if (validateInputs()) {
             const data = new FormData(event.currentTarget);
-            console.log({
-                email: data.get('email'),
-                password: data.get('password'),
-            });
+            try {
+                const response = await createUser(data.get('username') as string, data.get('email') as string, data.get('password') as string);
+                alert('User created successfully');
+                navigate('/login');
+            } catch (err: any) {
+                alert(err.message);
+            }
         }
     };
 
     const validateInputs = () => {
+        const username = document.getElementById('username') as HTMLInputElement;
         const email = document.getElementById('email') as HTMLInputElement;
         const password = document.getElementById('password') as HTMLInputElement;
         const confirmPassword = document.getElementById('confirmPassword') as HTMLInputElement;
 
         let isValid = true;
 
+        // Username validation
+        if (!username.value || username.value.length < 3) {
+            setUsernameError(true);
+            setUsernameErrorMessage('Username must be at least 3 characters long.');
+            isValid = false;
+        } else {
+            setUsernameError(false);
+            setUsernameErrorMessage('');
+        }
+
+        // Email validation
         if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
             setEmailError(true);
             setEmailErrorMessage('Please enter a valid email address.');
@@ -44,6 +64,7 @@ const RegisterPage = () => {
             setEmailErrorMessage('');
         }
 
+        // Password validation
         if (!password.value || password.value.length < 6) {
             setPasswordError(true);
             setPasswordErrorMessage('Password must be at least 6 characters long.');
@@ -53,6 +74,7 @@ const RegisterPage = () => {
             setPasswordErrorMessage('');
         }
 
+        // Confirm password validation
         if (password.value !== confirmPassword.value) {
             setConfirmPasswordError(true);
             setConfirmPasswordErrorMessage('Passwords do not match.');
@@ -101,6 +123,24 @@ const RegisterPage = () => {
                         gap: 2,
                     }}
                 >
+                    {/* Username Field */}
+                    <FormControl>
+                        <FormLabel htmlFor="username">Username</FormLabel>
+                        <TextField
+                            error={usernameError}
+                            helperText={usernameErrorMessage}
+                            id="username"
+                            type="text"
+                            name="username"
+                            placeholder="Username"
+                            autoFocus
+                            required
+                            fullWidth
+                            variant="outlined"
+                        />
+                    </FormControl>
+
+                    {/* Email Field */}
                     <FormControl>
                         <FormLabel htmlFor="email">Email</FormLabel>
                         <TextField
@@ -111,19 +151,20 @@ const RegisterPage = () => {
                             name="email"
                             placeholder="your@email.com"
                             autoComplete="email"
-                            autoFocus
                             required
                             fullWidth
                             variant="outlined"
                         />
                     </FormControl>
+
+                    {/* Password Field */}
                     <FormControl>
                         <FormLabel htmlFor="password">Password</FormLabel>
                         <TextField
                             error={passwordError}
                             helperText={passwordErrorMessage}
                             name="password"
-                            placeholder="••••••"
+                            placeholder="••••••••••••"
                             type="password"
                             id="password"
                             autoComplete="new-password"
@@ -132,13 +173,15 @@ const RegisterPage = () => {
                             variant="outlined"
                         />
                     </FormControl>
+
+                    {/* Confirm Password Field */}
                     <FormControl>
                         <FormLabel htmlFor="confirmPassword">Confirm Password</FormLabel>
                         <TextField
                             error={confirmPasswordError}
                             helperText={confirmPasswordErrorMessage}
                             name="confirmPassword"
-                            placeholder="••••••"
+                            placeholder="••••••••••••"
                             type="password"
                             id="confirmPassword"
                             autoComplete="new-password"
@@ -147,6 +190,8 @@ const RegisterPage = () => {
                             variant="outlined"
                         />
                     </FormControl>
+
+                    {/* Submit Button */}
                     <Button
                         type="submit"
                         color="secondary"
@@ -156,6 +201,8 @@ const RegisterPage = () => {
                     >
                         Sign Up
                     </Button>
+
+                    {/* Redirect to Sign In */}
                     <Typography sx={{ textAlign: 'center', marginTop: '20px' }}>
                         Already have an account?{' '}
                         <Link href="/login" variant="body2">
@@ -166,5 +213,6 @@ const RegisterPage = () => {
             </Box>
         </Container>
     );
-}
+};
+
 export default RegisterPage;

@@ -14,7 +14,7 @@ import {
 import QuestionCard from './QuestionCard';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
-import { sortQuestion } from '../../controller/question-service/QuestionService';
+import { sortQuestion } from '../../services/question-service/QuestionService';
 
 interface ExampleProps {
     id: number;

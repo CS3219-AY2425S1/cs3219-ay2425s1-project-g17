@@ -9,14 +9,19 @@ import Container from '@mui/material/Container';
 import Avatar from '@mui/material/Avatar';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
-import Logo from '../assets/Logo.png'
+import Logo from '../assets/Logo.png';
+import { AuthContext } from '../context/AuthContext';
 
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
 function Navbar() {
+  const username = localStorage.getItem('username');
 
-  // TODO: Retrieve username from user service
-  const username = '[username]';
+  const authContext = React.useContext(AuthContext);
+  if (!authContext) {
+      throw new Error('AuthContext must be used within an AuthProvider');
+  }
+  const { logout } = authContext;
 
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
 
@@ -26,6 +31,12 @@ function Navbar() {
 
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
+  };
+
+  const handleLogout = () => {
+    logout();
+    handleCloseUserMenu();
+    window.location.href = '/';
   };
 
   return (
@@ -38,7 +49,7 @@ function Navbar() {
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
           </Box>
           <Box sx={{ flexGrow: 0, display: "flex", alignItems: "center" }}>
-            <Typography variant="h6" sx={{ paddingRight: "15px" }} >
+            <Typography variant="h6" sx={{ paddingRight: "15px" }}>
               Hello {username}!
             </Typography>
             <Tooltip title="Open settings">
@@ -63,7 +74,10 @@ function Navbar() {
               onClose={handleCloseUserMenu}
             >
               {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                <MenuItem 
+                  key={setting} 
+                  onClick={setting === 'Logout' ? handleLogout : handleCloseUserMenu}
+                >
                   <Typography sx={{ textAlign: 'center' }}>{setting}</Typography>
                 </MenuItem>
               ))}
