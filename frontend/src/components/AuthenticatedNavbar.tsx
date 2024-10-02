@@ -12,7 +12,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Logo from '../assets/Logo.png';
 import { AuthContext } from '../context/AuthContext';
 
-const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
+const settings = ['Profile', 'Dashboard', 'Logout'];
 
 function Navbar() {
   const username = localStorage.getItem('username');
@@ -49,7 +49,7 @@ function Navbar() {
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
           </Box>
           <Box sx={{ flexGrow: 0, display: "flex", alignItems: "center" }}>
-            <Typography variant="h6" sx={{ paddingRight: "15px" }}>
+            <Typography sx={{ paddingRight: "15px" }}>
               Hello {username}!
             </Typography>
             <Tooltip title="Open settings">
@@ -76,7 +76,10 @@ function Navbar() {
               {settings.map((setting) => (
                 <MenuItem 
                   key={setting} 
-                  onClick={setting === 'Logout' ? handleLogout : handleCloseUserMenu}
+                  onClick={setting === 'Logout' ? handleLogout 
+                    : setting === 'Profile' ? () => window.location.href = '/profile' 
+                    : setting === 'Dashboard' ? () => window.location.href = '/dashboard'
+                    : handleCloseUserMenu}
                 >
                   <Typography sx={{ textAlign: 'center' }}>{setting}</Typography>
                 </MenuItem>

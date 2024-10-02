@@ -1,9 +1,9 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { ThemeProvider, createTheme, ThemeOptions } from '@mui/material/styles';
 import { BrowserRouter } from 'react-router-dom';
 import CssBaseline from '@mui/material/CssBaseline';
 import { AuthenticatedRoutes, PublicRoutes } from './routes/';
-import { AuthProvider, AuthContext } from "./context/AuthContext"; // Importing AuthProvider and AuthContext
+import { AuthProvider, AuthContext } from "./context/AuthContext";
 
 function App() {
   const themeOptions: ThemeOptions = {
@@ -39,7 +39,7 @@ function App() {
           <AuthContext.Consumer>
             {context => {
               if (!context) {
-                return null; // or a fallback UI
+                return null;
               }
 
               const { isAuthenticated } = context; 

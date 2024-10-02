@@ -31,6 +31,7 @@ export default function SignIn() {
             try {
                 const response = await loginUser(data.get('email') as string, data.get('password') as string);
                 const token = response?.data?.accessToken;
+                console.log(response.data)
 
                 // Verify the token before navigating
                 const verified = await verifyToken(token);
@@ -40,7 +41,7 @@ export default function SignIn() {
                         window.location.href = '/dashboard';
                     }, 999);
                     setTimeout(() => {
-                        login(response?.data.username as string, response?.data.email as string, token);
+                        login(response?.data.username as string, response?.data.email as string, token, response?.data.id as string);
                     }, 1000);
                 } else {
                     alert('Token verification failed.');
