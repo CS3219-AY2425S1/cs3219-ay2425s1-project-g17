@@ -110,7 +110,7 @@ const RegisterPage = () => {
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
-                minHeight: '90vh',
+                minHeight: '100vh',
             }}
         >
             <Box
@@ -214,7 +214,7 @@ const RegisterPage = () => {
                         color="secondary"
                         fullWidth
                         variant="contained"
-                        sx={{ padding: '10px 0', fontSize: '16px' }}
+                        sx={{ padding: '10px 0', fontSize: '16px', color: 'white' }}
                     >
                         Sign Up
                     </Button>

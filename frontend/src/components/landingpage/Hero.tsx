@@ -1,7 +1,7 @@
 import React from 'react';
 import { Container, Box, Typography, Button } from '@mui/material';
 import HeroImage from '../../assets/Herobg.jpg';
-import Logo from '../../assets/Logo.png';
+import Logo from '../../assets/Logo black.png';
 import { useNavigate } from 'react-router-dom';
 
 const Hero = () => {
