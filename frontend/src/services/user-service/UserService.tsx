@@ -112,6 +112,20 @@ async function updatePassword(userid: string, email: string, token: string, oldP
     }
 }
 
+async function deleteUser(userid: string, token: string) {
+    try {
+        const response = await api.delete(`/users/${userid}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        return response.data;
+    } catch (error) {
+        throw new Error(handleAxiosError(error));
+    }
+}
+
 
 export { createUser,
     loginUser,
@@ -119,5 +133,6 @@ export { createUser,
     updateUsername,
     updateEmail,
     getUserDetails,
-    updatePassword
+    updatePassword,
+    deleteUser
  };
