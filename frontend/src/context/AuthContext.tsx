@@ -58,7 +58,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             const userId = localStorage.getItem('id');
             if (token && userId) {
                 const userDetails = await getUserDetails(userId, token);
-                console.log(userDetails);
                 if (userDetails) {
                     localStorage.setItem('username', userDetails.data.username);
                     localStorage.setItem('email', userDetails.data.email);

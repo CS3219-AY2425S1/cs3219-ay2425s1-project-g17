@@ -21,6 +21,10 @@ function handleAxiosError(error: any) {
 // Create User
 async function createUser(username: string, email: string, password: string) {
     try {
+        if (!validatePassword(password)) {
+            throw new Error('Password must be at least 6 characters long, contain at least one number, one uppercase, and one lowercase letter.');
+        }
+
         const response = await api.post("/users", {
             username: username,
             email: email,
@@ -101,7 +105,10 @@ async function updatePassword(userid: string, email: string, token: string, oldP
     try {
         const verified = await loginUser(email, oldPassword);
         if (!verified) {
-            throw new Error('Invalid password');
+            throw new Error('Invalid current password.');
+        }
+        if (!validatePassword(newPassword)) {
+            throw new Error('Password must be at least 6 characters long, contain at least one number, one uppercase, and one lowercase letter.');
         }
         const response = await api.patch(`/users/${userid}`, 
             { password: newPassword },
@@ -125,6 +132,23 @@ async function deleteUser(userid: string, token: string) {
         throw new Error(handleAxiosError(error));
     }
 }
+
+const validatePassword = (password: string) => {
+    // Regular expression to validate the password:
+    // - At least 6 characters long
+    // - At least one number
+    // - At least one uppercase letter
+    // - At least one lowercase letter
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$/;
+
+    if (!password) {
+        return false;
+    } else if (!passwordRegex.test(password)) {
+        return false;
+    } else {
+        return true;
+    }
+};
 
 
 export { createUser,

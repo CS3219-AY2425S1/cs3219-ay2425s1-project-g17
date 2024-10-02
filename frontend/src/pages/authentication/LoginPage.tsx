@@ -31,7 +31,6 @@ export default function SignIn() {
             try {
                 const response = await loginUser(data.get('email') as string, data.get('password') as string);
                 const token = response?.data?.accessToken;
-                console.log(response.data)
 
                 // Verify the token before navigating
                 const verified = await verifyToken(token);
@@ -67,9 +66,9 @@ export default function SignIn() {
             setEmailErrorMessage('');
         }
 
-        if (!password.value || password.value.length < 6 || password.value.length > 21) {
+        if (!password.value || password.value.length < 6) {
             setPasswordError(true);
-            setPasswordErrorMessage('Password must be at least 6 characters and less than 20 characters.');
+            setPasswordErrorMessage('Please enter a valid password.');
             isValid = false;
         } else {
             setPasswordError(false);

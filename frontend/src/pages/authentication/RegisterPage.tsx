@@ -65,14 +65,31 @@ const RegisterPage = () => {
         }
 
         // Password validation
-        if (!password.value || password.value.length < 6) {
-            setPasswordError(true);
-            setPasswordErrorMessage('Password must be at least 6 characters long.');
-            isValid = false;
-        } else {
-            setPasswordError(false);
-            setPasswordErrorMessage('');
-        }
+        const validatePassword = (password: string) => {
+            // Regular expression to validate the password:
+            // - At least 6 characters long
+            // - At least one number
+            // - At least one uppercase letter
+            // - At least one lowercase letter
+            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$/;
+
+            if (!password) {
+                setPasswordError(true);
+                setPasswordErrorMessage('Please enter a valid password.');
+                return false;
+            } else if (!passwordRegex.test(password)) {
+                setPasswordError(true);
+                setPasswordErrorMessage('Password must be at least 6 characters long, contain at least one number, one uppercase, and one lowercase letter.');
+                return false;
+            } else {
+                setPasswordError(false);
+                setPasswordErrorMessage('');
+                return true;
+            }
+        };
+
+        // Use the validation function within your form validation
+        isValid = validatePassword(password.value);
 
         // Confirm password validation
         if (password.value !== confirmPassword.value) {
