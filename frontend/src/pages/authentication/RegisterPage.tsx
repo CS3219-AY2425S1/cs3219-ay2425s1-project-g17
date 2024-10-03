@@ -21,7 +21,6 @@ const RegisterPage = () => {
     const [confirmPasswordErrorMessage, setConfirmPasswordErrorMessage] = React.useState('');
     const navigate = useNavigate();
 
-    // TODO: Handle registration logic (User Service)
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         if (validateInputs()) {
