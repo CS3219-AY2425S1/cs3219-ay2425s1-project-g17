@@ -3,12 +3,9 @@ import { ThemeProvider, createTheme, ThemeOptions } from '@mui/material/styles';
 import { BrowserRouter } from 'react-router-dom';
 import CssBaseline from '@mui/material/CssBaseline';
 import { AuthenticatedRoutes, PublicRoutes } from './routes/';
+import { AuthProvider, AuthContext } from "./context/AuthContext";
 
 function App() {
-
-  // TODO: Implement authentication
-  const isAuth = false;
-
   const themeOptions: ThemeOptions = {
     typography: {
       fontFamily: 'Roboto, sans-serif, Arial, JetBrains Mono',
@@ -35,12 +32,22 @@ function App() {
   const theme = createTheme(themeOptions);
 
   return (
-
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <BrowserRouter>
-        {isAuth ? <AuthenticatedRoutes /> : <PublicRoutes />}
-      </BrowserRouter>
+      <AuthProvider>
+        <BrowserRouter>
+          <AuthContext.Consumer>
+            {context => {
+              if (!context) {
+                return null;
+              }
+
+              const { isAuthenticated } = context; 
+              return isAuthenticated ? <AuthenticatedRoutes /> : <PublicRoutes />;
+            }}
+          </AuthContext.Consumer>
+        </BrowserRouter>
+      </AuthProvider>
     </ThemeProvider>
   );
 }

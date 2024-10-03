@@ -8,23 +8,46 @@ import FormControl from '@mui/material/FormControl';
 import Link from '@mui/material/Link';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import { Container } from '@mui/material';
+import { Container, CircularProgress } from '@mui/material';
+import { loginUser, verifyToken } from '../../services/user-service/UserService';
+import { AuthContext } from '../../context/AuthContext';
 
 export default function SignIn() {
+    const authContext = React.useContext(AuthContext);
+    if (!authContext) {
+        throw new Error('AuthContext must be used within an AuthProvider');
+    }
+    const { login } = authContext;
     const [emailError, setEmailError] = React.useState(false);
     const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
     const [passwordError, setPasswordError] = React.useState(false);
     const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
+    const [loading, setLoading] = React.useState(false); // New loading state
 
-    // TODO: Link to User Service
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         if (validateInputs()) {
             const data = new FormData(event.currentTarget);
-            console.log({
-                email: data.get('email'),
-                password: data.get('password'),
-            });
+            try {
+                const response = await loginUser(data.get('email') as string, data.get('password') as string);
+                const token = response?.data?.accessToken;
+
+                // Verify the token before navigating
+                const verified = await verifyToken(token);
+                if (verified) {
+                    setLoading(true);
+                    setTimeout(() => {
+                        window.location.href = '/dashboard';
+                    }, 999);
+                    setTimeout(() => {
+                        login(response?.data.username as string, response?.data.email as string, token, response?.data.id as string);
+                    }, 1000);
+                } else {
+                    alert('Token verification failed.');
+                }
+            } catch (err: any) {
+                alert(err.message);
+            }
         }
     };
 
@@ -45,7 +68,7 @@ export default function SignIn() {
 
         if (!password.value || password.value.length < 6) {
             setPasswordError(true);
-            setPasswordErrorMessage('Password must be at least 6 characters long.');
+            setPasswordErrorMessage('Please enter a valid password.');
             isValid = false;
         } else {
             setPasswordError(false);
@@ -81,70 +104,75 @@ export default function SignIn() {
                 >
                     Sign in
                 </Typography>
-                <Box
-                    component="form"
-                    onSubmit={handleSubmit}
-                    noValidate
-                    sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: 2,
-                    }}
-                >
-                    <FormControl>
-                        <FormLabel htmlFor="email">Email</FormLabel>
-                        <TextField
-                            error={emailError}
-                            helperText={emailErrorMessage}
-                            id="email"
-                            type="email"
-                            name="email"
-                            placeholder="your@email.com"
-                            autoComplete="email"
-                            autoFocus
-                            required
-                            fullWidth
-                            variant="outlined"
-                        />
-                    </FormControl>
-                    <FormControl>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <FormLabel htmlFor="password">Password</FormLabel>
-                        </Box>
-                        <TextField
-                            error={passwordError}
-                            helperText={passwordErrorMessage}
-                            name="password"
-                            placeholder="••••••"
-                            type="password"
-                            id="password"
-                            autoComplete="current-password"
-                            required
-                            fullWidth
-                            variant="outlined"
-                        />
-                    </FormControl>
-                    <FormControlLabel
-                        control={<Checkbox value="remember" color="primary" />}
-                        label="Remember me"
-                    />
-                    <Button
-                        type="submit"
-                        color="secondary"
-                        fullWidth
-                        variant="contained"
-                        onClick={validateInputs}
-                        sx={{ padding: '10px 0', fontSize: '16px' }}
+                {loading ? (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
+                        <CircularProgress />
+                    </Box>
+                ) : (
+                    <Box
+                        component="form"
+                        onSubmit={handleSubmit}
+                        noValidate
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: 2,
+                        }}
                     >
-                        Sign in
-                    </Button>
-                    <Typography sx={{ textAlign: 'center', marginTop: '20px' }}>
-                        Don&apos;t have an account?{' '}
-                        <Link href="register" variant="body2">
-                            Sign up
-                        </Link>
-                    </Typography>
-                </Box>
+                        <FormControl>
+                            <FormLabel htmlFor="email">Email</FormLabel>
+                            <TextField
+                                error={emailError}
+                                helperText={emailErrorMessage}
+                                id="email"
+                                type="email"
+                                name="email"
+                                placeholder="your@email.com"
+                                autoComplete="email"
+                                autoFocus
+                                required
+                                fullWidth
+                                variant="outlined"
+                            />
+                        </FormControl>
+                        <FormControl>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                <FormLabel htmlFor="password">Password</FormLabel>
+                            </Box>
+                            <TextField
+                                error={passwordError}
+                                helperText={passwordErrorMessage}
+                                name="password"
+                                placeholder="••••••••••••"
+                                type="password"
+                                id="password"
+                                autoComplete="current-password"
+                                required
+                                fullWidth
+                                variant="outlined"
+                            />
+                        </FormControl>
+                        <FormControlLabel
+                            control={<Checkbox value="remember" color="primary" />}
+                            label="Remember me"
+                        />
+                        <Button
+                            type="submit"
+                            color="secondary"
+                            fullWidth
+                            variant="contained"
+                            sx={{ padding: '10px 0', fontSize: '16px', color: 'white' }}
+                        >
+                            Sign in
+                        </Button>
+                        <Typography sx={{ textAlign: 'center', marginTop: '20px' }}>
+                            Don&apos;t have an account?{' '}
+                            <Link href="register" variant="body2">
+                                Sign up
+                            </Link>
+                        </Typography>
+                    </Box>
+                )}
             </Box>
         </Container>
     );

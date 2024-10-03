@@ -13,6 +13,13 @@ services:
     restart: unless-stopped # Restarts the container irrespective of the exit code but stops restarting when the service is stopped or removed.
     networks:
       - frontend-network # Connects the frontend to the 'frontend-network' network.
+    volumes:
+      - ./frontend:/app # Bind mount the local frontend folder to the container's app directory
+      - /app/node_modules # Exclude node_modules so Docker doesn't overwrite it
+    environment:
+      - CHOKIDAR_USEPOLLING=true # Required for hot reloading in some systems
+    stdin_open: true
+    tty: true
 
   question-service:
     build:

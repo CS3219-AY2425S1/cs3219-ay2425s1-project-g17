@@ -3,7 +3,7 @@ import AddBoxIcon from '@mui/icons-material/AddBox';
 import { Button, Modal, Box, Typography, TextField, MenuItem, Select, FormControl, InputLabel, ListItemText } from '@mui/material';
 import Chip from '@mui/material/Chip';
 import AddIcon from '@mui/icons-material/Add';
-import { addQuestion, checkTitle } from '../../controller/question-service/QuestionService';
+import { addQuestion, checkTitle } from '../../services/question-service/QuestionService';
 import DeleteIcon from '@mui/icons-material/Delete';
 
 const complexities = ['Easy', 'Medium', 'Hard'];

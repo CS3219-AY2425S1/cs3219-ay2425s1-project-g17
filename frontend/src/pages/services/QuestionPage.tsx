@@ -6,7 +6,7 @@ import {
     Autocomplete,
     TextField,
 } from '@mui/material';
-import { getAllQuestions, getFilteredQuestions } from '../../controller/question-service/QuestionService';
+import { getAllQuestions, getFilteredQuestions } from '../../services/question-service/QuestionService';
 import AddQuestionButton from '../../components/questionpage/AddQuestionButton';
 import SearchBar from '../../components/questionpage/SearchBar';
 import QuestionTable from '../../components/questionpage/QuestionTable';
