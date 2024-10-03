@@ -139,7 +139,7 @@ const validatePassword = (password: string) => {
     // - At least one number
     // - At least one uppercase letter
     // - At least one lowercase letter
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$/;
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d\W_]{6,}$/;
 
     if (!password) {
         return false;
