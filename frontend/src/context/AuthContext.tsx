@@ -4,7 +4,7 @@ import { verifyToken, getUserDetails } from '../services/user-service/UserServic
 interface AuthContextType {
     token: string | null;
     isAuthenticated: boolean;
-    login: (username: string, email: string, newToken: string, id: string) => void;
+    login: (username: string, email: string, newToken: string, id: string, profileImage: string) => void;
     logout: () => void;
     updateUserData: () => Promise<void>;
 }
@@ -34,12 +34,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         verifyAuthToken();
     }, [token]);
 
-    const login = (username: string, email: string, newToken: string, id: string) => {
+    const login = (username: string, email: string, newToken: string, id: string, profileImage: string,) => {
         setToken(newToken);
         localStorage.setItem('username', username);
         localStorage.setItem('email', email);
         localStorage.setItem('token', newToken); 
         localStorage.setItem('id', id);
+        localStorage.setItem('profileImage', profileImage)
         setIsAuthenticated(true);
     };
 
@@ -49,6 +50,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         localStorage.removeItem('username');
         localStorage.removeItem('email');
         localStorage.removeItem('id');
+        localStorage.removeItem('profileImage');
         setIsAuthenticated(false);
     };
 

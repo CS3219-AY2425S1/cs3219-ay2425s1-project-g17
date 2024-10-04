@@ -1,4 +1,5 @@
 import * as React from 'react';
+import axios from 'axios';
 import {
     Container,
     Box,
@@ -27,6 +28,7 @@ export default function ProfilePage() {
     // User data states
     const [username, setUsername] = React.useState('');
     const [email, setEmail] = React.useState('');
+    const [profileImageUrl, setprofileImageUrl] = React.useState('');
 
     // Edit states
     const [isEditingUsername, setIsEditingUsername] = React.useState(false);
@@ -67,8 +69,16 @@ export default function ProfilePage() {
         async function fetchUserData() {
             const username = localStorage.getItem('username') || '';
             const email = localStorage.getItem('email') || '';
+            const profileImage = localStorage.getItem('profileImage') || '';
             setUsername(username);
             setEmail(email);
+
+            // TODO: Change Default value and host a default URL
+            if (profileImage == "NaN") {
+                setprofileImageUrl("https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png")
+            } else {
+                getUserProfilePic(profileImage)
+            }
         }
         fetchUserData();
     }, [token]);
@@ -182,6 +192,51 @@ export default function ProfilePage() {
         window.location.reload();
     };
 
+    const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        const id = localStorage.getItem('id') || '';
+        console.log("file in react", file);
+        if (file) {
+            const formData = new FormData();
+            formData.append('image', file);
+            formData.append('userId', id);
+            axios.post('http://localhost:4001/users/upload', formData, {
+                headers: {
+                  'Content-Type': 'multipart/form-data',
+                },
+            })
+            .then(response => {
+                localStorage.setItem('profileImage', response.data.fileName)
+                getUserProfilePic(response.data.fileName)
+                console.log('Image uploaded successfully:', response.data.message);
+            })
+            .catch(error => {
+                console.error('Error uploading image:', error);
+            });
+        }
+      };
+
+      // TODO: Make it a GET request instead
+      const getUserProfilePic = async (imageName: string) => {
+        try {
+            const formData = new FormData();
+            formData.append('imageName', imageName);
+            console.log(imageName)
+
+            axios.post('http://localhost:4001/users/profilePic', formData, {
+                headers: {
+                  'Content-Type': 'multipart/form-data',
+                },
+            })
+            .then(response => {
+                setprofileImageUrl(response.data.url);
+                console.log('Image retrieved successfully:', response.data);
+            })
+        } catch (error) {
+          console.error('Error:', error);
+        }
+      }
+
     return (
         <>
             <Container
@@ -210,8 +265,42 @@ export default function ProfilePage() {
                             boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
                         }}
                     >
-                        <Avatar sx={{ height: "18vh", width: "18vh", padding: "5px" }} />
-                        <Box>
+
+                    <Box 
+                        position="relative"
+                        display="inline-block"
+                    >
+                        <Avatar 
+                            src={profileImageUrl} 
+                            sx={{ height: "18vh", width: "18vh" }} 
+                        />
+                        <input
+                            accept="image/*"
+                            style={{ display: 'none' }}
+                            id="icon-button-file"
+                            type="file"
+                            onChange={handleImageChange}
+                        />
+                        <label
+                            htmlFor="icon-button-file"
+                        >
+                            <IconButton 
+                                color="secondary" 
+                                component="span" 
+                                sx={{ 
+                                    position: 'absolute', 
+                                    bottom: 0, 
+                                    right: 0, 
+                                    backgroundColor: 'white', '&:hover': {
+                                        backgroundColor: 'lightgray',
+                                    }
+                                }}
+                            >
+                                <EditIcon />
+                            </IconButton>
+                        </label>
+                     </Box>
+                         <Box>
                             <Typography variant="h5" sx={{ textAlign: "center", padding: "5px" }}>
                                 <b>{username}</b>
                             </Typography>
