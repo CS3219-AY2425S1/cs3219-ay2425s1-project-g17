@@ -1,3 +1,5 @@
 node_modules
 question-service/.env
 question-service/dist
+matching-service/.env
+matching-service/dist
