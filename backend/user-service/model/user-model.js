@@ -26,6 +26,11 @@ const UserModelSchema = new Schema({
     required: true,
     default: false,
   },
+  profilePic: {
+    type: String,
+    required: false,
+    default: NaN // TODO: Better default 
+  }
 });
 
 export default mongoose.model("UserModel", UserModelSchema);
