@@ -14,7 +14,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import { AuthContext } from '../../context/AuthContext';
-import { updateUsername, updateEmail, updatePassword, deleteUser, uploadToS3, getSignedImageURL } from '../../services/user-service/UserService';
+import { updateUsername, updateEmail, updatePassword, deleteUser, updateProfilePicture, getSignedImageURL } from '../../services/user-service/UserService';
 
 export default function ProfilePage() {
     const authContext = React.useContext(AuthContext);
@@ -66,6 +66,7 @@ export default function ProfilePage() {
     // Fetch user data from the server on component mount
     React.useEffect(() => {
         async function fetchUserData() {
+            await updateUserData();
             const username = localStorage.getItem('username') || '';
             const email = localStorage.getItem('email') || '';
             const profileImage = localStorage.getItem('profileImage') || '';
@@ -189,8 +190,10 @@ export default function ProfilePage() {
         const file = event.target.files?.[0];
         if (file) {
             try {
-                const response = await uploadToS3(localStorage.getItem('id') || '', file);
-                getUserProfilePic(response.fileName)
+                const response = await updateProfilePicture(localStorage.getItem('id') || '', file);
+                localStorage.setItem('profileImage', response?.fileName)
+                getUserProfilePic(response?.fileName)
+                window.location.reload();
             } catch (err: any) {
                 alert(err.message);
             }
@@ -200,7 +203,7 @@ export default function ProfilePage() {
       const getUserProfilePic = async (imageName: string) => {
         try {
             const response = await getSignedImageURL(imageName)
-            setprofileImageUrl(response.url);
+            setprofileImageUrl(response);
         } catch (err: any) {
             alert(err.message);
         }

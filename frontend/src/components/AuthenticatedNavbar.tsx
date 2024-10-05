@@ -10,16 +10,18 @@ import Avatar from '@mui/material/Avatar';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import Logo from '../assets/Logo.png';
+import { getSignedImageURL } from '../services/user-service/UserService';
 import { AuthContext } from '../context/AuthContext';
 
 const settings = ['Profile', 'Dashboard', 'Logout'];
 
 function Navbar() {
   const username = localStorage.getItem('username');
+  const [profileImageUrl, setprofileImageUrl] = React.useState('');
 
   const authContext = React.useContext(AuthContext);
   if (!authContext) {
-      throw new Error('AuthContext must be used within an AuthProvider');
+    throw new Error('AuthContext must be used within an AuthProvider');
   }
   const { logout } = authContext;
 
@@ -39,6 +41,19 @@ function Navbar() {
     window.location.href = '/';
   };
 
+  React.useEffect(() => {
+    const getUserProfilePic = async (imageName: string) => {
+      try {
+        const response = await getSignedImageURL(imageName)
+        setprofileImageUrl(response);
+      } catch (err: any) {
+        alert(err.message);
+      }
+    }
+    getUserProfilePic(localStorage.getItem('profileImage') as string);
+
+  }, []);
+
   return (
     <AppBar position="static">
       <Container maxWidth={false}>
@@ -54,7 +69,10 @@ function Navbar() {
             </Typography>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar sx={{ bgcolor: "white" }} />
+                <Avatar
+                  src={profileImageUrl}
+                  sx={{ bgcolor: "white" }}
+                />
               </IconButton>
             </Tooltip>
             <Menu
@@ -74,12 +92,12 @@ function Navbar() {
               onClose={handleCloseUserMenu}
             >
               {settings.map((setting) => (
-                <MenuItem 
-                  key={setting} 
-                  onClick={setting === 'Logout' ? handleLogout 
-                    : setting === 'Profile' ? () => window.location.href = '/profile' 
-                    : setting === 'Dashboard' ? () => window.location.href = '/dashboard'
-                    : handleCloseUserMenu}
+                <MenuItem
+                  key={setting}
+                  onClick={setting === 'Logout' ? handleLogout
+                    : setting === 'Profile' ? () => window.location.href = '/profile'
+                      : setting === 'Dashboard' ? () => window.location.href = '/dashboard'
+                        : handleCloseUserMenu}
                 >
                   <Typography sx={{ textAlign: 'center' }}>{setting}</Typography>
                 </MenuItem>
@@ -92,3 +110,4 @@ function Navbar() {
   );
 }
 export default Navbar;
+

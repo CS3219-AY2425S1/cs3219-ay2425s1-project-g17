@@ -72,7 +72,6 @@ async function getUserDetails(userid: string, token: string) {
                 Authorization: `Bearer ${token}`,
             },
         });
-
         return response.data;
     } catch (error) {
         throw new Error(handleAxiosError(error));
@@ -133,7 +132,8 @@ async function deleteUser(userid: string, token: string) {
     }
 }
 
-async function uploadToS3(userid: string, file: File) {
+// Update user profile picture by uploading to S3
+async function updateProfilePicture(userid: string, file: File) {
     try {
         const formData = new FormData();
         formData.append('image', file);
@@ -150,6 +150,7 @@ async function uploadToS3(userid: string, file: File) {
 }
 
 // TODO: Make it a GET request instead
+// Get signed image URL
 async function getSignedImageURL(imageName: string) {
     try {
         const formData = new FormData();
@@ -159,7 +160,7 @@ async function getSignedImageURL(imageName: string) {
               'Content-Type': 'multipart/form-data',
             },
         });
-        return response.data;
+        return response?.data?.url;
     } catch (error) {
         throw new Error(handleAxiosError(error));
     }
@@ -191,6 +192,6 @@ export { createUser,
     getUserDetails,
     updatePassword,
     deleteUser,
-    uploadToS3,
+    updateProfilePicture,
     getSignedImageURL
  };

@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect } from 'react';
-import { verifyToken, getUserDetails } from '../services/user-service/UserService';  // Assuming getUserDetails fetches user info from the server
+import { verifyToken, getUserDetails } from '../services/user-service/UserService';
 
 interface AuthContextType {
     token: string | null;
