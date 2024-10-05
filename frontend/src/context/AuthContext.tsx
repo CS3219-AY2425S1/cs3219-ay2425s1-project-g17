@@ -34,7 +34,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         verifyAuthToken();
     }, [token]);
 
-    const login = (username: string, email: string, newToken: string, id: string, profileImage: string,) => {
+    const login = (username: string, email: string, newToken: string, id: string, profileImage: string) => {
         setToken(newToken);
         localStorage.setItem('username', username);
         localStorage.setItem('email', email);

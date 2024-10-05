@@ -133,6 +133,38 @@ async function deleteUser(userid: string, token: string) {
     }
 }
 
+async function uploadToS3(userid: string, file: File) {
+    try {
+        const formData = new FormData();
+        formData.append('image', file);
+        formData.append('userId', userid);
+        const response = await api.post('/users/upload', formData, {
+            headers: {
+            'Content-Type': 'multipart/form-data',
+            },
+        });
+        return response.data;
+    } catch (error) {
+        throw new Error(handleAxiosError(error));
+    }
+}
+
+// TODO: Make it a GET request instead
+async function getSignedImageURL(imageName: string) {
+    try {
+        const formData = new FormData();
+        formData.append('imageName', imageName);
+        const response = await api.post('/users/profilePic', formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+        });
+        return response.data;
+    } catch (error) {
+        throw new Error(handleAxiosError(error));
+    }
+}
+
 const validatePassword = (password: string) => {
     // Regular expression to validate the password:
     // - At least 6 characters long
@@ -158,5 +190,7 @@ export { createUser,
     updateEmail,
     getUserDetails,
     updatePassword,
-    deleteUser
+    deleteUser,
+    uploadToS3,
+    getSignedImageURL
  };

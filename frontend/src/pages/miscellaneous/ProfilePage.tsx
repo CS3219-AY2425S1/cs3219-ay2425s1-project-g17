@@ -1,5 +1,4 @@
 import * as React from 'react';
-import axios from 'axios';
 import {
     Container,
     Box,
@@ -15,7 +14,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import { AuthContext } from '../../context/AuthContext';
-import { updateUsername, updateEmail, updatePassword, deleteUser } from '../../services/user-service/UserService';
+import { updateUsername, updateEmail, updatePassword, deleteUser, uploadToS3, getSignedImageURL } from '../../services/user-service/UserService';
 
 export default function ProfilePage() {
     const authContext = React.useContext(AuthContext);
@@ -72,13 +71,7 @@ export default function ProfilePage() {
             const profileImage = localStorage.getItem('profileImage') || '';
             setUsername(username);
             setEmail(email);
-
-            // TODO: Change Default value and host a default URL
-            if (profileImage == "NaN") {
-                setprofileImageUrl("https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png")
-            } else {
-                getUserProfilePic(profileImage)
-            }
+            getUserProfilePic(profileImage)
         }
         fetchUserData();
     }, [token]);
@@ -192,50 +185,26 @@ export default function ProfilePage() {
         window.location.reload();
     };
 
-    const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
-        const id = localStorage.getItem('id') || '';
-        console.log("file in react", file);
         if (file) {
-            const formData = new FormData();
-            formData.append('image', file);
-            formData.append('userId', id);
-            axios.post('http://localhost:4001/users/upload', formData, {
-                headers: {
-                  'Content-Type': 'multipart/form-data',
-                },
-            })
-            .then(response => {
-                localStorage.setItem('profileImage', response.data.fileName)
-                getUserProfilePic(response.data.fileName)
-                console.log('Image uploaded successfully:', response.data.message);
-            })
-            .catch(error => {
-                console.error('Error uploading image:', error);
-            });
+            try {
+                const response = await uploadToS3(localStorage.getItem('id') || '', file);
+                getUserProfilePic(response.fileName)
+            } catch (err: any) {
+                alert(err.message);
+            }
         }
       };
 
-      // TODO: Make it a GET request instead
       const getUserProfilePic = async (imageName: string) => {
         try {
-            const formData = new FormData();
-            formData.append('imageName', imageName);
-            console.log(imageName)
-
-            axios.post('http://localhost:4001/users/profilePic', formData, {
-                headers: {
-                  'Content-Type': 'multipart/form-data',
-                },
-            })
-            .then(response => {
-                setprofileImageUrl(response.data.url);
-                console.log('Image retrieved successfully:', response.data);
-            })
-        } catch (error) {
-          console.error('Error:', error);
+            const response = await getSignedImageURL(imageName)
+            setprofileImageUrl(response.url);
+        } catch (err: any) {
+            alert(err.message);
         }
-      }
+    }
 
     return (
         <>
