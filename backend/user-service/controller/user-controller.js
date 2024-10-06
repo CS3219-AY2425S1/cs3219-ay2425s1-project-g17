@@ -10,7 +10,28 @@ import {
   findUserByUsernameOrEmail as _findUserByUsernameOrEmail,
   updateUserById as _updateUserById,
   updateUserPrivilegeById as _updateUserPrivilegeById,
+  updateUserProfilePicById as _updateUserProfilePicById,
 } from "../model/repository.js";
+
+import { S3Client, PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import crypto from 'crypto'
+import dotenv from 'dotenv'
+
+dotenv.config()
+
+const bucketName = process.env.BUCKET_NAME
+const bucketRegion = process.env.BUCKET_REGION
+const accessKey = process.env.ACCESS_KEY
+const secretAccessKey = process.env.SECRET_ACCESS_KEY
+
+const s3 = new S3Client({
+  credentials: {
+    accessKeyId: accessKey,
+    secretAccessKey: secretAccessKey,
+  },
+  region: bucketRegion
+})
 
 export async function createUser(req, res) {
   try {
@@ -156,6 +177,45 @@ export async function deleteUser(req, res) {
   }
 }
 
+export async function uploadProfilePicture(req, res) {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file provided' });
+    }
+
+    const file = req.file;
+    const fileName = crypto.randomBytes(32).toString('hex');
+    const userId = req.body.userId;
+  
+    const params = {
+      Bucket: bucketName,
+      Key: fileName,
+      Body: file.buffer,
+      ContentType: file.mimetype,
+    }
+
+    const command = new PutObjectCommand(params)
+    await s3.send(command)
+    await _updateUserProfilePicById(userId, fileName);
+    return res.status(200).json({ message: "Upload successful", fileName: fileName });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: 'Failed to upload file' });
+  }
+}
+
+export async function getUserProfilePic(req, res) {
+  const imageName = req.body.imageName;
+
+  const getObjectParams = {
+    Bucket: bucketName,
+    Key: imageName,
+  }
+  const command = new GetObjectCommand(getObjectParams);
+  const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
+  return res.status(200).json({ url: url });
+}
+
 export function formatUserResponse(user) {
   return {
     id: user.id,
@@ -163,5 +223,6 @@ export function formatUserResponse(user) {
     email: user.email,
     isAdmin: user.isAdmin,
     createdAt: user.createdAt,
+    profilePic: user.profilePic,
   };
 }

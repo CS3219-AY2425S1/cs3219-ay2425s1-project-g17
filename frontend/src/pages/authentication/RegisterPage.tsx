@@ -26,7 +26,7 @@ const RegisterPage = () => {
         if (validateInputs()) {
             const data = new FormData(event.currentTarget);
             try {
-                const response = await createUser(data.get('username') as string, data.get('email') as string, data.get('password') as string);
+                await createUser(data.get('username') as string, data.get('email') as string, data.get('password') as string);
                 alert('User created successfully');
                 navigate('/login');
             } catch (err: any) {

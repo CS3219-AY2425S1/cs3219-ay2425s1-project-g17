@@ -66,6 +66,18 @@ export async function updateUserPrivilegeById(userId, isAdmin) {
   );
 }
 
+export async function updateUserProfilePicById(userId, profilePic) {
+  return UserModel.findByIdAndUpdate(
+    userId,
+    {
+      $set: {
+        profilePic,
+      },
+    },
+    { new: true },  // return the updated user
+  );
+}
+
 export async function deleteUserById(userId) {
   return UserModel.findByIdAndDelete(userId);
 }

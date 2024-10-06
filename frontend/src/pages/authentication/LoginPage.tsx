@@ -22,7 +22,7 @@ export default function SignIn() {
     const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
     const [passwordError, setPasswordError] = React.useState(false);
     const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
-    const [loading, setLoading] = React.useState(false); // New loading state
+    const [loading, setLoading] = React.useState(false);
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -40,7 +40,7 @@ export default function SignIn() {
                         window.location.href = '/dashboard';
                     }, 999);
                     setTimeout(() => {
-                        login(response?.data.username as string, response?.data.email as string, token, response?.data.id as string);
+                        login(response?.data.username as string, response?.data.email as string, token, response?.data.id as string, response?.data.profilePic as string);
                     }, 1000);
                 } else {
                     alert('Token verification failed.');

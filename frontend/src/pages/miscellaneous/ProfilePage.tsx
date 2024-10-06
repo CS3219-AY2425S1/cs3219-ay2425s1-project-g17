@@ -14,7 +14,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import { AuthContext } from '../../context/AuthContext';
-import { updateUsername, updateEmail, updatePassword, deleteUser } from '../../services/user-service/UserService';
+import { updateUsername, updateEmail, updatePassword, deleteUser, updateProfilePicture, getSignedImageURL } from '../../services/user-service/UserService';
 
 export default function ProfilePage() {
     const authContext = React.useContext(AuthContext);
@@ -27,6 +27,7 @@ export default function ProfilePage() {
     // User data states
     const [username, setUsername] = React.useState('');
     const [email, setEmail] = React.useState('');
+    const [profileImageUrl, setprofileImageUrl] = React.useState('');
 
     // Edit states
     const [isEditingUsername, setIsEditingUsername] = React.useState(false);
@@ -65,10 +66,13 @@ export default function ProfilePage() {
     // Fetch user data from the server on component mount
     React.useEffect(() => {
         async function fetchUserData() {
+            await updateUserData();
             const username = localStorage.getItem('username') || '';
             const email = localStorage.getItem('email') || '';
+            const profileImage = localStorage.getItem('profileImage') || '';
             setUsername(username);
             setEmail(email);
+            getUserProfilePic(profileImage)
         }
         fetchUserData();
     }, [token]);
@@ -182,6 +186,29 @@ export default function ProfilePage() {
         window.location.reload();
     };
 
+    const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            try {
+                const response = await updateProfilePicture(localStorage.getItem('id') || '', file);
+                localStorage.setItem('profileImage', response?.fileName)
+                getUserProfilePic(response?.fileName)
+                window.location.reload();
+            } catch (err: any) {
+                alert(err.message);
+            }
+        }
+      };
+
+      const getUserProfilePic = async (imageName: string) => {
+        try {
+            const response = await getSignedImageURL(imageName)
+            setprofileImageUrl(response);
+        } catch (err: any) {
+            alert(err.message);
+        }
+    }
+
     return (
         <>
             <Container
@@ -210,8 +237,42 @@ export default function ProfilePage() {
                             boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
                         }}
                     >
-                        <Avatar sx={{ height: "18vh", width: "18vh", padding: "5px" }} />
-                        <Box>
+
+                    <Box 
+                        position="relative"
+                        display="inline-block"
+                    >
+                        <Avatar 
+                            src={profileImageUrl} 
+                            sx={{ height: "18vh", width: "18vh" }} 
+                        />
+                        <input
+                            accept="image/*"
+                            style={{ display: 'none' }}
+                            id="icon-button-file"
+                            type="file"
+                            onChange={handleImageChange}
+                        />
+                        <label
+                            htmlFor="icon-button-file"
+                        >
+                            <IconButton 
+                                color="secondary" 
+                                component="span" 
+                                sx={{ 
+                                    position: 'absolute', 
+                                    bottom: 0, 
+                                    right: 0, 
+                                    backgroundColor: 'white', '&:hover': {
+                                        backgroundColor: 'lightgray',
+                                    }
+                                }}
+                            >
+                                <EditIcon />
+                            </IconButton>
+                        </label>
+                     </Box>
+                         <Box>
                             <Typography variant="h5" sx={{ textAlign: "center", padding: "5px" }}>
                                 <b>{username}</b>
                             </Typography>

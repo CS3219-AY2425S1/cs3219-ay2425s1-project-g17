@@ -26,6 +26,11 @@ const UserModelSchema = new Schema({
     required: true,
     default: false,
   },
+  profilePic: {
+    type: String,
+    required: false,
+    default: "default.webp" // TODO: Find a better default image
+  }
 });
 
 export default mongoose.model("UserModel", UserModelSchema);
