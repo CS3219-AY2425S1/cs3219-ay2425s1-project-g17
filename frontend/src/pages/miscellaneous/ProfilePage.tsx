@@ -169,8 +169,12 @@ export default function ProfilePage() {
             setEmail(tempEmail);
             setIsEditingEmail(false);
             setEmailError(false);
-            await updateEmail(id, token, tempEmail);
-            await updateUserData();
+            try {
+                await updateEmail(id, token, tempEmail);
+                await updateUserData();
+            } catch (err: any) {
+                alert(err.message);
+            }
         } else if (field === 'password') {
             if (!validatePassword()) {
                 return;
