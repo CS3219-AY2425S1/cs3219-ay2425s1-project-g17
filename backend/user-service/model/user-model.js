@@ -29,7 +29,7 @@ const UserModelSchema = new Schema({
   profilePic: {
     type: String,
     required: false,
-    default: "default.webp" // TODO: Find a better default image
+    default: "default-avatar.jpg"
   }
 });
 
