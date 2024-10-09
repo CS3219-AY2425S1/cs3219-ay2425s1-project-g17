@@ -17,7 +17,9 @@ const settings = ['Profile', 'Dashboard', 'Logout'];
 
 function Navbar() {
   const username = localStorage.getItem('username');
-  const [profileImageUrl, setprofileImageUrl] = React.useState('');
+  const storedUrl = localStorage.getItem('profileImageUrl') || "";
+
+  const [profileImageUrl, setprofileImageUrl] = React.useState(storedUrl);
 
   const authContext = React.useContext(AuthContext);
   if (!authContext) {
@@ -43,15 +45,23 @@ function Navbar() {
 
   React.useEffect(() => {
     const getUserProfilePic = async (imageName: string) => {
-      try {
-        const response = await getSignedImageURL(imageName)
-        setprofileImageUrl(response);
-      } catch (err: any) {
-        alert(err.message);
+      const storedUrl = localStorage.getItem('profileImageUrl');
+      const storedExpiry = localStorage.getItem('profileImageUrlExpiry');
+      const currentTime = Date.now();
+      if ((!storedUrl || !storedExpiry) || (currentTime >= Number(storedExpiry))) { 
+        try {
+          const token = localStorage.getItem('token') || '';
+          const response = await getSignedImageURL(imageName, token)
+          const urlExpiry = currentTime + (response?.expiresIn * 1000) - 60000; // 1 minute buffer
+          setprofileImageUrl(response?.url);
+          localStorage.setItem('profileImageUrl', response?.url)
+          localStorage.setItem('profileImageUrlExpiry', urlExpiry.toString())
+        } catch (err: any) {
+          alert(err.message);
+        }
       }
     }
-    getUserProfilePic(localStorage.getItem('profileImage') as string);
-
+      getUserProfilePic(localStorage.getItem('profileImage') as string);
   }, []);
 
   return (

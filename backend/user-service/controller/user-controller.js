@@ -205,15 +205,21 @@ export async function uploadProfilePicture(req, res) {
 }
 
 export async function getUserProfilePic(req, res) {
-  const imageName = req.body.imageName;
+  const expiresIn = 36000 // URL is valid for 10 hours
+  try {
+    const imageName = req.params.imageName;
 
-  const getObjectParams = {
-    Bucket: bucketName,
-    Key: imageName,
+    const getObjectParams = {
+      Bucket: bucketName,
+      Key: imageName,
+    }
+    const command = new GetObjectCommand(getObjectParams);
+    const url = await getSignedUrl(s3, command, { expiresIn: expiresIn });
+    return res.status(200).json({ url: url, expiresIn: expiresIn });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Unknown error when getting user profile picture!" });
   }
-  const command = new GetObjectCommand(getObjectParams);
-  const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
-  return res.status(200).json({ url: url });
 }
 
 export function formatUserResponse(user) {

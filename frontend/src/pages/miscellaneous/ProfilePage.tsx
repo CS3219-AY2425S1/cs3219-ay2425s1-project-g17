@@ -202,8 +202,12 @@ export default function ProfilePage() {
 
       const getUserProfilePic = async (imageName: string) => {
         try {
-            const response = await getSignedImageURL(imageName)
-            setprofileImageUrl(response);
+            const token = localStorage.getItem('token') || '';
+            const response = await getSignedImageURL(imageName, token)
+            setprofileImageUrl(response?.url);
+            const urlExpiry = Date.now() + (response?.expiresIn * 1000) - 60000; // 1 minute buffer
+            localStorage.setItem('profileImageUrl', response?.url)
+            localStorage.setItem('profileImageUrlExpiry', urlExpiry.toString())
         } catch (err: any) {
             alert(err.message);
         }
