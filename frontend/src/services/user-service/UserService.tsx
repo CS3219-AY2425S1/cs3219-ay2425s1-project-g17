@@ -149,19 +149,16 @@ async function updateProfilePicture(userid: string, file: File) {
     }
 }
 
-// TODO: Make it a GET request instead
-// Get signed image URL
-async function getSignedImageURL(imageName: string) {
+async function getSignedImageURL(imageName: string, token: string) {
     try {
-        const formData = new FormData();
-        formData.append('imageName', imageName);
-        const response = await api.post('/users/profilePic', formData, {
+        const response = await api.get(`/users/profilePic/${imageName}`, {
             headers: {
-              'Content-Type': 'multipart/form-data',
+                Authorization: `Bearer ${token}`,
             },
         });
-        return response?.data?.url;
+        return response?.data
     } catch (error) {
+        console.log(error)
         throw new Error(handleAxiosError(error));
     }
 }
