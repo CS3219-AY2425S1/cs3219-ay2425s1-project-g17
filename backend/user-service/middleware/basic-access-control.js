@@ -1,5 +1,9 @@
 import jwt from "jsonwebtoken";
+import multer from 'multer';
 import { findUserById as _findUserById } from "../model/repository.js";
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
 export function verifyAccessToken(req, res, next) {
   const authHeader = req.headers["authorization"];
@@ -46,3 +50,6 @@ export function verifyIsOwnerOrAdmin(req, res, next) {
 
   return res.status(403).json({ message: "Not authorized to access this resource" });
 }
+
+export const uploadSingleImage = upload.single('image');
+export const uploadNone = upload.none();

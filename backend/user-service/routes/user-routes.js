@@ -10,11 +10,7 @@ import {
   uploadProfilePicture,
   getUserProfilePic,
 } from "../controller/user-controller.js";
-import { verifyAccessToken, verifyIsAdmin, verifyIsOwnerOrAdmin } from "../middleware/basic-access-control.js";
-import multer from 'multer';
-
-const storage = multer.memoryStorage();
-export const upload = multer({ storage });
+import { verifyAccessToken, verifyIsAdmin, verifyIsOwnerOrAdmin, uploadSingleImage, uploadNone } from "../middleware/basic-access-control.js";
 
 const router = express.Router();
 
@@ -30,9 +26,8 @@ router.patch("/:id", verifyAccessToken, verifyIsOwnerOrAdmin, updateUser);
 
 router.delete("/:id", verifyAccessToken, verifyIsOwnerOrAdmin, deleteUser);
 
-// TODO: Don't put multer here
-router.post("/upload", upload.single('image'), uploadProfilePicture)
+router.post("/upload", uploadSingleImage, uploadProfilePicture)
 
-router.post("/profilePic", upload.none(), getUserProfilePic)
+router.get("/profilePic/:imageName", uploadNone, getUserProfilePic)
 
 export default router;
