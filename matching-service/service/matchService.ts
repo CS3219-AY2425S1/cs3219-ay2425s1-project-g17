@@ -59,7 +59,8 @@ export const matchUser = async (userId: string, category: string) => {
       const secondAttempt = await Match.findOne({
         category,
         isMatched: false,
-        userId: { $ne: userId }
+        userId: { $ne: userId },
+        createdAt : {$lt: new Date(currentTime - 15000)}
       });
 
       // Check if a potential match exists and if it's not the same user
@@ -103,7 +104,8 @@ export const matchUser = async (userId: string, category: string) => {
       const thirdAttempt = await Match.findOne({
         difficulty,
         isMatched: false,
-        userId: { $ne: userId }
+        userId: { $ne: userId },
+        createdAt : {$lt: new Date(currentTime - 30000)}
       });
 
       // Check if a potential match exists and if it's not the same user
@@ -151,7 +153,7 @@ export const matchUser = async (userId: string, category: string) => {
 export async function getUsersFromQueue(): Promise<any[]> {
   try {
       // Fetch users from MongoDB who are still in the queue and not yet matched
-      const usersInQueue = await Match.find({isMatched: false }).exec();
+      const usersInQueue = await Match.find({isMatched: false }).sort({createdAt : 1}).exec();
       return usersInQueue;
   } catch (err) {
       console.error(`Error fetching users from queue: ${err}`);
