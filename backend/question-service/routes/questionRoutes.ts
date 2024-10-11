@@ -7,8 +7,8 @@ import {
     deleteQuestionById,
     getQuestionCategories,
     uploadQuestions
-} from '../controller/questionController';
-import { verifyAccessToken, uploadMiddleware } from '../middleware/questionMiddleware';  
+} from '../controller/QuestionController';
+import { verifyAccessToken, uploadMiddleware } from '../middleware/QuestionMiddleware';  
 
 const router = express.Router();
 
