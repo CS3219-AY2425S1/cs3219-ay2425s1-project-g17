@@ -86,6 +86,37 @@ export const getQuestionCategories = async (req: Request, res: Response) => {
     }
 };
 
+export const getRandomQuestion = async (req: Request, res: Response) => {
+    try {
+        const { difficulty, category } = req.query;
+        
+        if (!difficulty || !category) {
+            return res.status(400).json({ error: "Both difficulty and category must be provided" });
+        }
+
+        const randomQuestion = await Question.aggregate([
+            {
+                $match: {
+                    question_complexity: difficulty,
+                    question_categories: { $in: [category] }
+                }
+            },
+            {
+                $sample: { size: 1 }
+            }
+        ]);
+
+        if (randomQuestion.length === 0) {
+            return res.status(404).json({ message: 'No questions found for the given difficulty and category' });
+        }
+
+        res.status(200).json(randomQuestion[0]);
+    } catch (error) {
+        console.error('Error getting question categories', error);
+        res.status(400).json({ error: (error as Error).message });
+    }
+}
+
 export const uploadQuestions = async (req: Request, res: Response) => {
     try {
         if (!req.file) {
