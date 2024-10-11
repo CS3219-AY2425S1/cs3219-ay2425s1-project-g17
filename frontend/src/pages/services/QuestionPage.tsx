@@ -6,12 +6,13 @@ import {
     Autocomplete,
     TextField,
 } from '@mui/material';
-import { getAllQuestions, getFilteredQuestions } from '../../services/question-service/QuestionService';
+import { getAllQuestions, getFilteredQuestions, getAvailableCategories } from '../../services/question-service/QuestionService';
 import AddQuestionButton from '../../components/questionpage/AddQuestionButton';
 import SearchBar from '../../components/questionpage/SearchBar';
 import QuestionTable from '../../components/questionpage/QuestionTable';
 import UploadJsonButton from '../../components/questionpage/UploadJsonButton';
 import EditIcon from '@mui/icons-material/Edit';
+import { get } from 'http';
 
 interface ComplexityOption {
     label: string;
@@ -45,6 +46,7 @@ function QuestionPage() {
     const [isEditMode, setIsEditMode] = React.useState(false);
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
+    const [availableCategories, setAvailableCategories] = React.useState<string[]>([]);
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
@@ -161,6 +163,17 @@ function QuestionPage() {
                 console.error('Failed to fetch questions:', error);
             }
         }
+
+        async function getCategories() {
+            try {
+                const data = await getAvailableCategories();
+                setAvailableCategories(data);
+            } catch (error) {
+                console.error('Failed to fetch categories:', error);
+            }
+        }
+
+        getCategories();
         fetchQuestions();
         fetchFilteredQuestions();
     }, [selectedCategories, selectedComplexity, searchQuery]);
@@ -203,7 +216,7 @@ function QuestionPage() {
                         <Autocomplete
                             multiple
                             size="small"
-                            options={categories}
+                            options={availableCategories}
                             value={selectedCategories}
                             onChange={(event, newValue) => setSelectedCategories(newValue)}
                             renderInput={(params) => <TextField {...params} label="Category" />}

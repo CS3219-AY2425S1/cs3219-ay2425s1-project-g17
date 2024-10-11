@@ -203,8 +203,16 @@ async function sortQuestion(questions: QuestionProps[], sortDirection: String, s
         handleAxiosError(error);
         return [];
     }
+}
 
-
+// Function to get available categories
+async function getAvailableCategories() {
+    try {
+        const response = await api.get("/categories");
+        return response.data;
+    } catch (error) {
+        handleAxiosError(error);
+    }
 }
 
 // Function to upload JSON file with FormData
@@ -225,5 +233,6 @@ export {
     deleteQuestion,
     checkTitle,
     uploadJson,
-    sortQuestion
+    sortQuestion,
+    getAvailableCategories
 }
