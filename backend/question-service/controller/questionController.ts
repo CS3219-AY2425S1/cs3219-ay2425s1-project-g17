@@ -1,13 +1,9 @@
 import { Request, Response } from 'express';
-import Question from '../model/questionModel';
-import multer from 'multer';
+import Question from '../model/QuestionModel';
 import fs from 'fs';
 
 // Utility function to convert string to number
 const toNumber = (id: string): number => parseInt(id, 10);
-
-// Middleware to support multiform-data
-const upload = multer({ dest: 'data/' });
 
 export const createQuestion = async (req: Request, res: Response) => {
     try {
@@ -80,6 +76,16 @@ export const deleteQuestionById = async (req: Request, res: Response) => {
     }
 };
 
+export const getQuestionCategories = async (req: Request, res: Response) => {
+    try {
+        const uniqueCategories = await Question.distinct('question_categories');
+        res.json(uniqueCategories);
+    } catch (error) {
+        console.error('Error getting question categories', error);
+        res.status(400).json({ error: (error as Error).message });
+    }
+};
+
 export const uploadQuestions = async (req: Request, res: Response) => {
     try {
         if (!req.file) {
@@ -110,5 +116,3 @@ export const uploadQuestions = async (req: Request, res: Response) => {
         res.status(400).json({ error: (error as Error).message });
     }
 };
-
-export const uploadMiddleware = upload.single('file');

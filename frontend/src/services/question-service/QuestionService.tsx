@@ -1,4 +1,5 @@
 import axios from 'axios';
+import applyInterceptors from '../middleware/Interceptor';
 
 const api = axios.create({
     baseURL: "http://localhost:4000/questions",
@@ -9,6 +10,9 @@ const jsonApi = axios.create({
     baseURL: "http://localhost:4000/questions/upload",
     timeout: 5000, // Timeout after 5 seconds
 });
+
+applyInterceptors(api);
+applyInterceptors(jsonApi);
 
 interface ExampleProps {
     id: number;
