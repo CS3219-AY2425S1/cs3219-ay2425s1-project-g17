@@ -229,14 +229,6 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
                     </Typography>
                     <div>
                     <Markdown>{editedDescription}</Markdown>
-                        {/* <Typography sx={{ mt: 2, color: 'white' }}>
-                            {editedDescription?.split('\n').map((line, index) => (
-                                <React.Fragment key={index}>
-                                    {line}
-                                    <br />
-                                </React.Fragment>
-                            ))}
-                        </Typography> */}
                         <Typography sx={{ mt: 2, color: 'white' }}>
                             {example?.map((example, index) => (
                                 <div key={index}>
