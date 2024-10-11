@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import bodyParser from "body-parser";
 import cors from "cors";
 import dotenv from "dotenv";
-import questionRoutes from './routes/QuestionRoutes';
+import questionRoutes from './routes/questionRoutes';
 
 dotenv.config();
 
