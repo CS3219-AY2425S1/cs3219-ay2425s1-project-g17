@@ -51,6 +51,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         localStorage.removeItem('email');
         localStorage.removeItem('id');
         localStorage.removeItem('profileImage');
+        localStorage.removeItem('profileImageUrl');
+        localStorage.removeItem('profileImageUrlExpiry');
         setIsAuthenticated(false);
     };
 
