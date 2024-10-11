@@ -37,10 +37,8 @@ export default function SignIn() {
                 if (verified) {
                     setLoading(true);
                     setTimeout(() => {
+                        login(response?.data.username as string, response?.data.email as string, token, response?.data.id as string, response?.data.profilePic as string)
                         window.location.href = '/dashboard';
-                    }, 999);
-                    setTimeout(() => {
-                        login(response?.data.username as string, response?.data.email as string, token, response?.data.id as string, response?.data.profilePic as string);
                     }, 1000);
                 } else {
                     alert('Token verification failed.');
