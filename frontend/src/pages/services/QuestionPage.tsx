@@ -11,6 +11,7 @@ import AddQuestionButton from '../../components/questionpage/AddQuestionButton';
 import SearchBar from '../../components/questionpage/SearchBar';
 import QuestionTable from '../../components/questionpage/QuestionTable';
 import UploadJsonButton from '../../components/questionpage/UploadJsonButton';
+import EditIcon from '@mui/icons-material/Edit';
 
 interface ComplexityOption {
     label: string;
@@ -192,6 +193,7 @@ function QuestionPage() {
                         <Button
                             variant="contained"
                             color="secondary"
+                            startIcon={< EditIcon />}
                             sx={{ color: 'white', fontWeight: isEditMode ? 'bold' : 'normal' }}
                             onClick={() => setIsEditMode(!isEditMode)}
                         >

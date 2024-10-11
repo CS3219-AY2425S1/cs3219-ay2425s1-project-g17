@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import Question from '../model/QuestionModel';
+import Question from '../model/questionModel';
 import fs from 'fs';
 
 // Utility function to convert string to number

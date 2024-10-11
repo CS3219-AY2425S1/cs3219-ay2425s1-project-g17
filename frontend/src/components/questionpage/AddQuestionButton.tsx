@@ -116,7 +116,7 @@ const AddQuestionButton: React.FC<AddQuestionButtonProps> = ({ categories }) => 
                 sx={{ color: 'white' }}
                 onClick={handleOpen}
             >
-                Add Question
+                Add
             </Button>
 
             <Modal

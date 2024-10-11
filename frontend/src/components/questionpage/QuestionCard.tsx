@@ -20,6 +20,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import { updateQuestion, deleteQuestion, checkTitle } from '../../services/question-service/QuestionService';
 import Chip from '@mui/material/Chip';
+import Markdown from 'react-markdown'
 
 const complexityColors: Record<'EASY' | 'MEDIUM' | 'HARD', string> = {
     EASY: '#2C6B6D',
@@ -227,14 +228,15 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
                         {id + '. ' + title}
                     </Typography>
                     <div>
-                        <Typography sx={{ mt: 2, color: 'white' }}>
+                    <Markdown>{editedDescription}</Markdown>
+                        {/* <Typography sx={{ mt: 2, color: 'white' }}>
                             {editedDescription?.split('\n').map((line, index) => (
                                 <React.Fragment key={index}>
                                     {line}
                                     <br />
                                 </React.Fragment>
                             ))}
-                        </Typography>
+                        </Typography> */}
                         <Typography sx={{ mt: 2, color: 'white' }}>
                             {example?.map((example, index) => (
                                 <div key={index}>
