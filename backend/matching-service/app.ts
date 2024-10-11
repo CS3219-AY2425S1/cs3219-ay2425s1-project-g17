@@ -1,31 +1,30 @@
 import express from 'express';
 import dotenv from 'dotenv';
-import mongoose from 'mongoose';
 import cors from "cors";
 import matchRoutes from './route/matchRoute';
 import './queue_worker/matchWorker';
+import { redisClient } from './redisClient'; // Import Redis client
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT ?? "";
 
-const connectToMongoDB = async () => {mongoose
-    .connect(process.env.MONGODB_URI || '', {
-        dbName: "Matching-Service",
-    })
-    .then(() => console.log("Connected to MongoDB successfully!"))
-    .catch((error) => console.error("MongoDB connection eror:", error))
-
-  
+// Call this function to check Redis connection
+const connectToRedis = async () => {
+  try {
+    await redisClient.ping();
+    console.log("Connected to Redis successfully!");
+  } catch (error) {
+    console.error("Redis connection error:", error);
+  }
 };
 
 // Call this function in your app.ts
-connectToMongoDB();
+connectToRedis();
 
 app.use(cors());
 app.use(express.json());
-//app.use(express.static('public')); // Serve static files from the 'public' directory
 app.use('/matching', matchRoutes);
 
 app.listen(PORT, () => {

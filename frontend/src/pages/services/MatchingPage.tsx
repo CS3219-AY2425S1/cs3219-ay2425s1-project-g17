@@ -56,7 +56,7 @@ const MatchingService = () => {
             try {
                 const response = await api.get(`/matching/check-match-status/${userId}`);
                 if (response.data.matched) {
-                    setResultMessage('Match found!');
+                    setResultMessage(`Successfully matched with ${response.data.partnerId}, you will be attempting a ${response.data.difficultyAssigned} question on ${response.data.categoryAssigned}`);
                     clearInterval(pollInterval); // Stop polling when match is found
                     if (timerIntervalRef.current) clearInterval(timerIntervalRef.current); // Stop the timer from here
                 } else {

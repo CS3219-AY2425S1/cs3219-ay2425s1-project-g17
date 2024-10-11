@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
-import { Match, DIFFICULTY } from '../model/matchModel';
+import { DIFFICULTY } from '../model/matchModel';
+import { redisClient } from '../redisClient'; // Import Redis client
 
 export const requestMatch = async (req: Request, res: Response) => {
   const { userId, category, difficulty } = req.body;
@@ -13,15 +14,19 @@ export const requestMatch = async (req: Request, res: Response) => {
       userId,
       category,
       difficulty: difficulty as DIFFICULTY,
-      createdAt: new Date(),
+      createdAt: Date.now(),
+      isMatched: false,
+      partnerId: null,
+      categoryAssigned: null,
+      difficultyAssigned: null,
     };
 
-    // Save the match request to the database
-    await Match.create(matchRequest);
+    // Save the match request to Redis
+    await redisClient.hset(`match:${userId}`, matchRequest);
 
     console.log(`Message sent to the queue`, matchRequest);
 
-    res.status(202).json({ success: true, message: `User added to ${difficulty} queue` });
+    res.status(202).json({ success: true, message: `User added to queue` });
   } catch (error) {
     res.status(500).json({ success: false, error: (error as Error).message });
   }
@@ -32,22 +37,21 @@ export const checkMatchStatus = async (req: Request, res: Response) => {
 
   try {
     // Check if user is matched
-    const match = await Match.findOne({ userId, isMatched: true });
-    if (match) {
-      const user = match.userId
+    const match = await redisClient.hgetall(`match:${userId}`);
+    if (match && match.isMatched === 'true') {
       const partner = match.partnerId;
       const categoryAssigned = match.categoryAssigned;
       const difficultyAssigned = match.difficultyAssigned;
 
-      await Match.findOneAndDelete({userId: user, partnerId: partner});
-      console.log(`User ${user} removed from queue after being matched`)
-      return res.status(200).json({ matched: true, partnerId: partner, categoryAssigned: categoryAssigned, difficultyAssigned: difficultyAssigned });
-    } 
+      await redisClient.del(`match:${userId}`); // Remove from Redis
+      console.log(`User ${userId} removed from queue after being matched`);
+      return res.status(200).json({ matched: true, partnerId: partner, categoryAssigned, difficultyAssigned });
+    }
 
     // Check if user has been removed from the queue without getting matched
-    const userInQueue = await Match.findOne({userId, isMatched: false, partnerId: null, categoryAssigned: null, difficultyAssigned: null});
+    const userInQueue = await redisClient.hgetall(`match:${userId}`);
     if (!userInQueue) {
-      return res.status(200).json({removed: true});
+      return res.status(200).json({ removed: true });
     }
 
     // User is still in queue, but has not found a match yet
@@ -56,4 +60,3 @@ export const checkMatchStatus = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, error: (error as Error).message });
   }
 };
-
