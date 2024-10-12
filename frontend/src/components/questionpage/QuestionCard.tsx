@@ -101,7 +101,6 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
                     editedComplexity,
                     editedPopularity,
                 );
-                alert('Question updated successfully');
                 setEditOpen(false);
                 window.location.reload();
             }
@@ -113,7 +112,6 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
     const handleDelete = async () => {
         try {
             await deleteQuestion(id);
-            alert('Question deleted successfully.');
             setDeleteOpen(false);
             window.location.reload();
         } catch (error) {
