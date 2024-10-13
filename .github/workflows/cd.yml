@@ -13,9 +13,9 @@ jobs:
         strategy:
           matrix:
             include:
-              # - context: ./frontend
-              #   dockerfile: Dockerfile.prod
-              #   tag: peerprep-frontend
+              - context: ./frontend
+                dockerfile: Dockerfile.prod
+                tag: peerprep-frontend
               - context: ./backend/question-service
                 dockerfile: Dockerfile
                 tag: peerprep-question
