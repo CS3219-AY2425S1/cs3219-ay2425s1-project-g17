@@ -1,7 +1,16 @@
 name: Backend Question Service CI
 
-# on:
-#   workflow_dispatch: {}
+on:
+  workflow_dispatch: {}
+  push:
+    branches:
+      # - main
+      - backend/question-service
+      - devops/ci
+
+env:
+  MONGO_URI_TEST: ${{ secrets.MONGO_URI_TEST }}
+  JWT_SECRET: ${{ secrets.JWT_SECRET }}
 
 jobs:
   backend-question-service-test:
