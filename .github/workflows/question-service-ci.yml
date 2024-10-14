@@ -1,7 +1,7 @@
 name: Backend Question Service CI
 
-on:
-  workflow_dispatch: {}
+# on:
+#   workflow_dispatch: {}
 
 jobs:
   backend-question-service-test:
