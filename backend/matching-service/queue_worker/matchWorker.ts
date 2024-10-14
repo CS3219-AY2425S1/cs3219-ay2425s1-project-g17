@@ -1,6 +1,6 @@
 import { matchUser, getUsersFromQueue } from '../service/matchService';
 import { DIFFICULTY } from '../model/matchModel';
-import { redisClient } from '../redisClient'; // Import Redis client
+import { redisClient } from '../redisClient';
 
 const TIMEOUT_MS = 45000; // 45 seconds timeout
 const difficulties: DIFFICULTY[] = [DIFFICULTY.EASY, DIFFICULTY.MEDIUM, DIFFICULTY.HARD];
@@ -20,7 +20,7 @@ async function checkAllQueuesForMatches() {
   }
 }
 
-// A function to periodically check and remove expired users
+// Function to periodically check and remove expired users
 async function checkForExpiredUsers() {
   const currentTime = Date.now();
 
@@ -30,7 +30,7 @@ async function checkForExpiredUsers() {
     const match = await redisClient.hgetall(key);
     if (match && match.isMatched === 'false' && (currentTime - Number(match.createdAt)) > TIMEOUT_MS) {
       const userId = match.userId;
-      // Remove the user from the queue and Redis
+      // Remove the user from Redis
       await redisClient.del(key);
       console.log(`User ${userId} removed due to timeout.`);
     }
@@ -38,5 +38,5 @@ async function checkForExpiredUsers() {
 }
 
 // Schedule a periodic job to check every second for expired users
-setInterval(checkForExpiredUsers, 1000);  // Check every 1 second
+setInterval(checkForExpiredUsers, 1000);
 setInterval(checkAllQueuesForMatches, 4000);

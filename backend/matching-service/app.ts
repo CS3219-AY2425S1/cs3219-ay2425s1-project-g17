@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 import cors from "cors";
 import matchRoutes from './route/matchRoute';
 import './queue_worker/matchWorker';
-import { redisClient } from './redisClient'; // Import Redis client
+import { redisClient } from './redisClient';
 
 dotenv.config();
 
@@ -20,7 +20,6 @@ const connectToRedis = async () => {
   }
 };
 
-// Call this function in your app.ts
 connectToRedis();
 
 app.use(cors());
