@@ -20,7 +20,7 @@ interface IQuestion extends Document {
     question_categories: string[];
     question_complexity: DIFFICULTY;
     question_popularity: number;
-    question_examples?: Example[];
+    question_example?: Example[];
 }
 
 // Define the schema for the Question
