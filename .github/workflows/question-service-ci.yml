@@ -40,9 +40,9 @@ jobs:
     # Run question service unit tests
     - name: Run Backend Question Service Unit Tests
       working-directory: ./backend/question-service
-      run: npm test unit
+      run: npm run unit
 
     # Run question service integration tests
     - name: Run Backend Question Service Integration Tests
       working-directory: ./backend/question-service
-      run: npm test integration
+      run: npm run integration
