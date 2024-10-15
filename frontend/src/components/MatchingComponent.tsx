@@ -30,7 +30,7 @@ const MatchingComponent = () => {
     const [timer, setTimer] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
     const [matchStatus, setMatchStatus] = useState<'searching' | 'success' | 'timeout' | null>(null);
-    const [countdown, setCountdown] = useState<number | null>(null); 
+    const [countdown, setCountdown] = useState<number | null>(null);
     const [availableCategories, setAvailableCategories] = useState<string[]>([]);
     const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
     const [open, setOpen] = React.useState(false);
@@ -56,7 +56,7 @@ const MatchingComponent = () => {
     const handleSendRequest = async () => {
         const userId = localStorage.getItem('id');
         if (!userId) {
-            setResultMessage('Please enter a valid User ID.');
+            alert('User not authenticated');
             return;
         }
         if (!category) {
@@ -94,7 +94,7 @@ const MatchingComponent = () => {
                         clearInterval(timerIntervalRef.current);
                     }
                     setMatchStatus('success');
-                    startCountdown(5); 
+                    startCountdown(5);
                 }
             } catch (error: any) {
                 setResultMessage(error.message);
@@ -136,9 +136,9 @@ const MatchingComponent = () => {
                 if (prev === 1) {
                     clearInterval(countdownInterval);
                     // navigate('/collaboration');
-                    return 0; 
+                    return 0;
                 }
-                return prev ? prev - 1 : 0; 
+                return prev ? prev - 1 : 0;
             });
         }, 1000);
     };
@@ -154,16 +154,17 @@ const MatchingComponent = () => {
         <>
             <Paper elevation={4} sx={{ padding: "20px", maxWidth: "600px", borderRadius: "10px", margin: "auto" }}>
                 <Typography variant="h5" mb="20px" color="#9AC143">
-                    Matching
+                    Find a Match
                 </Typography>
                 <Box component="form" sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                     <Autocomplete
+                        size='small'
                         options={availableCategories}
                         value={category}
                         onChange={(event, newValue) => setCategory(newValue)}
                         renderInput={(params) => <TextField {...params} label="Category" variant="outlined" />}
                     />
-                    <FormControl variant="outlined" fullWidth>
+                    <FormControl size='small' variant="outlined" fullWidth>
                         <InputLabel>Select Difficulty</InputLabel>
                         <Select
                             value={difficulty}
@@ -225,7 +226,7 @@ const MatchingComponent = () => {
                         </Typography>
 
                         {matchStatus === 'searching' && <Typography mt={2} variant="body2" textAlign="center">
-                             Time in queue: {timer}s
+                            Time in queue: {timer}s
                         </Typography>}
 
                         {countdown !== null && (
@@ -234,13 +235,15 @@ const MatchingComponent = () => {
                             </Typography>
                         )}
                         <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
-                            <Button
-                                variant="outlined"
-                                color="secondary"
-                                onClick={handleClose}
-                                sx={{ color: "white" }}
-                            >Cancel
-                            </Button>
+                            {matchStatus !== 'success' && (
+                                <Button
+                                    variant="outlined"
+                                    color="secondary"
+                                    onClick={handleClose}
+                                    sx={{ color: "white" }}
+                                >Cancel
+                                </Button>
+                            )}
                             {matchStatus === 'timeout' && (
                                 <Button
                                     variant="contained"
