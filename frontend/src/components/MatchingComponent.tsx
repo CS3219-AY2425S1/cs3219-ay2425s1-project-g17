@@ -53,6 +53,11 @@ const MatchingComponent = () => {
     const handleSnackbarDifficultyOpen = () => setSnackbarDifficultyOpen(true);
     const handleSnackbarDifficultyClose = () => setSnackbarDifficultyOpen(false);
 
+    // TODO: implement cancellation of match request
+    const handleCancelRequest = () => {
+        handleClose();
+    };
+
     const handleSendRequest = async () => {
         const userId = localStorage.getItem('id');
         if (!userId) {
@@ -239,7 +244,7 @@ const MatchingComponent = () => {
                                 <Button
                                     variant="outlined"
                                     color="secondary"
-                                    onClick={handleClose}
+                                    onClick={handleCancelRequest}
                                     sx={{ color: "white" }}
                                 >Cancel
                                 </Button>
