@@ -27,6 +27,15 @@ export async function pollMatchStatus(userId: string) {
     }
 }
 
+export async function cancelMatchRequest(userId: string) {
+    try {
+        const response = await api.post(`/matching/cancel-match-request`, {userId});
+        return response.data;
+    } catch (error) {
+        throw new Error(handleAxiosError(error));
+    }
+}
+
 export function handleAxiosError(error: any) {
     if (axios.isAxiosError(error)) {
         console.error("Axios error:", error.response?.data || error.message);

@@ -60,3 +60,17 @@ export const checkMatchStatus = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, error: (error as Error).message });
   }
 };
+
+export const cancelMatch = async (req: Request, res: Response) => {
+  const { userId } = req.body;
+  try {
+    const key = await redisClient.keys(`match:${userId}`);
+    await redisClient.del(key);
+
+    console.log(`User ${userId} removed from the queue due to cancellation`);
+
+    res.status(202).json({ success: true, message: `User removed from queue` });
+  } catch (error) {
+    res.status(500).json({ success: false, error: (error as Error).message });
+  }
+};

@@ -18,7 +18,7 @@ import {
 import PersonSearchIcon from '@mui/icons-material/PersonSearch';
 import MoodIcon from '@mui/icons-material/Mood';
 import MoodBadIcon from '@mui/icons-material/MoodBad';
-import { sendMatchRequest, pollMatchStatus } from '../services/matching-service/MatchingService';
+import { sendMatchRequest, pollMatchStatus, cancelMatchRequest } from '../services/matching-service/MatchingService';
 import { getAvailableCategories } from '../services/question-service/QuestionService';
 import { useNavigate } from 'react-router-dom';
 
@@ -54,7 +54,30 @@ const MatchingComponent = () => {
     const handleSnackbarDifficultyClose = () => setSnackbarDifficultyOpen(false);
 
     // TODO: implement cancellation of match request
-    const handleCancelRequest = () => {
+    const handleCancelRequest = async () => {
+        const userId = localStorage.getItem('id');
+        if (!userId) {
+            alert('User not authenticated');
+            return;
+        }
+        if (!category) {
+            handleSnackbarCategoryOpen();
+            return;
+        }
+        if (!difficulty) {
+            handleSnackbarDifficultyOpen();
+            return;
+        }
+
+        setIsLoading(true);
+        handleOpen();
+        try {
+            await cancelMatchRequest(userId);
+        } catch (error: any) {
+            setResultMessage(error.message);
+        } finally {
+            setIsLoading(false);
+        }
         handleClose();
     };
 
