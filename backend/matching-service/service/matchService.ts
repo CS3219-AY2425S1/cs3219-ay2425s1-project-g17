@@ -5,7 +5,7 @@ export const matchUser = async (userId: string, category: string) => {
   // Log the matching attempt
   const user = await redisClient.hgetall(`match:${userId}`);
 
-  if (user) {
+  if (user && user.isMatched === 'false') {
     const difficulty: DIFFICULTY = user.difficulty as DIFFICULTY;
     console.log(`Attempting to match user: ${user.username}, category: ${category}, difficulty: ${difficulty}`);
 
@@ -33,13 +33,13 @@ export const matchUser = async (userId: string, category: string) => {
           potentialUser.categoryAssigned = user.category;
         } else {
           user.difficultyAssigned = potentialUser.difficulty;
-          user.categoryAssigned = potentialUser.difficulty;
+          user.categoryAssigned = potentialUser.category;
           potentialUser.difficultyAssigned = potentialUser.difficulty;
-          potentialUser.categoryAssigned = potentialUser.difficulty;
+          potentialUser.categoryAssigned = potentialUser.category;
         }
 
-        await redisClient.hmset(`match:${userId}`, user);
-        await redisClient.hmset(`match:${potentialUser.userId}`, potentialUser);
+        await redisClient.multi().hmset(`match:${userId}`, user).hmset(`match:${potentialUser.userId}`, potentialUser).exec();
+
         console.log(`User ${potentialUser.username} and User ${user.username} have been assigned a ${user.difficultyAssigned} question about ${user.categoryAssigned}`);
         return potentialUser;
       }
@@ -70,13 +70,12 @@ export const matchUser = async (userId: string, category: string) => {
             potentialUser.categoryAssigned = user.category;
           } else {
             user.difficultyAssigned = potentialUser.difficulty;
-            user.categoryAssigned = potentialUser.difficulty;
+            user.categoryAssigned = potentialUser.category;
             potentialUser.difficultyAssigned = potentialUser.difficulty;
-            potentialUser.categoryAssigned = potentialUser.difficulty;
+            potentialUser.categoryAssigned = potentialUser.category;
           }
 
-          await redisClient.hmset(`match:${userId}`, user);
-          await redisClient.hmset(`match:${potentialUser.userId}`, potentialUser);
+          await redisClient.multi().hmset(`match:${userId}`, user).hmset(`match:${potentialUser.userId}`, potentialUser).exec();
           console.log(`User ${potentialUser.username} and User ${user.username} have been assigned a ${user.difficultyAssigned} question about ${user.categoryAssigned}`);
           return potentialUser;
         }
@@ -108,13 +107,12 @@ export const matchUser = async (userId: string, category: string) => {
             potentialUser.categoryAssigned = user.category;
           } else {
             user.difficultyAssigned = potentialUser.difficulty;
-            user.categoryAssigned = potentialUser.difficulty;
+            user.categoryAssigned = potentialUser.category;
             potentialUser.difficultyAssigned = potentialUser.difficulty;
-            potentialUser.categoryAssigned = potentialUser.difficulty;
+            potentialUser.categoryAssigned = potentialUser.category;
           }
 
-          await redisClient.hmset(`match:${userId}`, user);
-          await redisClient.hmset(`match:${potentialUser.userId}`, potentialUser);
+          await redisClient.multi().hmset(`match:${userId}`, user).hmset(`match:${potentialUser.userId}`, potentialUser).exec();
           console.log(`User ${potentialUser.username} and User ${user.username} have been assigned a ${user.difficultyAssigned} question about ${user.categoryAssigned}`);
           return potentialUser;
         }
