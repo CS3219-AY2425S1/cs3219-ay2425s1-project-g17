@@ -4,16 +4,27 @@ name: PeerPrep
 # Define the services and applications that make up your application.
 services:
   frontend:
-    image: ngyaodong/peerprep-frontend:latest # Pulling the latest frontend image from Docker Hub
+    build: 
+      context: ./frontend # Path to the directory containing the Dockerfile for building the frontend image.
+      dockerfile: Dockerfile # Specified Dockerfile for building the frontend image.
     container_name: frontend # Defining the name of the container.
     ports:
-      - "3000:80" # Maps port 3000 on the host to port 80 in the container, making the app accessible on the host.
+      - "3000:3000" # Maps port 3000 on the host to port 3000 in the container, making the app accessible on the host.
     restart: unless-stopped # Restarts the container irrespective of the exit code but stops restarting when the service is stopped or removed.
     networks:
       - frontend-network # Connects the frontend to the 'frontend-network' network.
+    volumes:
+      - ./frontend:/app # Bind mount the local frontend folder to the container's app directory
+      - /app/node_modules # Exclude node_modules so Docker doesn't overwrite it
+    environment:
+      - CHOKIDAR_USEPOLLING=true # Required for hot reloading in some systems
+      - WATCHPACK_POLLING=true
+    stdin_open: true
+    tty: true
 
   question-service:
-    image: ngyaodong/peerprep-question:latest
+    build:
+      context: ./backend/question-service # Path to the directory containing the Dockerfile for building the question-service image.
     container_name: question-service # Defining the name of the container.
     ports:
       - "4000:4000" # Maps port 4000 on the host to port 4000 in the container, making the app accessible on the host.
@@ -24,7 +35,8 @@ services:
       - backend-network # Connects the question-service to the 'backend-network' network.
 
   user-service:
-    image: ngyaodong/peerprep-user:latest
+    build: 
+      context: ./backend/user-service # Path to the directory containing the Dockerfile for building the user-service image.
     container_name: user-service # Defining the name of the container.
     ports:
       - "4001:4001" # Maps port 4001 on the host to port 4001 in the container, making the app accessible on the host.
@@ -35,7 +47,8 @@ services:
       - backend-network # Connects the user-service to the 'backend-network' network.
       
   # matching-service:
-  #   image: ngyaodong/peerprep-matching:latest
+  #   build: 
+  #     context: ./backend/matching-service # Path to the directory containing the Dockerfile for building the matching-service image.
   #   container_name: matching-service # Defining the name of the container.
   #   ports:
   #     - "4002:4002" # Maps port 4002 on the host to port 4002 in the container, making the app accessible on the host.
@@ -46,7 +59,8 @@ services:
   #     - backend-network # Connects the matching-service to the 'backend-network' network.
       
   # collaboration-service:
-  #   image: ngyaodong/peerprep-collab:latest
+  #   build: 
+  #     context: ./backend/collaboration-service # Path to the directory containing the Dockerfile for building the collaboration-service image.
   #   container_name: collaboration-service # Defining the name of the container.
   #   ports:
   #     - "4003:4003" # Maps port 4003 on the host to port 4003 in the container, making the app accessible on the host.
