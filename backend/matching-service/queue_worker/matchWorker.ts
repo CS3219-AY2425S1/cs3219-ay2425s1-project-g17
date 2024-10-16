@@ -32,7 +32,9 @@ async function checkForExpiredUsers() {
       const userId = match.userId;
       // Remove the user from Redis
       await redisClient.del(key);
-      console.log(`User ${userId} removed due to timeout.`);
+
+      const count = (await getUsersFromQueue()).length;
+      console.log(`User ${userId} is removed due to timeout, total users currently in the queue: ${count}`);
     }
   }
 }

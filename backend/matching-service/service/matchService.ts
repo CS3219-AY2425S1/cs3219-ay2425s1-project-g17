@@ -40,7 +40,8 @@ export const matchUser = async (userId: string, category: string) => {
 
         await redisClient.hmset(`match:${userId}`, user);
         await redisClient.hmset(`match:${potentialUser.userId}`, potentialUser);
-        console.log(`User ${potentialUser.username} and User ${user.username} have been assigned a ${user.difficultyAssigned} question about ${user.categoryAssigned}`);
+        const count = (await getUsersFromQueue()).length;
+        console.log(`User ${potentialUser.Id} and User ${user.Id} have been assigned a ${user.difficultyAssigned} question about ${user.categoryAssigned}, total users currently in the queue: ${count}`);
         return potentialUser;
       }
     }
@@ -77,7 +78,8 @@ export const matchUser = async (userId: string, category: string) => {
 
           await redisClient.hmset(`match:${userId}`, user);
           await redisClient.hmset(`match:${potentialUser.userId}`, potentialUser);
-          console.log(`User ${potentialUser.username} and User ${user.username} have been assigned a ${user.difficultyAssigned} question about ${user.categoryAssigned}`);
+          const count = (await getUsersFromQueue()).length;
+          console.log(`User ${potentialUser.userId} and User ${user.userId} have been assigned a ${user.difficultyAssigned} question about ${user.categoryAssigned}, total users currently in the queue: ${count}`);
           return potentialUser;
         }
       }
@@ -115,7 +117,8 @@ export const matchUser = async (userId: string, category: string) => {
 
           await redisClient.hmset(`match:${userId}`, user);
           await redisClient.hmset(`match:${potentialUser.userId}`, potentialUser);
-          console.log(`User ${potentialUser.username} and User ${user.username} have been assigned a ${user.difficultyAssigned} question about ${user.categoryAssigned}`);
+          const count = (await getUsersFromQueue()).length;
+          console.log(`User ${potentialUser.userId} and User ${user.userId} have been assigned a ${user.difficultyAssigned} question about ${user.categoryAssigned}, total users currently in the queue: ${count}`);
           return potentialUser;
         }
       }
