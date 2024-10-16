@@ -5,6 +5,8 @@ import { redisClient } from '../redisClient';
 const TIMEOUT_MS = 45000; // 45 seconds timeout
 const difficulties: DIFFICULTY[] = [DIFFICULTY.EASY, DIFFICULTY.MEDIUM, DIFFICULTY.HARD];
 
+let isMatchingUser = false; // Flag to indicate if matchUser is currently running
+
 async function checkAllQueuesForMatches() {
   try {
     const usersInQueue = await getUsersFromQueue();
@@ -12,13 +14,21 @@ async function checkAllQueuesForMatches() {
     if (usersInQueue.length > 0) {
       // Try to match each user in the queue
       for (const user of usersInQueue) {
-        await matchUser(user.userId, user.category);
+        if (!isMatchingUser) { // Check if matchUser is not currently running
+          isMatchingUser = true; // Set the flag to true before calling matchUser
+          await matchUser(user.userId, user.category);
+          isMatchingUser = false; // Reset the flag after matchUser completes
+        } else {
+          console.log(`Currently matching another user. Skipping user: ${user.userId}`);
+          break; // Exit the loop if matchUser is already running
+        }
       }
     }
   } catch (err) {
     console.error(`Error checking queue`);
   }
 }
+
 
 // Function to periodically check and remove expired users
 async function checkForExpiredUsers() {

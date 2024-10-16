@@ -84,3 +84,16 @@ export const cancelMatch = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, error: (error as Error).message });
   }
 };
+
+export const checkIfUserInQueue = async (req: Request, res: Response) => {
+  const { userId } = req.body;
+  try {
+    const userInQueue = await redisClient.hgetall(`match:${userId}`);
+    if (userInQueue) {
+      return res.status(202).json({ inQueue: true });
+    }
+    res.status(202).json({ inQueue: false });
+  } catch (error) {
+    res.status(500).json({ success: false, error: (error as Error).message });
+  }
+};
