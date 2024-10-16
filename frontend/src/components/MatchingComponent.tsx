@@ -28,7 +28,6 @@ const MatchingComponent = () => {
     const [difficulty, setDifficulty] = useState('');
     const [resultMessage, setResultMessage] = useState('');
     const [timer, setTimer] = useState(0);
-    const [isLoading, setIsLoading] = useState(false);
     const [matchStatus, setMatchStatus] = useState<'searching' | 'success' | 'timeout' | null>(null);
     const [countdown, setCountdown] = useState<number | null>(null);
     const [availableCategories, setAvailableCategories] = useState<string[]>([]);
@@ -41,7 +40,26 @@ const MatchingComponent = () => {
         getAvailableCategories()
             .then((categories) => setAvailableCategories(categories))
             .catch((error) => console.error("Error:", error));
-    }, []);
+
+        // Add event listeners for refreshing or navigating away
+        const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+            handleCancelRequest();
+
+        };
+
+        const handlePopState = () => {
+            handleCancelRequest();
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        window.addEventListener('popstate', handlePopState);
+
+        // Cleanup listeners on unmount
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+            window.removeEventListener('popstate', handlePopState);
+        };
+    });
 
     const handleOpen = () => setOpen(true);
     const handleClose = () => {
@@ -57,23 +75,10 @@ const MatchingComponent = () => {
     const handleCancelRequest = async () => {
         const userId = localStorage.getItem('id');
         const username = localStorage.getItem('username');
-        if (!userId) {
-            alert('User not authenticated');
-            return;
-        }
-        if (!username) {
-            handleSnackbarCategoryOpen();
-            return;
-        }
-
-        setIsLoading(true);
-        handleOpen();
         try {
             await cancelMatchRequest(userId, username);
         } catch (error: any) {
-            setResultMessage(error.message);
-        } finally {
-            setIsLoading(false);
+            alert("Error Cancelling: " + error.message);
         }
         handleClose();
     };
@@ -86,7 +91,7 @@ const MatchingComponent = () => {
             return;
         }
         if (!username) {
-            handleSnackbarCategoryOpen();
+            console.error('Username not found');
             return;
         }
         if (!category) {
@@ -97,8 +102,6 @@ const MatchingComponent = () => {
             handleSnackbarDifficultyOpen();
             return;
         }
-
-        setIsLoading(true);
         handleOpen();
         try {
             await sendMatchRequest(userId, username, category, difficulty);
@@ -108,8 +111,6 @@ const MatchingComponent = () => {
             startTimer();
         } catch (error: any) {
             setResultMessage(error.message);
-        } finally {
-            setIsLoading(false);
         }
     };
 
