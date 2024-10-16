@@ -40,7 +40,7 @@ export const matchUser = async (userId: string, category: string) => {
 
         await redisClient.multi().hmset(`match:${userId}`, user).hmset(`match:${potentialUser.userId}`, potentialUser).exec();
         const count = (await getUsersFromQueue()).length;
-        console.log(`User ${potentialUser.Id} and User ${user.Id} have been assigned a ${user.difficultyAssigned} question about ${user.categoryAssigned}, total users currently in the queue: ${count}`);
+        console.log(`User ${potentialUser.userId} and User ${user.userId} have been assigned a ${user.difficultyAssigned} question about ${user.categoryAssigned}, total users currently in the queue: ${count}`);
         return potentialUser;
       }
     }
