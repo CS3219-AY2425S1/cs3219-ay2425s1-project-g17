@@ -56,23 +56,20 @@ const MatchingComponent = () => {
     // TODO: implement cancellation of match request
     const handleCancelRequest = async () => {
         const userId = localStorage.getItem('id');
+        const username = localStorage.getItem('username');
         if (!userId) {
             alert('User not authenticated');
             return;
         }
-        if (!category) {
+        if (!username) {
             handleSnackbarCategoryOpen();
-            return;
-        }
-        if (!difficulty) {
-            handleSnackbarDifficultyOpen();
             return;
         }
 
         setIsLoading(true);
         handleOpen();
         try {
-            await cancelMatchRequest(userId);
+            await cancelMatchRequest(userId, username);
         } catch (error: any) {
             setResultMessage(error.message);
         } finally {
@@ -83,8 +80,13 @@ const MatchingComponent = () => {
 
     const handleSendRequest = async () => {
         const userId = localStorage.getItem('id');
+        const username = localStorage.getItem('username');
         if (!userId) {
             alert('User not authenticated');
+            return;
+        }
+        if (!username) {
+            handleSnackbarCategoryOpen();
             return;
         }
         if (!category) {
@@ -99,7 +101,7 @@ const MatchingComponent = () => {
         setIsLoading(true);
         handleOpen();
         try {
-            await sendMatchRequest(userId, category, difficulty);
+            await sendMatchRequest(userId, username, category, difficulty);
             setResultMessage('Sit tight while we find a match for you...');
             setMatchStatus('searching');
             pollForMatch(userId);

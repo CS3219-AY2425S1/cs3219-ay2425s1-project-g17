@@ -5,10 +5,11 @@ const api = axios.create({
     timeout: 5000,
 });
 
-export async function sendMatchRequest(userId: string, category: string | null, difficulty: string) {
+export async function sendMatchRequest(userId: string, username: string, category: string | null, difficulty: string) {
     try {
         const response = await api.post('/matching/match-request', {
             userId,
+            username,
             category,
             difficulty,
         });
@@ -27,9 +28,9 @@ export async function pollMatchStatus(userId: string) {
     }
 }
 
-export async function cancelMatchRequest(userId: string) {
+export async function cancelMatchRequest(userId: string, username: string) {
     try {
-        const response = await api.post(`/matching/cancel-match-request`, {userId});
+        const response = await api.post(`/matching/cancel-match-request`, {userId, username});
         return response.data;
     } catch (error) {
         throw new Error(handleAxiosError(error));

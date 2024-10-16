@@ -7,7 +7,7 @@ export const matchUser = async (userId: string, category: string) => {
 
   if (user) {
     const difficulty: DIFFICULTY = user.difficulty as DIFFICULTY;
-    console.log(`Attempting to match user: ${userId}, category: ${category}, difficulty: ${difficulty}`);
+    console.log(`Attempting to match user: ${user.username}, category: ${category}, difficulty: ${difficulty}`);
 
     // Try to find an available match in the same category and difficulty (Highest Priority)
     const potentialMatch = await redisClient.keys(`match:*`);
@@ -15,13 +15,15 @@ export const matchUser = async (userId: string, category: string) => {
       const potentialUser = await redisClient.hgetall(key);
       if (potentialUser.userId !== userId && potentialUser.category === category && potentialUser.difficulty === difficulty && potentialUser.isMatched === 'false') {
         // Log found match
-        console.log(`Match found: User ${potentialUser.userId} for User ${userId}`);
+        console.log(`Match found: User ${potentialUser.username} for User ${user.username}`);
 
         // Mark both users as matched and update partnerIds
         user.isMatched = 'true';
         user.partnerId = potentialUser.userId;
+        user.partnerUsername = potentialUser.username;
         potentialUser.isMatched = 'true';
         potentialUser.partnerId = userId;
+        potentialUser.partnerUsername = user.username;
 
         // Update assigned categories and difficulties
         if (user.createdAt <= potentialUser.createdAt) {
@@ -38,7 +40,7 @@ export const matchUser = async (userId: string, category: string) => {
 
         await redisClient.hmset(`match:${userId}`, user);
         await redisClient.hmset(`match:${potentialUser.userId}`, potentialUser);
-        console.log(`User ${potentialUser.userId} and User ${userId} have been assigned a ${user.difficultyAssigned} question about ${user.categoryAssigned}`);
+        console.log(`User ${potentialUser.username} and User ${user.username} have been assigned a ${user.difficultyAssigned} question about ${user.categoryAssigned}`);
         return potentialUser;
       }
     }
@@ -50,13 +52,15 @@ export const matchUser = async (userId: string, category: string) => {
         const potentialUser = await redisClient.hgetall(key);
         if (potentialUser.userId !== userId && potentialUser.category === category && potentialUser.isMatched === 'false' && Number(potentialUser.createdAt) < currentTime - 15000) {
           // Log found match
-          console.log(`Match found: User ${potentialUser.userId} for User ${userId}`);
+          console.log(`Match found: User ${potentialUser.username} for User ${user.username}`);
 
           // Mark both users as matched and update partnerIds
           user.isMatched = 'true';
           user.partnerId = potentialUser.userId;
           potentialUser.isMatched = 'true';
           potentialUser.partnerId = userId;
+          user.partnerUsername = potentialUser.username;
+          potentialUser.partnerUsername = user.username;
 
           // Update assigned categories and difficulties
           if (user.createdAt <= potentialUser.createdAt) {
@@ -73,7 +77,7 @@ export const matchUser = async (userId: string, category: string) => {
 
           await redisClient.hmset(`match:${userId}`, user);
           await redisClient.hmset(`match:${potentialUser.userId}`, potentialUser);
-          console.log(`User ${potentialUser.userId} and User ${userId} have been assigned a ${user.difficultyAssigned} question about ${user.categoryAssigned}`);
+          console.log(`User ${potentialUser.username} and User ${user.username} have been assigned a ${user.difficultyAssigned} question about ${user.categoryAssigned}`);
           return potentialUser;
         }
       }
@@ -86,13 +90,15 @@ export const matchUser = async (userId: string, category: string) => {
         const potentialUser = await redisClient.hgetall(key);
         if (potentialUser.userId !== userId && potentialUser.difficulty === difficulty && potentialUser.isMatched === 'false' && Number(potentialUser.createdAt) < currentTime - 30000) {
           // Log found match
-          console.log(`Match found: User ${potentialUser.userId} for User ${userId}`);
+          console.log(`Match found: User ${potentialUser.username} for User ${user.username}`);
 
           // Mark both users as matched and update partnerIds
           user.isMatched = 'true';
           user.partnerId = potentialUser.userId;
           potentialUser.isMatched = 'true';
           potentialUser.partnerId = userId;
+          user.partnerUsername = potentialUser.username;
+          potentialUser.partnerUsername = user.username;
 
           // Update assigned categories and difficulties
           if (user.createdAt <= potentialUser.createdAt) {
@@ -109,13 +115,13 @@ export const matchUser = async (userId: string, category: string) => {
 
           await redisClient.hmset(`match:${userId}`, user);
           await redisClient.hmset(`match:${potentialUser.userId}`, potentialUser);
-          console.log(`User ${potentialUser.userId} and User ${userId} have been assigned a ${user.difficultyAssigned} question about ${user.categoryAssigned}`);
+          console.log(`User ${potentialUser.username} and User ${user.username} have been assigned a ${user.difficultyAssigned} question about ${user.categoryAssigned}`);
           return potentialUser;
         }
       }
     }
     // Return null if no match found
-    console.log(`No match found for user: ${userId}`);
+    console.log(`No match found for user: ${user.username}`);
     return null;
   }
 };

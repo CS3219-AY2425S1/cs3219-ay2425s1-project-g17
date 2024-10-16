@@ -3,7 +3,7 @@ import { DIFFICULTY } from '../model/matchModel';
 import { redisClient } from '../redisClient'; // Import Redis client
 
 export const requestMatch = async (req: Request, res: Response) => {
-  const { userId, category, difficulty } = req.body;
+  const { userId, username, category, difficulty } = req.body;
   try {
     // Validate that the difficulty is one of the enum values
     if (!Object.values(DIFFICULTY).includes(difficulty)) {
@@ -11,11 +11,13 @@ export const requestMatch = async (req: Request, res: Response) => {
     }
 
     const matchRequest = {
+      username,
       userId,
       category,
       difficulty: difficulty as DIFFICULTY,
       createdAt: Date.now(),
       isMatched: false,
+      partnerUsername: null,
       partnerId: null,
       categoryAssigned: null,
       difficultyAssigned: null,
@@ -39,12 +41,13 @@ export const checkMatchStatus = async (req: Request, res: Response) => {
     // Check if user is matched
     const match = await redisClient.hgetall(`match:${userId}`);
     if (match && match.isMatched === 'true') {
-      const partner = match.partnerId;
+      const partnerId = match.partnerId;
+      const partner = match.partnerUsername
       const categoryAssigned = match.categoryAssigned;
       const difficultyAssigned = match.difficultyAssigned;
 
       await redisClient.del(`match:${userId}`); // Remove from Redis
-      console.log(`User ${userId} removed from queue after being matched`);
+      console.log(`User ${match.username} removed from queue after being matched`);
       return res.status(200).json({ matched: true, partnerId: partner, categoryAssigned, difficultyAssigned });
     }
 
@@ -62,12 +65,12 @@ export const checkMatchStatus = async (req: Request, res: Response) => {
 };
 
 export const cancelMatch = async (req: Request, res: Response) => {
-  const { userId } = req.body;
+  const { userId, username } = req.body;
   try {
     const key = await redisClient.keys(`match:${userId}`);
     await redisClient.del(key);
 
-    console.log(`User ${userId} removed from the queue due to cancellation`);
+    console.log(`User ${username} removed from the queue due to cancellation`);
 
     res.status(202).json({ success: true, message: `User removed from queue` });
   } catch (error) {
