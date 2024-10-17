@@ -10,8 +10,24 @@ export const matchUser = async (userId: string, category: string) => {
     console.log(`Attempting to match user: ${user.username}, category: ${category}, difficulty: ${difficulty}`);
 
     // Try to find an available match in the same category and difficulty (Highest Priority)
-    const potentialMatch = await redisClient.keys(`match:*`);
-    for (const key of potentialMatch) {
+    const potentialMatchKeys = await redisClient.keys(`match:*`);
+
+    // Fetch createdAt values and sort potentialMatchKeys based on it
+    const potentialUsers = await Promise.all(
+      potentialMatchKeys.map(async (key) => {
+        const potentialUser = await redisClient.hgetall(key);
+        return { key, createdAt: Number(potentialUser.createdAt) };
+      })
+    );
+    
+    // Sort by createdAt in increasing order
+    potentialUsers.sort((a, b) => a.createdAt - b.createdAt);
+    
+    // Extract sorted keys
+    const sortedPotentialMatchKeys = potentialUsers.map(user => user.key);
+
+    for (const key of sortedPotentialMatchKeys) {
+      
       const potentialUser = await redisClient.hgetall(key);
       if (potentialUser.userId !== userId && potentialUser.category === category && potentialUser.difficulty === difficulty && potentialUser.isMatched === 'false') {
         // Log found match
