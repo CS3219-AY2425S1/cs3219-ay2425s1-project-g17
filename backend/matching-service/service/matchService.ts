@@ -63,8 +63,8 @@ export const matchUser = async (userId: string, category: string) => {
     const currentTime = Date.now();
     if (Number(user.createdAt) < currentTime - 15000) {
       console.log("Expanded search... now including same category only search")
-      const potentialMatch = await redisClient.keys(`match:*`);
-      for (const key of potentialMatch) {
+      
+      for (const key of sortedPotentialMatchKeys) {
         const potentialUser = await redisClient.hgetall(key);
         if (potentialUser.userId !== userId && potentialUser.category === category && potentialUser.isMatched === 'false' && Number(potentialUser.createdAt) < currentTime - 15000) {
           // Log found match
@@ -100,8 +100,8 @@ export const matchUser = async (userId: string, category: string) => {
 
     if (Number(user.createdAt) < currentTime - 30000) {
       console.log("Expanded search... now including same category only search")
-      const potentialMatch = await redisClient.keys(`match:*`);
-      for (const key of potentialMatch) {
+
+      for (const key of sortedPotentialMatchKeys) {
         const potentialUser = await redisClient.hgetall(key);
         if (potentialUser.userId !== userId && potentialUser.difficulty === difficulty && potentialUser.isMatched === 'false' && Number(potentialUser.createdAt) < currentTime - 30000) {
           // Log found match
