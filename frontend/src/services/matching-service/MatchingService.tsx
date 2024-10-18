@@ -28,7 +28,7 @@ export async function pollMatchStatus(userId: string) {
     }
 }
 
-export async function cancelMatchRequest(userId: string, username: string) {
+export async function cancelMatchRequest(userId: string | null, username: string | null) {
     try {
         const response = await api.post(`/matching/cancel-match-request`, {userId, username});
         return response.data;
