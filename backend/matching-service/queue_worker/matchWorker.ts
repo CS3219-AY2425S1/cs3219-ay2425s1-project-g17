@@ -19,7 +19,6 @@ async function checkAllQueuesForMatches() {
           await matchUser(user.userId, user.category);
           isMatchingUser = false; // Reset the flag after matchUser completes
         } else {
-          console.log(`Currently matching another user. Skipping user: ${user.userId}`);
           break; // Exit the loop if matchUser is already running
         }
       }
@@ -44,7 +43,7 @@ async function checkForExpiredUsers() {
       await redisClient.del(key);
 
       const count = (await getUsersFromQueue()).length;
-      console.log(`User ${userId} is removed due to timeout, total users currently in the queue: ${count}`);
+      console.log(`User ${userId} is removed due to 45s timeout, total users currently in the queue: ${count}`);
     }
   }
 }

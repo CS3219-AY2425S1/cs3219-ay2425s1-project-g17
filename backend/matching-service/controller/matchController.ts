@@ -28,8 +28,7 @@ export const requestMatch = async (req: Request, res: Response) => {
     await redisClient.hset(`match:${userId}`, matchRequest);
 
     const count = (await getUsersFromQueue()).length;
-    console.log(`Message sent to the queue`, matchRequest);
-    console.log(`User ${userId} has joined the queue, total users currently in the queue: ${count}`)
+    console.log(`User ${userId} has joined the queue with category ${category} and difficulty ${difficulty}, total users currently in the queue: ${count}`)
 
     res.status(202).json({ success: true, message: `User added to queue` });
   } catch (error) {
@@ -50,9 +49,6 @@ export const checkMatchStatus = async (req: Request, res: Response) => {
       const difficultyAssigned = match.difficultyAssigned;
 
       await redisClient.del(`match:${userId}`); // Remove from Redis
-      
-      
-      console.log(`User ${match.username} removed from queue after being matched`);
       return res.status(200).json({ matched: true, partnerId: partner, categoryAssigned, difficultyAssigned });
     }
 
@@ -76,8 +72,7 @@ export const cancelMatch = async (req: Request, res: Response) => {
     await redisClient.del(key);
 
     const count = (await getUsersFromQueue()).length;
-    console.log(`User ${username} removed from the queue due to cancellation`);
-    console.log(`User ${userId} has left the queue, total users currently in the queue: ${count}`)
+    console.log(`User ${userId} has left the queue due to cancellation, total users currently in the queue: ${count}`)
 
     res.status(202).json({ success: true, message: `User removed from queue` });
   } catch (error) {
