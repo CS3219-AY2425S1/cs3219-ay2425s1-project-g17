@@ -44,12 +44,12 @@ export const checkMatchStatus = async (req: Request, res: Response) => {
     const match = await redisClient.hgetall(`match:${userId}`);
     if (match && match.isMatched === 'true') {
       const partnerId = match.partnerId;
-      const partner = match.partnerUsername
+      const partnerUsername = match.partnerUsername
       const categoryAssigned = match.categoryAssigned;
       const difficultyAssigned = match.difficultyAssigned;
 
       await redisClient.del(`match:${userId}`); // Remove from Redis
-      return res.status(200).json({ matched: true, partnerId: partner, categoryAssigned, difficultyAssigned });
+      return res.status(200).json({ matched: true, partnerId: partnerId, partnerUsername: partnerUsername, categoryAssigned, difficultyAssigned });
     }
 
     // Check if user has been removed from the queue without getting matched

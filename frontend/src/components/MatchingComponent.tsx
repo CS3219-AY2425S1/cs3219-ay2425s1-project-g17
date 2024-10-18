@@ -119,7 +119,8 @@ const MatchingComponent = () => {
             try {
                 const matchData = await pollMatchStatus(userId);
                 if (matchData.matched) {
-                    setResultMessage(`Successfully matched with ${matchData.username}, you will be attempting a ${matchData.difficultyAssigned} question on ${matchData.categoryAssigned}`);
+                    console.log(matchData)
+                    setResultMessage(`Successfully matched with ${matchData.partnerUsername}, you will be attempting a ${matchData.difficultyAssigned} question on ${matchData.categoryAssigned}`);
                     clearInterval(pollInterval);
                     if (timerIntervalRef.current) {
                         clearInterval(timerIntervalRef.current);
