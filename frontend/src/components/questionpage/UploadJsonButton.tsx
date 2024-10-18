@@ -61,7 +61,7 @@ const UploadJsonButton = () => {
                 sx={{ color: 'white' }}
                 onClick={handleOpen}
             >
-                Upload JSON
+                Upload
             </Button>
 
             <Modal

@@ -24,7 +24,7 @@ const Features = () => {
                     mt: 5,
                 }}
             >
-                <Typography variant="h4" sx={{ color: 'white', textAlign: 'Left' }}>
+                <Typography variant="h4" sx={{ color: '#9AC143', textAlign: 'Left' }}>
                     <b>Our Features</b>
                 </Typography>
             </Box>

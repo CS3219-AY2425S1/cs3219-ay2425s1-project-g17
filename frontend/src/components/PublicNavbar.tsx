@@ -19,9 +19,16 @@ function Navbar() {
           </a>
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
           </Box>
-          <Box sx={{ flexGrow: 0, display: "flex", alignItems: "center" }}>
-            <Button 
-            onClick={() => navigate('/login')}>
+          <Box sx={{ flexGrow: 0, display: "flex", alignItems: "center", gap: 2 }}>
+            <Button
+              onClick={() => navigate('/learn')}>
+              About Us
+            </Button>
+            <Button
+              variant='contained'
+              color='secondary'
+              sx={{ color: 'white' }}
+              onClick={() => navigate('/login')}>
               Sign In
             </Button>
           </Box>

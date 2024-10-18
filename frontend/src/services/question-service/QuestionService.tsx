@@ -1,4 +1,5 @@
 import axios from 'axios';
+import applyInterceptors from '../middleware/Interceptor';
 
 const api = axios.create({
     baseURL: "http://localhost:4000/questions",
@@ -9,6 +10,9 @@ const jsonApi = axios.create({
     baseURL: "http://localhost:4000/questions/upload",
     timeout: 5000, // Timeout after 5 seconds
 });
+
+applyInterceptors(api);
+applyInterceptors(jsonApi);
 
 interface ExampleProps {
     id: number;
@@ -199,8 +203,16 @@ async function sortQuestion(questions: QuestionProps[], sortDirection: String, s
         handleAxiosError(error);
         return [];
     }
+}
 
-
+// Function to get available categories
+async function getAvailableCategories() {
+    try {
+        const response = await api.get("/categories");
+        return response.data;
+    } catch (error) {
+        handleAxiosError(error);
+    }
 }
 
 // Function to upload JSON file with FormData
@@ -221,5 +233,6 @@ export {
     deleteQuestion,
     checkTitle,
     uploadJson,
-    sortQuestion
+    sortQuestion,
+    getAvailableCategories
 }

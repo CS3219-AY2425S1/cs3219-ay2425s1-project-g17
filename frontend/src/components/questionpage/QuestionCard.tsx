@@ -20,6 +20,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import { updateQuestion, deleteQuestion, checkTitle } from '../../services/question-service/QuestionService';
 import Chip from '@mui/material/Chip';
+import Markdown from 'react-markdown'
 
 const complexityColors: Record<'EASY' | 'MEDIUM' | 'HARD', string> = {
     EASY: '#2C6B6D',
@@ -100,7 +101,6 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
                     editedComplexity,
                     editedPopularity,
                 );
-                alert('Question updated successfully');
                 setEditOpen(false);
                 window.location.reload();
             }
@@ -112,7 +112,6 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
     const handleDelete = async () => {
         try {
             await deleteQuestion(id);
-            alert('Question deleted successfully.');
             setDeleteOpen(false);
             window.location.reload();
         } catch (error) {
@@ -203,7 +202,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
                         top: '50%',
                         left: '50%',
                         transform: 'translate(-50%, -50%)',
-                        width: 550,
+                        width: '50%',
                         bgcolor: 'background.paper',
                         boxShadow: 24,
                         p: 4,
@@ -227,14 +226,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
                         {id + '. ' + title}
                     </Typography>
                     <div>
-                        <Typography sx={{ mt: 2, color: 'white' }}>
-                            {editedDescription?.split('\n').map((line, index) => (
-                                <React.Fragment key={index}>
-                                    {line}
-                                    <br />
-                                </React.Fragment>
-                            ))}
-                        </Typography>
+                    <Markdown>{editedDescription}</Markdown>
                         <Typography sx={{ mt: 2, color: 'white' }}>
                             {example?.map((example, index) => (
                                 <div key={index}>

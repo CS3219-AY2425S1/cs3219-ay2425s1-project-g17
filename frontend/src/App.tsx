@@ -29,6 +29,8 @@ function App() {
     },
   };
 
+  // #9AC143 green
+
   const theme = createTheme(themeOptions);
 
   return (
@@ -42,7 +44,7 @@ function App() {
                 return null;
               }
 
-              const { isAuthenticated } = context; 
+              const { isAuthenticated } = context;
               return isAuthenticated ? <AuthenticatedRoutes /> : <PublicRoutes />;
             }}
           </AuthContext.Consumer>
