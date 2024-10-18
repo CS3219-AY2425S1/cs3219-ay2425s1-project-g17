@@ -5,7 +5,6 @@ import { AuthContext } from "../context/AuthContext";
 import Navbar from "../components/PublicNavbar";
 import { LandingPage, NotFoundPage, LearnMorePage } from "../pages/miscellaneous";
 import { LoginPage, RegisterPage } from "../pages/authentication";
-import MatchingPage from "../pages/services/MatchingPage";
 
 export const PublicRoutes = () => {
     const authContext = useContext(AuthContext);
@@ -29,7 +28,6 @@ export const PublicRoutes = () => {
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/learn" element={<LearnMorePage />} />
-                <Route path="/matching" element={<MatchingPage />} />
                 <Route path="/dashboard"/>
                 <Route path="/profile"/>
                 <Route path="*" element={<NotFoundPage />} />
