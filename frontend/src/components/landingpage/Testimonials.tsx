@@ -2,6 +2,7 @@ import React from 'react';
 import { Container, Box, Typography, Paper } from '@mui/material';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import StarIcon from '@mui/icons-material/Star';
+import { motion } from 'framer-motion';
 
 const Testimonials = () => {
     const testimonials = [
@@ -33,7 +34,6 @@ const Testimonials = () => {
                 flexDirection: 'column',
                 justifyContent: 'center',
                 minHeight: '70vh',
-                pb: 15,
             }}
         >
             <Box sx={{ marginBottom: '30px', textAlign: 'left' }}>
@@ -51,42 +51,49 @@ const Testimonials = () => {
                 }}
             >
                 {testimonials.map((testimonial, index) => (
-                    <Paper
+                    <motion.div
                         key={index}
-                        sx={{
-                            width: '300px',
-                            padding: '20px',
-                            backgroundColor: 'rgba(255, 255, 255, 0.15)',
-                            borderRadius: '15px',
-                            boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
-                            textAlign: 'center',
-                            transition: 'transform 0.3s, box-shadow 0.3s',
-                            '&:hover': {
-                                transform: 'scale(1.05)',
-                                boxShadow: '0 8px 20px rgba(0, 0, 0, 0.3)',
-                            },
-                        }}
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.6, delay: index * 0.2 }}
                     >
-                        <Box sx={{ display: 'flex', justifyContent: 'center', marginBottom: 2 }}>
-                            <AccountCircleIcon sx={{ fontSize: 60, color: 'white' }} />
-                        </Box>
-                        <Typography sx={{ color: 'white', fontWeight: 'bold', marginBottom: '5px' }}>
-                            {testimonial.name}
-                        </Typography>
-                        <Typography sx={{ color: 'white', fontStyle: 'italic', marginBottom: '15px' }}>
-                            {testimonial.role}
-                        </Typography>
+                        <Paper
+                            sx={{
+                                width: '300px',
+                                padding: '20px',
+                                backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                                borderRadius: '15px',
+                                boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
+                                textAlign: 'center',
+                                transition: 'transform 0.3s, box-shadow 0.3s',
+                                '&:hover': {
+                                    transform: 'scale(1.05)',
+                                    boxShadow: '0 8px 20px rgba(0, 0, 0, 0.3)',
+                                },
+                            }}
+                        >
+                            <Box sx={{ display: 'flex', justifyContent: 'center', marginBottom: 2 }}>
+                                <AccountCircleIcon sx={{ fontSize: 60, color: 'white' }} />
+                            </Box>
+                            <Typography sx={{ color: 'white', fontWeight: 'bold', marginBottom: '5px' }}>
+                                {testimonial.name}
+                            </Typography>
+                            <Typography sx={{ color: 'white', fontStyle: 'italic', marginBottom: '15px' }}>
+                                {testimonial.role}
+                            </Typography>
 
-                        <Box sx={{ display: 'flex', justifyContent: 'center', marginBottom: 2 }}>
-                            {Array.from({ length: testimonial.rating }).map((_, starIndex) => (
-                                <StarIcon key={starIndex} sx={{ fontSize: 24, color: 'yellow' }} />
-                            ))}
-                        </Box>
+                            <Box sx={{ display: 'flex', justifyContent: 'center', marginBottom: 2 }}>
+                                {Array.from({ length: testimonial.rating }).map((_, starIndex) => (
+                                    <StarIcon key={starIndex} sx={{ fontSize: 24, color: 'yellow' }} />
+                                ))}
+                            </Box>
 
-                        <Typography variant="body1" sx={{ color: 'white', textAlign: 'justify' }}>
-                            {testimonial.feedback}
-                        </Typography>
-                    </Paper>
+                            <Typography variant="body1" sx={{ color: 'white', textAlign: 'justify' }}>
+                                {testimonial.feedback}
+                            </Typography>
+                        </Paper>
+                    </motion.div>
                 ))}
             </Box>
         </Container>

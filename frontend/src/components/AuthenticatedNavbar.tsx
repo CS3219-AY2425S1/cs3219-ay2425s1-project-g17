@@ -12,11 +12,18 @@ import MenuItem from '@mui/material/MenuItem';
 import Badge from '@mui/material/Badge';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import PeopleIcon from '@mui/icons-material/People';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import LogoutIcon from '@mui/icons-material/Logout';
 import Logo from '../assets/Logo.png';
 import { getSignedImageURL } from '../services/user-service/UserService';
 import { AuthContext } from '../context/AuthContext';
 
-const settings = ['Dashboard', 'Profile', 'Logout'];
+const settings = [
+  { name: 'Dashboard', icon: <DashboardIcon /> },
+  { name: 'Profile', icon: <AccountCircleIcon /> },
+  { name: 'Logout', icon: <LogoutIcon /> },
+];
 
 function Navbar() {
   const [profileImageUrl, setprofileImageUrl] = React.useState('');
@@ -109,15 +116,18 @@ function Navbar() {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              {settings.map((setting) => (
+              {settings.map(({ name, icon }) => (
                 <MenuItem
-                  key={setting}
-                  onClick={setting === 'Logout' ? handleLogout
-                    : setting === 'Profile' ? () => window.location.href = '/profile'
-                      : setting === 'Dashboard' ? () => window.location.href = '/dashboard'
+                  key={name}
+                  onClick={name === 'Logout' ? handleLogout
+                    : name === 'Profile' ? () => window.location.href = '/profile'
+                      : name === 'Dashboard' ? () => window.location.href = '/dashboard'
                         : handleCloseUserMenu}
                 >
-                  <Typography sx={{ textAlign: 'center' }}>{setting}</Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    {icon}
+                    <Typography sx={{ textAlign: 'center' }}>{name}</Typography>
+                  </Box>
                 </MenuItem>
               ))}
             </Menu>
