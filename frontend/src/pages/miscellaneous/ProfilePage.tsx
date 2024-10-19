@@ -75,7 +75,7 @@ export default function ProfilePage() {
             getUserProfilePic(profileImage)
         }
         fetchUserData();
-    }, [token]);
+    });
 
     const handleEditClick = (field: 'username' | 'email' | 'password') => {
         if (field === 'username') {

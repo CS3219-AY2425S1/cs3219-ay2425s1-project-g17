@@ -37,7 +37,7 @@ const Testimonials = () => {
             }}
         >
             <Box sx={{ marginBottom: '30px', textAlign: 'left' }}>
-                <Typography variant="h4" sx={{ color: 'white', fontWeight: 'bold' }}>
+                <Typography variant="h4" sx={{ color: '#9AC143', fontWeight: 'bold' }}>
                     Our Testimonials
                 </Typography>
             </Box>

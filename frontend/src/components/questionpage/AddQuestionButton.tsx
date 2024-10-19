@@ -69,7 +69,6 @@ const AddQuestionButton: React.FC<AddQuestionButtonProps> = ({ categories }) => 
         const newQuestion = await addQuestion(title, description, example, category, complexity, popularity);
 
         if (newQuestion) {
-            alert('Question added successfully!');
             window.location.reload();
         } else {
             alert('Failed to add question. Please try again.');
@@ -116,7 +115,7 @@ const AddQuestionButton: React.FC<AddQuestionButtonProps> = ({ categories }) => 
                 sx={{ color: 'white' }}
                 onClick={handleOpen}
             >
-                Add Question
+                Add
             </Button>
 
             <Modal

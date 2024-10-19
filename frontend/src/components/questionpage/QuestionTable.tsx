@@ -77,7 +77,12 @@ const QuestionTable: React.FC<QuestionTableProps> = ({
                 <Table sx={{ minWidth: 650 }} aria-label="simple table">
                     <TableHead>
                         <TableRow>
-                            <TableCell sx={{ fontWeight: 'bold' }}>No</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold', cursor: 'pointer' }} onClick={() => handleSort('question_id')}>
+                                No
+                                <IconButton size="small">
+                                    {sortField === 'question_id' && sortDirection === 'asc' ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />}
+                                </IconButton>
+                            </TableCell>
                             <TableCell sx={{ fontWeight: 'bold', cursor: 'pointer' }} onClick={() => handleSort('question_title')}>
                                 Title
                                 <IconButton size="small">

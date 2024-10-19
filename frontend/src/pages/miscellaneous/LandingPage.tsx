@@ -1,12 +1,15 @@
 import React from 'react';
 import { Hero, Features, Testimonials } from '../../components/landingpage';
+import { Container } from '@mui/material';
 
 const LandingPage = () => {
     return (
         <>
             <Hero />
-            <Features />
-            <Testimonials />
+            <Container>
+                <Features />
+                <Testimonials />
+            </Container>
         </>
     );
 }
