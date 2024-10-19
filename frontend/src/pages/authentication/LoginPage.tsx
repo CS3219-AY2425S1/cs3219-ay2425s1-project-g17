@@ -176,7 +176,7 @@ export default function SignIn() {
                             color="secondary"
                             fullWidth
                             variant="contained"
-                            sx={{ padding: '10px 0', fontSize: '16px', color: 'white' }}
+                            sx={{ color: 'white' }}
                         >
                             Sign in
                         </Button>
