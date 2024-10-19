@@ -13,35 +13,35 @@ jobs:
         strategy:
           matrix:
             include:
-              - name: Deploy Frontend
+              - run-name: Deploy Frontend
                 context: ./frontend
                 dockerfile: Dockerfile.prod
                 repository: peerprep-frontend
                 task_def_name: frontend
                 container_name: frontend
                 service_name: frontend
-              - name: Deploy Question Service
+              - run-name: Deploy Question Service
                 context: ./backend/question-service
                 dockerfile: Dockerfile
                 repository: peerprep-question
                 task_def_name: question
                 container_name: question
                 service_name: question
-              - name: Deploy User Service
+              - run-name: Deploy User Service
                 context: ./backend/user-service
                 dockerfile: Dockerfile
                 repository: peerprep-user
                 task_def_name: user
                 container_name: user
                 service_name: user
-              - name: Deploy Matching Service
+              - run-name: Deploy Matching Service
                 context: ./backend/matching-service
                 dockerfile: Dockerfile
                 repository: peerprep-matching
                 task_def_name: matching
                 container_name: matching
                 service_name: matching
-              # - name: Deploy Collaboration Service
+              # - run-name: Deploy Collaboration Service
               #   context: ./backend/collaboration-service
               #   dockerfile: Dockerfile
               #   repository: peerprep-collab
@@ -53,20 +53,31 @@ jobs:
             - name: Checkout repository
               uses: actions/checkout@v4
             
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v3
+
+            - name: Login to Docker Hub
+              uses: docker/login-action@v3
+              with:
+                username: ${{ secrets.DOCKERHUB_USERNAME }}
+                password: ${{ secrets.DOCKERHUB_TOKEN }}  
+            
+            - name: Build and push
+              uses: docker/build-push-action@v6
+              env:
+                IMAGE_TAG: latest
+              with:
+                context: ${{ matrix.context }}
+                file: ${{ matrix.context }}/${{ matrix.dockerfile }}
+                push: true
+                tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.repository }}:$IMAGE_TAG
+
             - name: Build images
               id: build-image
               env:
                 IMAGE_TAG: latest
               run: |
-                docker build ${{ matrix.context }} \ 
-                -f ${{ matrix.context }}/${{ matrix.dockerfile }} \
-                -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.repository }}:$IMAGE_TAG
                 echo "image=${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.repository }}:$IMAGE_TAG" >> $GITHUB_OUTPUT
-
-            - name: Push image to Docker Hub
-              run: |
-                docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
-                docker push ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.repository }}:latest
 
             - name: Configure AWS credentials
               uses: aws-actions/configure-aws-credentials@v4
@@ -100,4 +111,3 @@ jobs:
             #     service: ${{ env.ECS_SERVICE }}
             #     cluster: ${{ env.ECS_CLUSTER }}
             #     wait-for-service-stability: true
-            
