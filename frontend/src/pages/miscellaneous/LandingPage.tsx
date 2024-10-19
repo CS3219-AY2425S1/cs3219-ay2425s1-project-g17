@@ -1,5 +1,5 @@
 import React from 'react';
-import { Hero, Features, Testimonials } from '../../components/landingpage';
+import { Hero, Features, Testimonials, CallToAction, Footer } from '../../components/landingpage';
 import { Container } from '@mui/material';
 
 const LandingPage = () => {
@@ -10,8 +10,9 @@ const LandingPage = () => {
                 <Features />
                 <Testimonials />
             </Container>
+            <CallToAction />
+            <Footer />
         </>
     );
 }
-
 export default LandingPage;

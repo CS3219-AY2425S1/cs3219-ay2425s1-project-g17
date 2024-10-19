@@ -27,9 +27,16 @@ function App() {
         secondary: '#FFFFFF',
       },
     },
+    components: {
+      MuiButton: {
+        styleOverrides: {
+          root: {
+            borderRadius: '20px', // Adjust the value to make it rounder
+          },
+        },
+      },
+    },
   };
-
-  // #9AC143 green
 
   const theme = createTheme(themeOptions);
 
@@ -55,3 +62,5 @@ function App() {
 }
 
 export default App;
+
+  // #9AC143 green

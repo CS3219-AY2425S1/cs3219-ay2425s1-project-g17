@@ -46,23 +46,10 @@ async function getAllQuestions() {
     }
 }
 
-// Function to find the highest id in the questions array
-async function getMaxId() {
-    try {
-        const questions = await getAllQuestions();
-        const maxId = Math.max(...questions.map((question: any) => question.question_id));
-        return maxId;
-    } catch (error) {
-        handleAxiosError(error);
-    }
-}
-
 // Function to add question to the API
 async function addQuestion(title: string, description: string, example: ExampleProps[], categories: string[], complexity: string, popularity: number) {
     try {
-        const maxId = await getMaxId();
         const questionData = {
-            question_id: maxId ? maxId + 1 : 0,
             question_title: title,
             question_description: description,
             question_example: example,
@@ -81,7 +68,6 @@ async function addQuestion(title: string, description: string, example: ExampleP
 async function updateQuestion(id: number, title: string, description: string, example: ExampleProps[], categories: string[], complexity: string, popularity: number) {
     try {
         const questionData = {
-            question_id: id,
             question_title: title,
             question_description: description,
             question_example: example,
@@ -100,20 +86,6 @@ async function updateQuestion(id: number, title: string, description: string, ex
 async function deleteQuestion(id: number) {
     try {
         const response = await api.delete(`/${id}`);
-        const remainingQuestions = await getAllQuestions();
-        remainingQuestions.forEach(async (question: any, index: number) => {
-            if (question.question_id > id) {
-                const updatedQuestionData = {
-                    question_id: question.question_id - 1,
-                    question_title: question.question_title,
-                    question_description: question.question_description,
-                    question_categories: question.question_categories,
-                    question_complexity: question.question_complexity,
-                    question_popularity: question.question_popularity,
-                };
-                await api.put(`/${question.question_id}`, updatedQuestionData);
-            }
-        });
         return response.data;
     } catch (error) {
         handleAxiosError(error);
