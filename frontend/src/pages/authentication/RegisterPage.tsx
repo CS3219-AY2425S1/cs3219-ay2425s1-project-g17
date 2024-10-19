@@ -7,6 +7,10 @@ import Link from '@mui/material/Link';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { Container } from '@mui/material';
+import InputAdornment from '@mui/material/InputAdornment';
+import IconButton from '@mui/material/IconButton';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { createUser } from '../../services/user-service/UserService';
 import { useNavigate } from 'react-router-dom';
 
@@ -19,6 +23,8 @@ const RegisterPage = () => {
     const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
     const [confirmPasswordError, setConfirmPasswordError] = React.useState(false);
     const [confirmPasswordErrorMessage, setConfirmPasswordErrorMessage] = React.useState('');
+    const [showPassword, setShowPassword] = React.useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
     const navigate = useNavigate();
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -65,11 +71,6 @@ const RegisterPage = () => {
 
         // Password validation
         const validatePassword = (password: string) => {
-            // Regular expression to validate the password:
-            // - At least 6 characters long
-            // - At least one number
-            // - At least one uppercase letter
-            // - At least one lowercase letter
             const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d\W_]{6,}$/;
 
             if (!password) {
@@ -87,7 +88,6 @@ const RegisterPage = () => {
             }
         };
 
-        // Use the validation function within your form validation
         isValid = validatePassword(password.value);
 
         // Confirm password validation
@@ -141,8 +141,11 @@ const RegisterPage = () => {
                 >
                     {/* Username Field */}
                     <FormControl>
-                        <FormLabel htmlFor="username">Username</FormLabel>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', pb: 1 }}>
+                            <FormLabel htmlFor="username">Username</FormLabel>
+                        </Box>
                         <TextField
+                            size="small"
                             error={usernameError}
                             helperText={usernameErrorMessage}
                             id="username"
@@ -158,8 +161,11 @@ const RegisterPage = () => {
 
                     {/* Email Field */}
                     <FormControl>
-                        <FormLabel htmlFor="email">Email</FormLabel>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', pb: 1 }}>
+                            <FormLabel htmlFor="email">Email</FormLabel>
+                        </Box>
                         <TextField
+                            size="small"
                             error={emailError}
                             helperText={emailErrorMessage}
                             id="email"
@@ -175,35 +181,65 @@ const RegisterPage = () => {
 
                     {/* Password Field */}
                     <FormControl>
-                        <FormLabel htmlFor="password">Password</FormLabel>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', pb: 1 }}>
+                            <FormLabel htmlFor="password">Password</FormLabel>
+                        </Box>
                         <TextField
+                            size="small"
                             error={passwordError}
                             helperText={passwordErrorMessage}
                             name="password"
                             placeholder="••••••••••••"
-                            type="password"
+                            type={showPassword ? 'text' : 'password'}
                             id="password"
                             autoComplete="new-password"
                             required
                             fullWidth
                             variant="outlined"
+                            InputProps={{
+                                endAdornment: (
+                                    <InputAdornment position="end">
+                                        <IconButton
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            edge="end"
+                                        >
+                                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                                        </IconButton>
+                                    </InputAdornment>
+                                ),
+                            }}
                         />
                     </FormControl>
 
                     {/* Confirm Password Field */}
                     <FormControl>
-                        <FormLabel htmlFor="confirmPassword">Confirm Password</FormLabel>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', pb: 1 }}>
+                            <FormLabel htmlFor="confirmPassword">Confirm Password</FormLabel>
+                        </Box>
                         <TextField
+                            size="small"
                             error={confirmPasswordError}
                             helperText={confirmPasswordErrorMessage}
                             name="confirmPassword"
                             placeholder="••••••••••••"
-                            type="password"
+                            type={showConfirmPassword ? 'text' : 'password'}
                             id="confirmPassword"
                             autoComplete="new-password"
                             required
                             fullWidth
                             variant="outlined"
+                            InputProps={{
+                                endAdornment: (
+                                    <InputAdornment position="end">
+                                        <IconButton
+                                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                            edge="end"
+                                        >
+                                            {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                                        </IconButton>
+                                    </InputAdornment>
+                                ),
+                            }}
                         />
                     </FormControl>
 
