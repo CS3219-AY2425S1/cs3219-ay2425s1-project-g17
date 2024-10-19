@@ -13,35 +13,35 @@ jobs:
         strategy:
           matrix:
             include:
-              - run-name: Deploy Frontend
+              - name: Deploy Frontend
                 context: ./frontend
                 dockerfile: Dockerfile.prod
                 repository: peerprep-frontend
                 task_def_name: frontend
                 container_name: frontend
                 service_name: frontend
-              - run-name: Deploy Question Service
+              - name: Deploy Question Service
                 context: ./backend/question-service
                 dockerfile: Dockerfile
                 repository: peerprep-question
                 task_def_name: question
                 container_name: question
                 service_name: question
-              - run-name: Deploy User Service
+              - name: Deploy User Service
                 context: ./backend/user-service
                 dockerfile: Dockerfile
                 repository: peerprep-user
                 task_def_name: user
                 container_name: user
                 service_name: user
-              - run-name: Deploy Matching Service
+              - name: Deploy Matching Service
                 context: ./backend/matching-service
                 dockerfile: Dockerfile
                 repository: peerprep-matching
                 task_def_name: matching
                 container_name: matching
                 service_name: matching
-              # - run-name: Deploy Collaboration Service
+              # - name: Deploy Collaboration Service
               #   context: ./backend/collaboration-service
               #   dockerfile: Dockerfile
               #   repository: peerprep-collab
@@ -64,13 +64,11 @@ jobs:
             
             - name: Build and push
               uses: docker/build-push-action@v6
-              env:
-                IMAGE_TAG: latest
               with:
                 context: ${{ matrix.context }}
                 file: ${{ matrix.context }}/${{ matrix.dockerfile }}
                 push: true
-                tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.repository }}:$IMAGE_TAG
+                tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.repository }}:latest
 
             - name: Build images
               id: build-image
