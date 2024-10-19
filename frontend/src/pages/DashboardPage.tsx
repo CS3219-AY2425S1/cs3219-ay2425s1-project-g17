@@ -2,16 +2,15 @@ import * as React from 'react';
 import {
     Container,
     Box,
-    Button,
     Autocomplete,
     TextField,
+    Typography,
 } from '@mui/material';
-import { getAllQuestions, getFilteredQuestions, getAvailableCategories } from '../../services/question-service/QuestionService';
-import AddQuestionButton from '../../components/questionpage/AddQuestionButton';
-import SearchBar from '../../components/questionpage/SearchBar';
-import QuestionTable from '../../components/questionpage/QuestionTable';
-import UploadJsonButton from '../../components/questionpage/UploadJsonButton';
-import EditIcon from '@mui/icons-material/Edit';
+import { getAllQuestions, getFilteredQuestions, getAvailableCategories } from '../services/question-service/QuestionService';
+import SearchBar from '../components/questionpage/SearchBar';
+import QuestionTable from '../components/questionpage/QuestionTable';
+import MatchingComponent from '../components/MatchingComponent';
+
 interface ComplexityOption {
     label: string;
     color: string;
@@ -36,15 +35,16 @@ interface QuestionProps {
     question_popularity: number;
 }
 
-function QuestionPage() {
+function DashboardPage() {
     const [questions, setQuestions] = React.useState<QuestionProps[]>([]);
     const [selectedCategories, setSelectedCategories] = React.useState<string[]>([]);
     const [selectedComplexity, setSelectedComplexity] = React.useState<ComplexityOption | null>(null);
     const [searchQuery, setSearchQuery] = React.useState('');
-    const [isEditMode, setIsEditMode] = React.useState(false);
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
     const [availableCategories, setAvailableCategories] = React.useState<string[]>([]);
+
+    const username = localStorage.getItem('username');
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
@@ -185,78 +185,118 @@ function QuestionPage() {
                     minHeight: '100vh',
                     display: 'flex',
                     flexDirection: 'column',
-                }}
-            >
+                }}>
+                <Typography variant="h5" align="left" sx={{ mt: 4, ml: 3 }}>
+                    <b>Hi, Welcome back {username}!</b>
+                </Typography>
                 <Container
-                    maxWidth="xl"
+                    maxWidth={false}
                     sx={{
                         backgroundColor: 'background.default',
                         minHeight: '100vh',
                         display: 'flex',
-                        flexDirection: 'column',
+                        flexDirection: 'row',
                     }}
                 >
-                    <Box sx={{ paddingTop: '20px', display: 'flex', gap: 2, alignItems: 'center' }}>
-                        {/* Upload JSON Button Component */}
-                        <UploadJsonButton />
 
-                        <AddQuestionButton categories={categories} />
-                        <Button
-                            variant="contained"
-                            color="secondary"
-                            startIcon={< EditIcon />}
-                            sx={{ color: 'white', fontWeight: isEditMode ? 'bold' : 'normal' }}
-                            onClick={() => setIsEditMode(!isEditMode)}
-                        >
-                            {isEditMode ? 'Done' : 'Edit'}
-                        </Button>
-
-                        <Autocomplete
-                            multiple
-                            size="small"
-                            options={availableCategories}
-                            value={selectedCategories}
-                            onChange={(event, newValue) => setSelectedCategories(newValue)}
-                            renderInput={(params) => <TextField {...params} label="Category" />}
-                            sx={{ minWidth: 150, maxWidth: 400 }}
-                        />
-
-                        <Autocomplete
-                            size="small"
-                            options={complexities}
-                            value={selectedComplexity}
-                            onChange={(event, newValue) => setSelectedComplexity(newValue)}
-                            getOptionLabel={(option) => option.label}
-                            renderInput={(params) => <TextField {...params} label="Complexity" />}
-                            sx={{ minWidth: 150, maxWidth: 400 }}
-                            renderOption={(props, option) => (
-                                <li {...props} style={{ color: option.color }}>
-                                    {option.label}
-                                </li>
-                            )}
-                        />
-
-                        {/* Search Bar Component */}
-                        <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-                        
+                    <Box sx={{
+                        flexDirection: 'row',
+                        flex: 1,
+                        pt: "20px"
+                    }}>
+                        <MatchingComponent />
                     </Box>
 
-                    {/* Question Table Component */}
-                    <Box sx={{ paddingTop: '20px' }}>
-                        <QuestionTable
-                            filteredQuestions={questions}
-                            categories={categories}
-                            page={page}
-                            rowsPerPage={rowsPerPage}
-                            isEditMode={isEditMode}
-                            handleChangePage={handleChangePage}
-                            handleChangeRowsPerPage={handleChangeRowsPerPage}
-                        />
-                    </Box>
+                    <Container
+                        maxWidth="xl"
+                        sx={{
+                            backgroundColor: 'background.default',
+                            minHeight: '100vh',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            flex: 3
+                        }}
+                    >
+
+                        <Box sx={{ paddingTop: '20px', display: 'flex', gap: 2, alignItems: 'center' }}>
+                            <Autocomplete
+                                multiple
+                                size="small"
+                                options={availableCategories}
+                                value={selectedCategories}
+                                onChange={(event, newValue) => setSelectedCategories(newValue)}
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        label="Category"
+                                        sx={{
+                                            minWidth: 150,
+                                            maxWidth: 400,
+                                            "& label": {
+                                                color: "primary.main",
+                                            },
+                                            "& label.Mui-focused": {
+                                                color: "primary.main",
+                                            }
+                                        }}
+                                    />
+                                )}
+                                sx={{ minWidth: 150, maxWidth: 400 }}
+                            />
+
+                            <Autocomplete
+                                size="small"
+                                options={complexities}
+                                value={selectedComplexity}
+                                onChange={(event, newValue) => setSelectedComplexity(newValue)}
+                                getOptionLabel={(option) => option.label}
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        label="Complexity"
+                                        sx={{
+                                            minWidth: 150,
+                                            maxWidth: 400,
+                                            "& label": {
+                                                color: "primary.main",
+                                            },
+                                            "& label.Mui-focused": {
+                                                color: "primary.main",
+                                            }
+                                        }}
+                                    />
+                                )}
+                                sx={{ minWidth: 150, maxWidth: 400 }}
+                                renderOption={(props, option) => (
+                                    <li {...props} style={{ color: option.color }}>
+                                        {option.label}
+                                    </li>
+                                )}
+                            />
+
+                            {/* Search Bar Component */}
+                            <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+
+                        </Box>
+
+                        {/* Question Table Component */}
+                        <Box sx={{ paddingTop: '20px' }}>
+                            <QuestionTable
+                                filteredQuestions={questions}
+                                categories={categories}
+                                page={page}
+                                rowsPerPage={rowsPerPage}
+                                isEditMode={false}
+                                handleChangePage={handleChangePage}
+                                handleChangeRowsPerPage={handleChangeRowsPerPage}
+                            />
+                        </Box>
+
+                    </Container>
                 </Container>
             </Container>
         </>
     );
 }
 
-export default QuestionPage;
+export default DashboardPage;

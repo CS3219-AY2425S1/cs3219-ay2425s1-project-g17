@@ -22,9 +22,9 @@ jobs:
               - context: ./backend/user-service
                 dockerfile: Dockerfile
                 tag: peerprep-user
-              # - context: ./backend/matching-service
-              #   dockerfile: Dockerfile
-              #   tag: peerprep-matching
+              - context: ./backend/matching-service
+                dockerfile: Dockerfile
+                tag: peerprep-matching
               # - context: ./backend/collaboration-service
               #   dockerfile: Dockerfile
               #   tag: peerprep-collab

@@ -34,16 +34,16 @@ services:
     networks:
       - backend-network # Connects the user-service to the 'backend-network' network.
       
-  # matching-service:
-  #   image: ngyaodong/peerprep-matching:latest
-  #   container_name: matching-service # Defining the name of the container.
-  #   ports:
-  #     - "4002:4002" # Maps port 4002 on the host to port 4002 in the container, making the app accessible on the host.
-  #   env_file:
-  #     - ./backend/matching-service/.env # Specifying the .env file for matching-service
-  #   restart: unless-stopped # Restarts the container irrespective of the exit code but stops restarting when the service is stopped or removed.
-  #   networks:
-  #     - backend-network # Connects the matching-service to the 'backend-network' network.
+  matching-service:
+    image: ngyaodong/peerprep-matching:latest
+    container_name: matching-service # Defining the name of the container.
+    ports:
+      - "4002:4002" # Maps port 4002 on the host to port 4002 in the container, making the app accessible on the host.
+    env_file:
+      - ./backend/matching-service/.env # Specifying the .env file for matching-service
+    restart: unless-stopped # Restarts the container irrespective of the exit code but stops restarting when the service is stopped or removed.
+    networks:
+      - backend-network # Connects the matching-service to the 'backend-network' network.
       
   # collaboration-service:
   #   image: ngyaodong/peerprep-collab:latest
