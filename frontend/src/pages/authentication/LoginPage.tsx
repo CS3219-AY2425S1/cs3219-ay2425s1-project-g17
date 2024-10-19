@@ -98,7 +98,7 @@ export default function SignIn() {
                 <Typography
                     component="h1"
                     variant="h4"
-                    sx={{ textAlign: 'center', marginBottom: '20px' }}
+                    sx={{ textAlign: 'center', marginBottom: '20px', color: '#9AC143' }}
                 >
                     Sign in
                 </Typography>

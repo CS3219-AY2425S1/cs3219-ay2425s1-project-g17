@@ -9,15 +9,19 @@ import Container from '@mui/material/Container';
 import Avatar from '@mui/material/Avatar';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
+import Badge from '@mui/material/Badge';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import PeopleIcon from '@mui/icons-material/People';
 import Logo from '../assets/Logo.png';
 import { getSignedImageURL } from '../services/user-service/UserService';
 import { AuthContext } from '../context/AuthContext';
 
-const settings = ['Profile', 'Dashboard', 'Logout'];
+const settings = ['Dashboard', 'Profile', 'Logout'];
 
 function Navbar() {
-  const username = localStorage.getItem('username');
   const [profileImageUrl, setprofileImageUrl] = React.useState('');
+  const [notificationCount, setNotificationCount] = React.useState(3);
+  const [friendRequestCount, setFriendRequestCount] = React.useState(5);
 
   const authContext = React.useContext(AuthContext);
   if (!authContext) {
@@ -44,35 +48,49 @@ function Navbar() {
   React.useEffect(() => {
     const getUserProfilePic = async (imageName: string) => {
       try {
-        const response = await getSignedImageURL(imageName)
+        const response = await getSignedImageURL(imageName);
         setprofileImageUrl(response);
       } catch (err: any) {
         alert(err.message);
       }
-    }
+    };
     getUserProfilePic(localStorage.getItem('profileImage') as string);
-
   }, []);
 
   return (
     <AppBar position="static">
       <Container maxWidth={false}>
         <Toolbar disableGutters>
-          <a href="/">
+          <a href="/dashboard">
             <img src={Logo} alt="Logo" style={{ height: '50px' }} />
           </a>
-          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-          </Box>
-          <Box sx={{ flexGrow: 0, display: "flex", alignItems: "center" }}>
-            <Typography sx={{ paddingRight: "15px" }}>
-              Hello {username}!
-            </Typography>
+          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }} />
+          <Box sx={{ flexGrow: 0, display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Box sx={{
+              backgroundColor: 'rgba(255, 255, 255, 0.1)', 
+              borderRadius: '50%',
+              padding: '2px',
+            }}>
+              <IconButton color="inherit">
+                <Badge badgeContent={friendRequestCount} color="error">
+                  <PeopleIcon />
+                </Badge>
+              </IconButton>
+            </Box>
+            <Box sx={{
+              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              borderRadius: '50%', 
+              padding: '2px', 
+            }}>
+              <IconButton color="inherit">
+                <Badge badgeContent={notificationCount} color="error">
+                  <NotificationsIcon />
+                </Badge>
+              </IconButton>
+            </Box>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar
-                  src={profileImageUrl}
-                  sx={{ bgcolor: "white" }}
-                />
+                <Avatar src={profileImageUrl} sx={{ bgcolor: "white" }} />
               </IconButton>
             </Tooltip>
             <Menu
@@ -109,5 +127,5 @@ function Navbar() {
     </AppBar>
   );
 }
-export default Navbar;
 
+export default Navbar;
