@@ -1,5 +1,5 @@
-import { Typography, Box } from '@mui/material';
-import Markdown from 'react-markdown'
+import { Typography, Box, Paper } from '@mui/material';
+import Markdown from 'react-markdown';
 import Chip from '@mui/material/Chip';
 import WhatshotIcon from '@mui/icons-material/Whatshot';
 
@@ -56,23 +56,21 @@ const getComplexityColor = (complexity: keyof typeof complexityColors) => {
 
 const QuestionPanel = () => {
     return (
-        <>
+        <Paper
+            sx={{
+                bgcolor: 'background.paper',
+                boxShadow: 24,
+                p: 2,
+                height: '90vh',
+                overflowY: 'auto',
+            }}
+        >
+            <Typography variant="h6" component="h2" sx={{ color: 'white', marginBottom: 0.5 }}>
+                {fakeQuestionPanelData.id + '. ' + fakeQuestionPanelData.title}
+            </Typography>
             <Box
-                sx={{
-                    width: '100%',   
-                    height: '100%',
-                    bgcolor: 'background.paper',
-                    boxShadow: 24,
-                    p: 4,
-                    overflowY: 'auto',
-                }}
+                sx={{ display: 'flex', alignItems: 'center', marginBottom: 1 }}
             >
-                <Typography variant="h6" component="h2" sx={{ color: 'white', marginBottom: 0.5 }}>
-                    {fakeQuestionPanelData.id + '. ' + fakeQuestionPanelData.title}
-                </Typography>
-                <Box 
-                    sx={{ display: 'flex', alignItems: 'center', marginBottom: 1 }}
-                >
                 <Typography
                     sx={{
                         color: getComplexityColor(fakeQuestionPanelData.complexity as keyof typeof complexityColors),
@@ -90,37 +88,38 @@ const QuestionPanel = () => {
                 >
                     {fakeQuestionPanelData.popularity}
                 </Typography>
-                </Box>
+            </Box>
 
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                 {fakeQuestionPanelData.categories?.map((category) => (
-                    <Chip 
-                        key={category} 
-                        label={category} 
-                        sx={{ padding: '0px 6px', height: 21 }}/>
+                    <Chip
+                        key={category}
+                        label={category}
+                        sx={{ padding: '0px 6px', height: 21 }} />
                 ))}
-                </Box>
-                <Markdown>{fakeQuestionPanelData.description}</Markdown>
-                <Typography sx={{ mt: 2, color: 'white' }}>
-                    {fakeQuestionPanelData.example?.map((example) => (
-                        <div key={example.id}>
-                            <Typography sx={{ mt: 2, color: 'white', fontFamily: 'JetBrains Mono, monospace' }}>
-                                Example {example.id + 1}
-                            </Typography>
+            </Box>
+            <Markdown>{fakeQuestionPanelData.description}</Markdown>
+            <Box sx={{ mt: 2, color: 'white' }}> {/* Change from Typography to Box */}
+                {fakeQuestionPanelData.example?.map((example) => (
+                    <Box key={example.id} sx={{ mt: 2 }}>
+                        <Typography sx={{ color: 'white', fontFamily: 'JetBrains Mono, monospace' }}>
+                            Example {example.id + 1}
+                        </Typography>
+                        <Typography sx={{ color: 'white', fontFamily: 'JetBrains Mono, monospace' }}>
+                            Input: {example.input}
+                        </Typography>
+                        <Typography sx={{ color: 'white', fontFamily: 'JetBrains Mono, monospace' }}>
+                            Output: {example.output}
+                        </Typography>
+                        {example.explanation && (
                             <Typography sx={{ color: 'white', fontFamily: 'JetBrains Mono, monospace' }}>
-                                Input: {example.input}
-                            </Typography>
-                            <Typography sx={{ color: 'white', fontFamily: 'JetBrains Mono, monospace' }}>
-                                Output: {example.output}
-                            </Typography>
-                            {example.explanation && <Typography sx={{ color: 'white', fontFamily: 'JetBrains Mono, monospace' }}>
                                 Explanation: {example.explanation}
-                            </Typography>}
-                        </div>
-                    ))}
-                    </Typography>
-            </Box>   
-        </>
+                            </Typography>
+                        )}
+                    </Box>
+                ))}
+            </Box>
+        </Paper>
     );
 }
 

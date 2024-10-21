@@ -28,6 +28,7 @@ export const PublicRoutes = () => {
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/learn" element={<LearnMorePage />} />
+                <Route path="/collaboration"/>
                 <Route path="/dashboard"/>
                 <Route path="/profile"/>
                 <Route path="*" element={<NotFoundPage />} />
