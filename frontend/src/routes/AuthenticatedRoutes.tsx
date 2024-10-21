@@ -7,8 +7,8 @@ import QuestionPage from "../pages/services/QuestionPage";
 import NotFoundPage from "../pages/miscellaneous/NotFoundPage";
 import ProfilePage from "../pages/miscellaneous/ProfilePage";
 import DashboardPage from "../pages/DashboardPage";
+import CollaborationPage from "../pages/services/CollaborationPage";
 
-// TODO: Add collaboration and matching pages here
 export const AuthenticatedRoutes = () => {
     const authContext = useContext(AuthContext);
 
@@ -30,6 +30,7 @@ export const AuthenticatedRoutes = () => {
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/questions" element={<QuestionPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/collab" element={<CollaborationPage />} />
                 <Route path="/login"/>
                 <Route path="*" element={<NotFoundPage />} />
             </Routes>
