@@ -70,8 +70,8 @@ jobs:
                 push: true
                 tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.repository }}:latest
 
-            - name: Build images
-              id: build-image
+            - name: Echo images to output
+              id: echo-image
               env:
                 IMAGE_TAG: latest
               run: |
@@ -97,10 +97,10 @@ jobs:
             #   with:
             #     task-definition: taskDefinition.json
             #     container-name: ${{ matrix.container_name }}
-            #     image: ${{ steps.build-image.outputs.image }}
+            #     image: ${{ steps.echo-image.outputs.image }}
         
             # - name: Deploy Amazon ECS task definition
-            #   uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+            #   uses: aws-actions/amazon-ecs-deploy-task-definition@v2
             #   env:
             #     ECS_SERVICE: ${{ matrix.service_name }}
             #     ECS_CLUSTER: PeerPrep
