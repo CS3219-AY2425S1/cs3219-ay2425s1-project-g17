@@ -17,8 +17,8 @@ const CollaborationPage = () => {
                 mr: 2,
             }}>
                 <Split
-                    sizes={[50, 50]} 
-                    minSize={500} 
+                    sizes={[35, 65]} 
+                    minSize={400} 
                     direction="horizontal"
                     style={{ display: 'flex' }}
                     gutter={(index, direction) => {

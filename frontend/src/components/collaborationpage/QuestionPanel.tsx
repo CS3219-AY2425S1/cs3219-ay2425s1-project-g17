@@ -75,16 +75,17 @@ const QuestionPanel = () => {
                     sx={{
                         color: getComplexityColor(fakeQuestionPanelData.complexity as keyof typeof complexityColors),
                         fontWeight: 'bold',
+                        fontSize: '12px',
                         marginRight: 2,
                     }}
                 >
                     {fakeQuestionPanelData.complexity}
                 </Typography>
 
-                <WhatshotIcon sx={{ color: 'orange', fontSize: 18, marginRight: 0.5 }} />
+                <WhatshotIcon sx={{ color: 'orange', fontSize: 16, marginRight: 0.5 }} />
                 <Typography
                     variant="body1"
-                    sx={{ color: 'white', fontWeight: 'bold' }}
+                    sx={{ color: 'white', fontWeight: 'bold', fontSize: '12px' }} 
                 >
                     {fakeQuestionPanelData.popularity}
                 </Typography>
@@ -95,24 +96,29 @@ const QuestionPanel = () => {
                     <Chip
                         key={category}
                         label={category}
-                        sx={{ padding: '0px 6px', height: 21 }} />
+                        sx={{ padding: '0px 6px', height: 18, fontSize: '10px' }} 
+                    />
                 ))}
             </Box>
-            <Markdown>{fakeQuestionPanelData.description}</Markdown>
-            <Box sx={{ mt: 2, color: 'white' }}> {/* Change from Typography to Box */}
+            <Box sx={{ fontSize: '14px' }}> 
+                <Markdown>
+                    {fakeQuestionPanelData.description}
+                </Markdown>
+            </Box>
+            <Box sx={{ mt: 2, color: 'white' }}>
                 {fakeQuestionPanelData.example?.map((example) => (
                     <Box key={example.id} sx={{ mt: 2 }}>
-                        <Typography sx={{ color: 'white', fontFamily: 'JetBrains Mono, monospace' }}>
+                        <Typography sx={{ color: 'white', fontFamily: 'JetBrains Mono, monospace', fontSize: '12px' }}>
                             Example {example.id + 1}
                         </Typography>
-                        <Typography sx={{ color: 'white', fontFamily: 'JetBrains Mono, monospace' }}>
+                        <Typography sx={{ color: 'white', fontFamily: 'JetBrains Mono, monospace', fontSize: '12px' }}>
                             Input: {example.input}
                         </Typography>
-                        <Typography sx={{ color: 'white', fontFamily: 'JetBrains Mono, monospace' }}>
+                        <Typography sx={{ color: 'white', fontFamily: 'JetBrains Mono, monospace', fontSize: '12px' }}>
                             Output: {example.output}
                         </Typography>
                         {example.explanation && (
-                            <Typography sx={{ color: 'white', fontFamily: 'JetBrains Mono, monospace' }}>
+                            <Typography sx={{ color: 'white', fontFamily: 'JetBrains Mono, monospace', fontSize: '12px' }}>
                                 Explanation: {example.explanation}
                             </Typography>
                         )}

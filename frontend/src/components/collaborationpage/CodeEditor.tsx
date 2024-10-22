@@ -13,14 +13,11 @@ import {
     Paper,
     Select,
     MenuItem,
-    InputLabel,
     FormControl,
     SelectChangeEvent,
-    IconButton
 } from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import CodeIcon from '@mui/icons-material/Code';
-import RestoreIcon from '@mui/icons-material/Restore';
 
 const CodeEditor = () => {
     const [language, setLanguage] = useState<string>('javascript');
@@ -48,10 +45,6 @@ const CodeEditor = () => {
     const handleCloseSnackbar = () => {
         setIsSnackbarOpen(false);
     };
-
-    const handleResetCode = () => {
-        console.log('Resetting code');
-    }
 
     const handleLanguageChange = (event: SelectChangeEvent<string>) => {
         const newValue = event.target.value as string;
@@ -86,6 +79,7 @@ const CodeEditor = () => {
                     <Select
                         labelId="language-select-label"
                         value={language}
+                        sx={{ fontSize: '14px' }}
                         onChange={handleLanguageChange}
                     >
                         <MenuItem value="javascript">JavaScript</MenuItem>
@@ -116,18 +110,19 @@ const CodeEditor = () => {
                 <Box>
                     <Button
                         variant="contained"
-                        color="success"
+                        color="primary"
                         onClick={handleRunCode}
-                        sx={{ marginRight: '8px', color: 'white' }}
+                        sx={{ marginRight: '8px', textTransform: 'none' }}
                         startIcon={<PlayArrowIcon />}
                     >
                         Run Code
                     </Button>
                     <Button
                         variant="contained"
-                        color="primary"
+                        color="success"
                         onClick={handleSubmit}
                         startIcon={<CodeIcon />}
+                        sx={{ textTransform: 'none', color: 'white',}}
                     >
                         Submit
                     </Button>
