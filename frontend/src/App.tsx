@@ -8,7 +8,7 @@ import { AuthProvider, AuthContext } from "./context/AuthContext";
 function App() {
   const themeOptions: ThemeOptions = {
     typography: {
-      fontFamily: 'FontAwesome, Roboto, sans-serif, Arial, JetBrains Mono',
+      fontFamily: 'Open Sans, FontAwesome, Roboto, sans-serif, Arial, JetBrains Mono',
     },
     palette: {
       mode: 'dark',

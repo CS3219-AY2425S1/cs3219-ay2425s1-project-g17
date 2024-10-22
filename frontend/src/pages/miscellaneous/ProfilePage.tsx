@@ -218,7 +218,7 @@ export default function ProfilePage() {
             <Container
                 sx={{
                     display: 'flex',
-                    minHeight: '80vh',
+                    minHeight: '85vh',
                     flexDirection: 'column',
                 }}
             >
@@ -277,10 +277,10 @@ export default function ProfilePage() {
                         </label>
                      </Box>
                          <Box>
-                            <Typography variant="h5" sx={{ textAlign: "center", padding: "5px" }}>
+                            <Typography variant="h6" sx={{ textAlign: "center", padding: "5px" }}>
                                 <b>{username}</b>
                             </Typography>
-                            <Typography variant="h6" sx={{ textAlign: "center", ppadding: "5px" }}>
+                            <Typography variant="body1" sx={{ textAlign: "center", ppadding: "5px" }}>
                                 {email}
                             </Typography>
                         </Box>
@@ -308,7 +308,7 @@ export default function ProfilePage() {
                                 alignItems: 'center',
                             }}
                         >
-                            <Typography variant='h6'>
+                            <Typography variant='body1'>
                                 <b>Username</b>
                             </Typography>
 
@@ -329,7 +329,7 @@ export default function ProfilePage() {
                                 </>
                             ) : (
                                 <>
-                                    <Typography variant='h6'>{username}</Typography>
+                                    <Typography variant='body1'>{username}</Typography>
                                     <IconButton onClick={() => handleEditClick('username')}>
                                         <EditIcon />
                                     </IconButton>
@@ -345,7 +345,7 @@ export default function ProfilePage() {
                                 alignItems: 'center',
                             }}
                         >
-                            <Typography variant='h6'>
+                            <Typography variant='body1'>
                                 <b>Email</b>
                             </Typography>
 
@@ -368,7 +368,7 @@ export default function ProfilePage() {
                                 </>
                             ) : (
                                 <>
-                                    <Typography variant='h6'>{email}</Typography>
+                                    <Typography variant='body1'>{email}</Typography>
                                     <IconButton onClick={() => handleEditClick('email')}>
                                         <EditIcon />
                                     </IconButton>
@@ -383,7 +383,7 @@ export default function ProfilePage() {
                                 gap: 2,
                             }}
                         >
-                            <Typography variant='h6'>
+                            <Typography variant='body1'>
                                 <b>Password</b>
                             </Typography>
 
@@ -445,7 +445,7 @@ export default function ProfilePage() {
                                 </>
                             ) : (
                                 <>
-                                    <Typography variant='h6'>•••••••••</Typography>
+                                    <Typography variant='body1'>•••••••••</Typography>
                                     <IconButton onClick={() => handleEditClick('password')}>
                                         <EditIcon />
                                     </IconButton>
@@ -480,7 +480,7 @@ export default function ProfilePage() {
                         borderRadius: 3,
                     }}
                 >
-                    <Typography variant="h6" component="h2" sx={{ mb: 2, color: "white" }}>
+                    <Typography variant="body1" component="h2" sx={{ mb: 2, color: "white" }}>
                         Delete Account?
                     </Typography>
                     <Typography sx={{ mb: 3, color: "white" }}>

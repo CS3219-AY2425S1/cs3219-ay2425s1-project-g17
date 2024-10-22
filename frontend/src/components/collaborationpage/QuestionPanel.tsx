@@ -96,7 +96,7 @@ const QuestionPanel = () => {
                     <Chip
                         key={category}
                         label={category}
-                        sx={{ padding: '0px 6px', height: 18, fontSize: '10px' }} 
+                        sx={{ padding: '0px 6px', height: 18, fontSize: '12px' }} 
                     />
                 ))}
             </Box>
