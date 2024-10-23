@@ -12,7 +12,9 @@
 		"app.ts",
 		"server.ts",
 		"controller/**/*.ts", 
+		"middleware/**/*.ts", 
 		"model/**/*.ts",
-		"routes/**/*.ts"
+		"routes/**/*.ts",
+		"test/**/*.ts"
 	]
 }
