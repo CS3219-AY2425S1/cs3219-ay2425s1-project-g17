@@ -10,6 +10,8 @@ import { getAllQuestions, getFilteredQuestions, getAvailableCategories } from '.
 import SearchBar from '../components/questionpage/SearchBar';
 import QuestionTable from '../components/questionpage/QuestionTable';
 import MatchingComponent from '../components/MatchingComponent';
+import TrendingQuestions from '../components/dashboardpage/TrendingQuestions';
+import AttemptedProgress from '../components/dashboardpage/AttemptedProgress';
 
 interface ComplexityOption {
     label: string;
@@ -37,6 +39,7 @@ interface QuestionProps {
 
 function DashboardPage() {
     const [questions, setQuestions] = React.useState<QuestionProps[]>([]);
+    const [allQuestions, setAllQuestions] = React.useState<QuestionProps[]>([]);
     const [selectedCategories, setSelectedCategories] = React.useState<string[]>([]);
     const [selectedComplexity, setSelectedComplexity] = React.useState<ComplexityOption | null>(null);
     const [searchQuery, setSearchQuery] = React.useState('');
@@ -144,6 +147,7 @@ function DashboardPage() {
             try {
                 const data = await getAllQuestions();
                 setQuestions(data);
+                setAllQuestions(data);
             } catch (error) {
                 console.error('Failed to fetch questions:', error);
             }
@@ -200,12 +204,16 @@ function DashboardPage() {
                 >
 
                     <Box sx={{
+                        flex: 1, 
+                        display: 'flex',
                         flexDirection: 'row',
-                        flex: 1,
-                        pt: "20px"
+                        pt: "20px",
+                        top: 20,
+                        zIndex: 1000,
                     }}>
                         <MatchingComponent />
                     </Box>
+
 
                     <Container
                         maxWidth="xl"
@@ -217,6 +225,15 @@ function DashboardPage() {
                             flex: 3
                         }}
                     >
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                flexDirection: 'row',
+                            }}
+                        >
+                            <TrendingQuestions questions={allQuestions} />
+                            <AttemptedProgress />
+                        </Box>
 
                         <Box sx={{ paddingTop: '20px', display: 'flex', gap: 2, alignItems: 'center' }}>
                             <Autocomplete
