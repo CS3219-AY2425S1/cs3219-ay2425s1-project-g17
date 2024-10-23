@@ -36,7 +36,7 @@ const Header = () => {
         >
             <Box display="flex" alignItems="center" gap={1}>
                 <Button
-                    variant="contained"
+                    variant="outlined"
                     color="primary"
                     onClick={onShuffleQuestions}
                     sx={{ textTransform: 'none', fontWeight: 'bold' }}
@@ -51,7 +51,7 @@ const Header = () => {
             </Typography>
 
             <Button
-                variant="contained"
+                variant="outlined"
                 color="error"
                 onClick={onDisconnect}
                 sx={{ textTransform: 'none', fontWeight: 'bold' }}
