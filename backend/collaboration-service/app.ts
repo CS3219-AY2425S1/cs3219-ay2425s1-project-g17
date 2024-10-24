@@ -3,14 +3,14 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import cors from "cors";
 import { createClient } from "redis";
-//import bodyParser from "body-parser";
+import bodyParser from "body-parser";
 import collaborationRoutes from './routes/collaborationRoutes';
 
 
 
 const app = express();
 app.use(cors());
-//app.use(bodyParser.json());
+app.use(bodyParser.json());
 app.use('/collaboration', collaborationRoutes);
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
