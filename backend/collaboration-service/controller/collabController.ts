@@ -58,11 +58,33 @@ export const createCollaborationRoom = async (req: Request, res: Response) => {
     }
 };
 
+const getParter = async (userId: string) => {
+    try {
+        const bearerToken = generateToken(userId);
+        const apiUrl = `http://localhost:4001/users/${userId}`;
+        const headers = { 
+            Authorization: `Bearer ${bearerToken}` 
+        };
+        const response = await axios.get(apiUrl, { headers });
+        return response.data.data;
+    } catch (error) {
+        return error;
+    }
+}
+
 const getSessionData = async (userId: string) => {
     const sessions = await redisClient.keys('session:*'); 
     for (const key of sessions) {
         const sessionData = await redisClient.hgetall(key);
-        if (sessionData.user1Id == userId || sessionData.user2Id == userId) {
+        if (sessionData.user1Id == userId) {
+            const partner = await getParter(sessionData.user2Id);
+            sessionData["partner"] = partner.username;
+            sessionData["partner_pic"] = partner.profilePic;
+            return { sessionId: key, session: sessionData };
+        } else if (sessionData.user2Id == userId) {
+            const partner =  await getParter(sessionData.user1Id);
+            sessionData["partner"] = partner.username;
+            sessionData["partner_pic"] = partner.profilePic;
             return { sessionId: key, session: sessionData };
         }
     }

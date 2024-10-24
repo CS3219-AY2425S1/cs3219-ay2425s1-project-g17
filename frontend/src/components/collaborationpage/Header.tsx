@@ -2,9 +2,17 @@ import React from 'react';
 import { Typography, Button, Box } from '@mui/material';
 import ShuffleIcon from '@mui/icons-material/Shuffle';
 import DisconnectIcon from '@mui/icons-material/PowerSettingsNew';
+import IconButton from '@mui/material/IconButton';
+import Avatar from '@mui/material/Avatar';
 import { useNavigate } from 'react-router-dom';
 
-const Header = () => {
+interface HeaderProps {
+    partnerName: string; 
+    partnerProfPicUrl: string;
+    ownProfPicUrl: string;
+}
+
+const Header: React.FC<HeaderProps> = ({ partnerName, partnerProfPicUrl, ownProfPicUrl }) => {
 
     const navigate = useNavigate();
 
@@ -20,9 +28,6 @@ const Header = () => {
         // Logic to shuffle questions goes here
         console.log("Shuffling questions...");
     };
-
-    // TODO: Replace with actual partner name
-    const partnerName = 'John Doe';
 
     return (
         <Box
@@ -49,7 +54,12 @@ const Header = () => {
             <Typography color="textPrimary">
                 You are connected with <strong>{partnerName}</strong>
             </Typography>
-
+            <IconButton sx={{ p: 0 }}>
+                <Avatar src={ownProfPicUrl} sx={{ bgcolor: "white" }} />
+            </IconButton>
+            <IconButton sx={{ p: 0 }}>
+                <Avatar src={partnerProfPicUrl} sx={{ bgcolor: "white" }} />
+            </IconButton>
             <Button
                 variant="contained"
                 color="error"

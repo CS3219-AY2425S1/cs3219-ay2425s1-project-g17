@@ -7,6 +7,7 @@ import Header from '../../components/collaborationpage/Header';
 import { Box } from '@mui/material';
 import DragHandleIcon from '@mui/icons-material/DragHandle';
 import { getSessionInfo, getQuestionInfo } from '../../services/collaboration-service/CollaborationService';
+import { getSignedImageURL } from '../../services/user-service/UserService';
 
 interface ExampleProps {
     id: number;
@@ -28,21 +29,35 @@ interface QuestionProps {
 
 const CollaborationPage = () => {
     const [question, setQuestion] = React.useState<QuestionProps | null>(null);
+    const [partnerName, setPartnerName] = React.useState('');
+    const [partnerProfPicUrl, setPartnerProfPicUrl] = React.useState('');
+    const [ownProfPicUrl, setOwnProfPicUrl] = React.useState('');
 
     const userId = localStorage.getItem('id') || '';
+    const ownProfPic = localStorage.getItem('profileImage') || '';
 
     React.useEffect(() => {
         async function fetchSessionInfo() {
             try {
                 const data = await getSessionInfo(userId);
                 const questionId = data.session.questionId;
-
+                
                 const question = await getQuestionInfo(questionId);
                 setQuestion(question);
 
+                const partnerName = data.session.partner;
+                setPartnerName(partnerName);
+
+                const partnerProfPic = data.session.partner_pic;
+                const partnerProfPicUrl = await getSignedImageURL(partnerProfPic);
+                setPartnerProfPicUrl(partnerProfPicUrl);
+
+                const ownProfPicUrl = await getSignedImageURL(ownProfPic);
+                setOwnProfPicUrl(ownProfPicUrl);
 
                 console.log(question);
                 console.log(data.session);
+                console.log(partnerName);
             } catch (error) {
                 console.error('Failed to fetch session:', error);
             }
@@ -53,7 +68,11 @@ const CollaborationPage = () => {
 
     return (
         <>
-            <Header />
+            <Header 
+                partnerName={partnerName}
+                partnerProfPicUrl={partnerProfPicUrl}
+                ownProfPicUrl={ownProfPicUrl}
+            />
             <Box height="90vh"
             sx={{
                 ml: 2,

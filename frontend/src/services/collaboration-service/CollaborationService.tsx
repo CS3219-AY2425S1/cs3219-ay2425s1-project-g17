@@ -11,6 +11,11 @@ const questionApi = axios.create({
     timeout: 5000,
 });
 
+const userApi = axios.create({
+    baseURL: "http://localhost:4001/users",
+    timeout: 5000,
+});
+
 applyInterceptors(collabApi);
 applyInterceptors(questionApi);
 
@@ -33,6 +38,16 @@ async function getSessionInfo(id: string) {
 async function getQuestionInfo(id: string) {
     try {
         const response = await questionApi.get(`/${id}`);
+        return response.data;
+    } catch (error) {
+        handleAxiosError(error);
+    }
+}
+
+// Function to get partner name
+async function getParterName(id: string) {
+    try {
+        const response = await userApi.get(`/${id}`);
         return response.data;
     } catch (error) {
         handleAxiosError(error);
