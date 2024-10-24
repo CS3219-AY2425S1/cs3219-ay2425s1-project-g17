@@ -67,14 +67,17 @@ export const checkMatchStatus = async (req: Request, res: Response) => {
 
 export const cancelMatch = async (req: Request, res: Response) => {
   const { userId, username } = req.body;
-  try {
-    const key = await redisClient.keys(`match:${userId}`);
-    await redisClient.del(key);
-
-    const count = (await getUsersFromQueue()).length;
-    console.log(`User ${userId} has left the queue due to cancellation, total users currently in the queue: ${count}`)
-
-    res.status(202).json({ success: true, message: `User removed from queue` });
+  try {   
+    const userInQueue = await redisClient.hgetall(`match:${userId}`);
+    if (userInQueue && userInQueue.userId == userId) {
+      const key = await redisClient.keys(`match:${userId}`);
+      await redisClient.del(key);
+      const count = (await getUsersFromQueue()).length;
+      console.log(`User ${userId} has left the queue due to cancellation, total users currently in the queue: ${count}`)
+      res.status(202).json({ success: true, message: `User removed from queue` });
+    } else {
+      res.status(202).json({ success: true, message: `User does not exist in queue` });
+    }
   } catch (error) {
     res.status(500).json({ success: false, error: (error as Error).message });
   }

@@ -71,7 +71,6 @@ const MatchingComponent = () => {
     const handleSnackbarDifficultyOpen = () => setSnackbarDifficultyOpen(true);
     const handleSnackbarDifficultyClose = () => setSnackbarDifficultyOpen(false);
 
-    // TODO: implement cancellation of match request
     const handleCancelRequest = async () => {
         const userId = localStorage.getItem('id');
         const username = localStorage.getItem('username');
@@ -184,10 +183,22 @@ const MatchingComponent = () => {
 
     return (
         <>
-            <Paper elevation={4} sx={{ padding: "20px", maxWidth: "600px", borderRadius: "10px", margin: "auto" }}>
-                <Typography variant="h5" mb="20px" color="#9AC143">
+            <Box sx={{
+                bgcolor: 'background.paper',
+                boxShadow: 24,
+                p: 2,
+                height: "35%", 
+                width: "25%",
+                display: 'flex', 
+                flexDirection: 'column', 
+                position: 'fixed',
+                transform: 'translate(-7%, 0)',
+            }}>
+
+                <Typography variant="h5" sx={{ marginBottom: 2, fontWeight: 'bold', color: 'white', fontSize: '18px' }}>
                     Find a Match
                 </Typography>
+
                 <Box component="form" sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                     <Autocomplete
                         size='small'
@@ -220,7 +231,7 @@ const MatchingComponent = () => {
                         </Button>
                     </Box>
                 </Box>
-            </Paper>
+            </Box>
 
             {/* View Modal */}
             <Modal open={open}>

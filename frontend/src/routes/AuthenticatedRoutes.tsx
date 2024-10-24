@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { Route, Routes, Navigate } from "react-router-dom";
+import { Route, Routes, Navigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 
 import Navbar from "../components/AuthenticatedNavbar";
@@ -8,9 +8,11 @@ import NotFoundPage from "../pages/miscellaneous/NotFoundPage";
 import ProfilePage from "../pages/miscellaneous/ProfilePage";
 import DashboardPage from "../pages/DashboardPage";
 import CollaborationPage from "../pages/services/CollaborationPage";
+import Footer from "../components/landingpage/Footer";
 
 export const AuthenticatedRoutes = () => {
     const authContext = useContext(AuthContext);
+    const location = useLocation();
 
     if (!authContext) {
         throw new Error("AuthContext must be used within an AuthProvider");
@@ -22,18 +24,21 @@ export const AuthenticatedRoutes = () => {
         return <Navigate to="/" replace />;
     }
 
+    const isCollabPage = location.pathname === '/collaboration';
+
     return (
         <>
-            <Navbar />
+            {!isCollabPage && <Navbar />}
             <Routes>
                 <Route path="/" element={<DashboardPage />} />
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/questions" element={<QuestionPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
-                <Route path="/collab" element={<CollaborationPage />} />
+                <Route path="/collaboration" element={<CollaborationPage />} />
                 <Route path="/login"/>
                 <Route path="*" element={<NotFoundPage />} />
             </Routes>
+            {!isCollabPage && <Footer />}
         </>
     );
 };
