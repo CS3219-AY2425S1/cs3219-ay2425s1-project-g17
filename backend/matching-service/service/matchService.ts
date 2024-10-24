@@ -1,5 +1,11 @@
 import { DIFFICULTY } from '../model/matchModel';
 import { redisClient } from '../redisClient'; // Import Redis client
+import axios from 'axios';
+
+const api = axios.create({
+  baseURL: "http://collaboration-service:4003/collaboration",
+  timeout: 5000,
+});
 
 export const matchUser = async (userId: string, category: string) => {
   // Log the matching attempt
@@ -53,6 +59,7 @@ export const matchUser = async (userId: string, category: string) => {
         await redisClient.multi().hmset(`match:${userId}`, user).hmset(`match:${potentialUser.userId}`, potentialUser).exec();
         const count = (await getUsersFromQueue()).length;
         console.log(`User ${potentialUser.userId} and User ${user.userId} have been assigned a ${user.difficultyAssigned} question about ${user.categoryAssigned}, total users currently in the queue: ${count}`);
+        sendDetailsToCollab(user.userId, user.partnerId, user.categoryAssigned, user.difficultyAssigned);
         return potentialUser;
       }
     }
@@ -85,6 +92,7 @@ export const matchUser = async (userId: string, category: string) => {
           await redisClient.multi().hmset(`match:${userId}`, user).hmset(`match:${potentialUser.userId}`, potentialUser).exec();
           const count = (await getUsersFromQueue()).length;
           console.log(`User ${potentialUser.userId} and User ${user.userId} have been assigned a ${user.difficultyAssigned} question about ${user.categoryAssigned}, total users currently in the queue: ${count}`);
+          sendDetailsToCollab(user.userId, user.partnerId, user.categoryAssigned, user.difficultyAssigned);
           return potentialUser;
         }
       }
@@ -118,6 +126,7 @@ export const matchUser = async (userId: string, category: string) => {
           await redisClient.multi().hmset(`match:${userId}`, user).hmset(`match:${potentialUser.userId}`, potentialUser).exec();
           const count = (await getUsersFromQueue()).length;
           console.log(`User ${potentialUser.userId} and User ${user.userId} have been assigned a ${user.difficultyAssigned} question about ${user.categoryAssigned}, total users currently in the queue: ${count}`);
+          sendDetailsToCollab(user.userId, user.partnerId, user.categoryAssigned, user.difficultyAssigned);
           return potentialUser;
         }
       }
@@ -143,5 +152,23 @@ export async function getUsersFromQueue(): Promise<any[]> {
   } catch (err) {
     console.error(`Error fetching users from queue: ${err}`);
     return [];
+  }
+}
+
+export function handleAxiosError(error: any) {
+  if (axios.isAxiosError(error)) {
+      console.error("Axios error:", error.response?.data || error.message);
+      return error.response?.data?.message || 'An error occurred while processing your request';
+  } else {
+      console.error("Unexpected error:", error);
+      return 'An unexpected error occurred';
+  }
+}
+
+export async function sendDetailsToCollab(user1Id: string, user2Id: string, category: string, difficulty: string) {
+  try {
+      await api.post('/', {user1Id, user2Id, category, difficulty});
+  } catch (error) {
+      throw new Error(handleAxiosError(error));
   }
 }

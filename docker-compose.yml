@@ -57,17 +57,17 @@ services:
     networks:
       - backend-network # Connects the matching-service to the 'backend-network' network.
       
-  # collaboration-service:
-  #   build: 
-  #     context: ./backend/collaboration-service # Path to the directory containing the Dockerfile for building the collaboration-service image.
-  #   container_name: collaboration-service # Defining the name of the container.
-  #   ports:
-  #     - "4003:4003" # Maps port 4003 on the host to port 4003 in the container, making the app accessible on the host.
-  #   env_file:
-  #     - ./backend/collaboration-service/.env # Specifying the .env file for collaboration-service
-  #   restart: unless-stopped # Restarts the container irrespective of the exit code but stops restarting when the service is stopped or removed.
-  #   networks:
-  #     - backend-network # Connects the collaboration-service to the 'backend-network' network.
+  collaboration-service:
+     build: 
+       context: ./backend/collaboration-service # Path to the directory containing the Dockerfile for building the collaboration-service image.
+     container_name: collaboration-service # Defining the name of the container.
+     ports:
+       - "4003:4003" # Maps port 4003 on the host to port 4003 in the container, making the app accessible on the host.
+     env_file:
+       - ./backend/collaboration-service/.env # Specifying the .env file for collaboration-service
+     restart: unless-stopped # Restarts the container irrespective of the exit code but stops restarting when the service is stopped or removed.
+     networks:
+       - backend-network # Connects the collaboration-service to the 'backend-network' network.
       
 networks:
   frontend-network: # Defines a network named 'frontend-network'

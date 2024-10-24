@@ -6,11 +6,95 @@ import QuestionPanel from '../../components/collaborationpage/QuestionPanel';
 import Header from '../../components/collaborationpage/Header';
 import { Box } from '@mui/material';
 import DragHandleIcon from '@mui/icons-material/DragHandle';
+import { getSessionInfo, getQuestionInfo } from '../../services/collaboration-service/CollaborationService';
+import { getSignedImageURL } from '../../services/user-service/UserService';
+import io from "socket.io-client";
+
+interface ExampleProps {
+    id: number;
+    input: string;
+    output: string;
+    explanation: string;
+}
+
+interface QuestionProps {
+    _id: string;
+    question_id: number;
+    question_title: string;
+    question_description: string;
+    question_example: ExampleProps[];
+    question_categories: string[];
+    question_complexity: string;
+    question_popularity: number;
+}
 
 const CollaborationPage = () => {
+    
+    const [question, setQuestion] = React.useState<QuestionProps | null>(null);
+    const [partnerName, setPartnerName] = React.useState('');
+    const [partnerProfPicUrl, setPartnerProfPicUrl] = React.useState('');
+    const [ownProfPicUrl, setOwnProfPicUrl] = React.useState('');
+    const [sessionId, setSessionId] = React.useState('');
+
+    const userId = localStorage.getItem('id') || '';
+    const ownProfPic = localStorage.getItem('profileImage') || '';
+
+    const socket = io("http://localhost:4003");
+
+    const handleShuffleQuestion = (newData: QuestionProps) => {
+        setQuestion(newData); 
+        socket.emit("shuffleQuestion", sessionId);
+    };
+
+    React.useEffect(() => {
+        async function fetchSessionInfo() {
+            try {
+                const data = await getSessionInfo(userId);
+                const questionId = data.session.questionId;
+                
+                const question = await getQuestionInfo(questionId);
+                setQuestion(question);
+
+                const partnerName = data.session.partner;
+                setPartnerName(partnerName);
+
+                const partnerProfPic = data.session.partner_pic;
+                const partnerProfPicUrl = await getSignedImageURL(partnerProfPic);
+                setPartnerProfPicUrl(partnerProfPicUrl);
+
+                const ownProfPicUrl = await getSignedImageURL(ownProfPic);
+                setOwnProfPicUrl(ownProfPicUrl);
+
+                setSessionId(data.sessionId);
+                const roomId = data.sessionId
+                socket.emit('joinSession', { userId, roomId });
+
+                console.log(data.session);
+            } catch (error) {
+                console.error('Failed to fetch session:', error);
+            }
+        }
+        fetchSessionInfo();
+    }, []);
+
+    React.useEffect(() => {
+        socket.on("shuffle", async (_) => {
+            const data = await getSessionInfo(userId);
+            const questionId = data.session.questionId;
+            const question = await getQuestionInfo(questionId);
+            setQuestion(question);
+        });
+      }, [socket]);
+
+
     return (
         <>
-            <Header />
+            <Header 
+                partnerName={partnerName}
+                partnerProfPicUrl={partnerProfPicUrl}
+                ownProfPicUrl={ownProfPicUrl}
+                onUpdateData={handleShuffleQuestion}
+            />
             <Box height="90vh"
             sx={{
                 ml: 2,
@@ -40,7 +124,15 @@ const CollaborationPage = () => {
                     }}
                 >
                     <Box width="100%">
-                        <QuestionPanel />
+                    <QuestionPanel
+                        id={question?.question_id ?? 0} 
+                        title={question?.question_title ?? ''}
+                        description={question?.question_description ?? ''}
+                        example={question?.question_example ?? []} 
+                        categories={question?.question_categories ?? []}
+                        complexity={question?.question_complexity ?? ''}
+                        popularity={question?.question_popularity ?? 0}
+                    />
                     </Box>
                     <Box width="100%">
                         <CodeEditor />
