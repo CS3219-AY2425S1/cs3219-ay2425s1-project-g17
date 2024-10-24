@@ -22,7 +22,7 @@ const CodeEditor = () => {
 
     //TODO: Update Room ID
     const room = "TESTROOMID123"
-    socket.emit("join_room", room);
+    //socket.emit("join_room", room);
     const [language, setLanguage] = useState('javascript'); 
     const [code, setCode] = useState(`var message = 'Hello, World!';\nconsole.log(message);`); 
     const [isSnackbarOpen, setIsSnackbarOpen] = useState(false); 
@@ -114,7 +114,7 @@ const CodeEditor = () => {
                 padding: { top: 8 }, 
 
             }}
-            onChange={handleEditorChange}
+            //onChange={handleEditorChange}
         />
 
         <Box display="flex" justifyContent="space-between" padding={2} gap={10}>

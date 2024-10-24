@@ -167,10 +167,6 @@ export function handleAxiosError(error: any) {
 
 export async function sendDetailsToCollab(user1Id: string, user2Id: string, category: string, difficulty: string) {
   try {
-      console.log(user1Id);
-      console.log(user2Id);
-      console.log(category);
-      console.log(difficulty);
       await api.post('/', {user1Id, user2Id, category, difficulty});
   } catch (error) {
       throw new Error(handleAxiosError(error));

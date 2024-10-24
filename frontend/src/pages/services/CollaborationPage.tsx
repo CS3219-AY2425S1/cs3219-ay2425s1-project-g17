@@ -8,6 +8,7 @@ import { Box } from '@mui/material';
 import DragHandleIcon from '@mui/icons-material/DragHandle';
 import { getSessionInfo, getQuestionInfo } from '../../services/collaboration-service/CollaborationService';
 import { getSignedImageURL } from '../../services/user-service/UserService';
+import io from "socket.io-client";
 
 interface ExampleProps {
     id: number;
@@ -28,13 +29,22 @@ interface QuestionProps {
 }
 
 const CollaborationPage = () => {
+    
     const [question, setQuestion] = React.useState<QuestionProps | null>(null);
     const [partnerName, setPartnerName] = React.useState('');
     const [partnerProfPicUrl, setPartnerProfPicUrl] = React.useState('');
     const [ownProfPicUrl, setOwnProfPicUrl] = React.useState('');
+    const [sessionId, setSessionId] = React.useState('');
 
     const userId = localStorage.getItem('id') || '';
     const ownProfPic = localStorage.getItem('profileImage') || '';
+
+    const socket = io("http://localhost:4003");
+
+    const handleShuffleQuestion = (newData: QuestionProps) => {
+        setQuestion(newData); 
+        socket.emit("shuffleQuestion", sessionId);
+    };
 
     React.useEffect(() => {
         async function fetchSessionInfo() {
@@ -55,15 +65,26 @@ const CollaborationPage = () => {
                 const ownProfPicUrl = await getSignedImageURL(ownProfPic);
                 setOwnProfPicUrl(ownProfPicUrl);
 
-                console.log(question);
+                setSessionId(data.sessionId);
+                const roomId = data.sessionId
+                socket.emit('joinSession', { userId, roomId });
+
                 console.log(data.session);
-                console.log(partnerName);
             } catch (error) {
                 console.error('Failed to fetch session:', error);
             }
         }
         fetchSessionInfo();
     }, []);
+
+    React.useEffect(() => {
+        socket.on("shuffle", async (_) => {
+            const data = await getSessionInfo(userId);
+            const questionId = data.session.questionId;
+            const question = await getQuestionInfo(questionId);
+            setQuestion(question);
+        });
+      }, [socket]);
 
 
     return (
@@ -72,7 +93,7 @@ const CollaborationPage = () => {
                 partnerName={partnerName}
                 partnerProfPicUrl={partnerProfPicUrl}
                 ownProfPicUrl={ownProfPicUrl}
-                onUpdateData={setQuestion}
+                onUpdateData={handleShuffleQuestion}
             />
             <Box height="90vh"
             sx={{

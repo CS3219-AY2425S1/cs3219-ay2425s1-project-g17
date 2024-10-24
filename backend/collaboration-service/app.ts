@@ -14,7 +14,7 @@ app.use('/collaboration', collaborationRoutes);
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: "*", 
     methods: ["GET", "POST"]
   }
 });
@@ -22,14 +22,15 @@ const io = new Server(httpServer, {
 io.on("connection", (socket) => {
     console.log(`User Connected: ${socket.id}`);
   
-    socket.on("join_room", (data) => {
-      socket.join(data);
+    socket.on('joinSession', ({ userId, roomId }) => {
+      socket.join(roomId);
+      console.log(`User ${userId} joined room ${roomId}`);
     });
-  
-    socket.on("send_message", (data) => {
-      socket.to(data.room).emit("receive_message", data);
-      console.log(data);
+
+    socket.on('shuffleQuestion', (sessionId) => {
+      console.log(`Shuffle question signal received for session: ${sessionId}`);
+      socket.to(sessionId).emit('shuffle', "-");
     });
   });
 
-export { httpServer };
+export { httpServer, io };
