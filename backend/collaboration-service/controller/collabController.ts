@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import axios from 'axios';
-import fs from 'fs';
 import { generateToken } from "../utils/tokenGenerator"
 import { redisClient } from "../redisClient"
 import { v4 as uuidv4 } from 'uuid';
@@ -48,18 +47,33 @@ export const createCollaborationRoom = async (req: Request, res: Response) => {
         const questionRes = await fetchRandomQuestion(difficulty, category, bearerToken);
 
         if (questionRes.question_id == null) {
-            res.status(questionRes.status).json({
-                error: questionRes 
-            });
+            res.status(questionRes.status).json({ error: questionRes });
         } else {
             const sessionId = await saveCollaborationRoom(user1Id, user2Id, questionRes, category, difficulty);
-            res.status(200).json({ 
-                message: "success",
-                sessionId: sessionId
-            });
+            res.status(200).json(sessionId);
         }
     } catch (error) {
         console.error('Error creating collaboration room:', error);
         res.status(400).json({ error: (error as Error).message });
     }
 };
+
+const getSessionData = async (userId: string) => {
+    const sessions = await redisClient.keys('session:*'); 
+    for (const key of sessions) {
+        const sessionData = await redisClient.hgetall(key);
+        console.log(sessionData.user1Id);
+        console.log(userId);
+        if (sessionData.user1Id == userId || sessionData.user2Id == userId) {
+            return { sessionId: key, session: sessionData };
+        }
+    }
+}
+
+export const getCollaborationRoom = async (req: Request, res: Response) => {
+    const userId = req.params.id;
+    console.log(userId);
+    const sessionData = await getSessionData(userId)
+    console.log(sessionData);
+    res.status(200).json(sessionData);
+}
