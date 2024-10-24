@@ -96,3 +96,30 @@ export const getCollaborationRoom = async (req: Request, res: Response) => {
     console.log(sessionData);
     res.status(200).json(sessionData);
 }
+
+export const shuffleQuestion = async (req: Request, res: Response) => {
+    const userId = req.params.id;
+    const sessionData = await getSessionData(userId);
+    const sessionId = sessionData?.sessionId;
+
+    if (!sessionId) {
+        res.status(440).json("Session Expired")
+        return
+    }
+
+    let newQuestionId = sessionData?.session.questionId;
+    let newQuestion;
+
+    const questionId = sessionData?.session.questionId;
+    const category = sessionData?.session.category || "Algorithms";
+    const difficulty = sessionData?.session.difficulty || "EASY";
+    const bearerToken = generateToken(userId);
+
+    while (newQuestionId == questionId) {
+        newQuestion = await fetchRandomQuestion(difficulty, category, bearerToken);
+        newQuestionId = newQuestion.question_id;
+    }
+
+    await redisClient.hset(sessionId, 'questionId', newQuestionId);
+    res.status(200).json({"question_id": newQuestionId});
+}

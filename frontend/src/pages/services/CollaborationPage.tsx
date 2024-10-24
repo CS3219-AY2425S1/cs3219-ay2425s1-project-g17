@@ -72,6 +72,7 @@ const CollaborationPage = () => {
                 partnerName={partnerName}
                 partnerProfPicUrl={partnerProfPicUrl}
                 ownProfPicUrl={ownProfPicUrl}
+                onUpdateData={setQuestion}
             />
             <Box height="90vh"
             sx={{

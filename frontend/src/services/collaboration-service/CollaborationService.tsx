@@ -11,11 +11,6 @@ const questionApi = axios.create({
     timeout: 5000,
 });
 
-const userApi = axios.create({
-    baseURL: "http://localhost:4001/users",
-    timeout: 5000,
-});
-
 applyInterceptors(collabApi);
 applyInterceptors(questionApi);
 
@@ -44,10 +39,10 @@ async function getQuestionInfo(id: string) {
     }
 }
 
-// Function to get partner name
-async function getParterName(id: string) {
+// Function to shuffle question
+async function shuffleQuestion(id: string) {
     try {
-        const response = await userApi.get(`/${id}`);
+        const response = await collabApi.get(`/shuffle/${id}`);
         return response.data;
     } catch (error) {
         handleAxiosError(error);
@@ -56,5 +51,6 @@ async function getParterName(id: string) {
 
 export {
     getSessionInfo,
-    getQuestionInfo
+    getQuestionInfo,
+    shuffleQuestion
 }

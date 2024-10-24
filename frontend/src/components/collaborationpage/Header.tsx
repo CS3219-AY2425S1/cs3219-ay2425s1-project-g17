@@ -5,14 +5,40 @@ import DisconnectIcon from '@mui/icons-material/PowerSettingsNew';
 import IconButton from '@mui/material/IconButton';
 import Avatar from '@mui/material/Avatar';
 import { useNavigate } from 'react-router-dom';
+import { getQuestionInfo } from '../../services/collaboration-service/CollaborationService';
+import { shuffleQuestion } from '../../services/collaboration-service/CollaborationService';
+
+interface ExampleProps {
+    id: number;
+    input: string;
+    output: string;
+    explanation: string;
+}
+
+interface QuestionProps {
+    _id: string;
+    question_id: number;
+    question_title: string;
+    question_description: string;
+    question_example: ExampleProps[];
+    question_categories: string[];
+    question_complexity: string;
+    question_popularity: number;
+}
 
 interface HeaderProps {
     partnerName: string; 
     partnerProfPicUrl: string;
     ownProfPicUrl: string;
+    onUpdateData: (newData: QuestionProps) => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ partnerName, partnerProfPicUrl, ownProfPicUrl }) => {
+const Header: React.FC<HeaderProps> = ({ 
+    partnerName, 
+    partnerProfPicUrl, 
+    ownProfPicUrl,
+    onUpdateData
+ }) => {
 
     const navigate = useNavigate();
 
@@ -24,9 +50,13 @@ const Header: React.FC<HeaderProps> = ({ partnerName, partnerProfPicUrl, ownProf
     };
 
     // TODO: Implement shuffle functionality
-    const onShuffleQuestions = () => {
-        // Logic to shuffle questions goes here
-        console.log("Shuffling questions...");
+    const onShuffleQuestions = async () => {
+        const userId = localStorage.getItem('id') || '';
+        const shuffleRes = await shuffleQuestion(userId);
+        const newQuestionId = shuffleRes.question_id;
+        const question = await getQuestionInfo(newQuestionId);
+        console.log(question);
+        onUpdateData(question);
     };
 
     return (
