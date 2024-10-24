@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import axios from 'axios';
 import fs from 'fs';
 import { generateToken } from "../utils/tokenGenerator"
+import { redisClient } from "../redisClient"
+import { v4 as uuidv4 } from 'uuid';
 
 const fetchRandomQuestion = async (difficulty: string, category: string, token: string) => {
     try {
@@ -15,6 +17,25 @@ const fetchRandomQuestion = async (difficulty: string, category: string, token: 
         return error;
     }
 };
+
+const saveCollaborationRoom = async (user1Id: string, user2Id: string, question: any, category: string, difficulty: string) => {
+    try {
+        const sessionId = uuidv4(); 
+        const sessionData = {
+            user1Id,
+            user2Id,
+            question, 
+            category,
+            difficulty
+        };
+
+        await redisClient.hset(`session:${sessionId}`, sessionData);
+        console.log('Session saved to Redis:', sessionId);
+        return sessionId;
+    } catch (error) {
+        return error;
+    }
+}
 
 export const createCollaborationRoom = async (req: Request, res: Response) => {
     try {
@@ -31,8 +52,11 @@ export const createCollaborationRoom = async (req: Request, res: Response) => {
                 error: questionRes 
             });
         } else {
-            console.log(questionRes);
-            res.status(200).json({"message": "success"});
+            const sessionId = await saveCollaborationRoom(user1Id, user2Id, questionRes, category, difficulty);
+            res.status(200).json({ 
+                message: "success",
+                sessionId: sessionId
+            });
         }
     } catch (error) {
         console.error('Error creating collaboration room:', error);
