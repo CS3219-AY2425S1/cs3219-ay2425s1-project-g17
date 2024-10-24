@@ -17,13 +17,13 @@ const fetchRandomQuestion = async (difficulty: string, category: string, token: 
     }
 };
 
-const saveCollaborationRoom = async (user1Id: string, user2Id: string, question: any, category: string, difficulty: string) => {
+const saveCollaborationRoom = async (user1Id: string, user2Id: string, questionId: any, category: string, difficulty: string) => {
     try {
         const sessionId = uuidv4(); 
         const sessionData = {
             user1Id,
             user2Id,
-            question, 
+            questionId, 
             category,
             difficulty
         };
@@ -49,7 +49,7 @@ export const createCollaborationRoom = async (req: Request, res: Response) => {
         if (questionRes.question_id == null) {
             res.status(questionRes.status).json({ error: questionRes });
         } else {
-            const sessionId = await saveCollaborationRoom(user1Id, user2Id, questionRes, category, difficulty);
+            const sessionId = await saveCollaborationRoom(user1Id, user2Id, questionRes.question_id, category, difficulty);
             res.status(200).json(sessionId);
         }
     } catch (error) {
@@ -62,8 +62,6 @@ const getSessionData = async (userId: string) => {
     const sessions = await redisClient.keys('session:*'); 
     for (const key of sessions) {
         const sessionData = await redisClient.hgetall(key);
-        console.log(sessionData.user1Id);
-        console.log(userId);
         if (sessionData.user1Id == userId || sessionData.user2Id == userId) {
             return { sessionId: key, session: sessionData };
         }
@@ -72,7 +70,6 @@ const getSessionData = async (userId: string) => {
 
 export const getCollaborationRoom = async (req: Request, res: Response) => {
     const userId = req.params.id;
-    console.log(userId);
     const sessionData = await getSessionData(userId)
     console.log(sessionData);
     res.status(200).json(sessionData);

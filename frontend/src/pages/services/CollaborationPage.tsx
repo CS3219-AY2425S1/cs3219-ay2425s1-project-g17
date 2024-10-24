@@ -6,8 +6,51 @@ import QuestionPanel from '../../components/collaborationpage/QuestionPanel';
 import Header from '../../components/collaborationpage/Header';
 import { Box } from '@mui/material';
 import DragHandleIcon from '@mui/icons-material/DragHandle';
+import { getSessionInfo, getQuestionInfo } from '../../services/collaboration-service/CollaborationService';
+
+interface ExampleProps {
+    id: number;
+    input: string;
+    output: string;
+    explanation: string;
+}
+
+interface QuestionProps {
+    _id: string;
+    question_id: number;
+    question_title: string;
+    question_description: string;
+    question_example: ExampleProps[];
+    question_categories: string[];
+    question_complexity: string;
+    question_popularity: number;
+}
 
 const CollaborationPage = () => {
+    const [question, setQuestion] = React.useState<QuestionProps | null>(null);
+
+    const userId = localStorage.getItem('id') || '';
+
+    React.useEffect(() => {
+        async function fetchSessionInfo() {
+            try {
+                const data = await getSessionInfo(userId);
+                const questionId = data.session.questionId;
+
+                const question = await getQuestionInfo(questionId);
+                setQuestion(question);
+
+
+                console.log(question);
+                console.log(data.session);
+            } catch (error) {
+                console.error('Failed to fetch session:', error);
+            }
+        }
+        fetchSessionInfo();
+    }, []);
+
+
     return (
         <>
             <Header />
@@ -40,7 +83,15 @@ const CollaborationPage = () => {
                     }}
                 >
                     <Box width="100%">
-                        <QuestionPanel />
+                    <QuestionPanel
+                        id={question?.question_id ?? 0} 
+                        title={question?.question_title ?? ''}
+                        description={question?.question_description ?? ''}
+                        example={question?.question_example ?? []} 
+                        categories={question?.question_categories ?? []}
+                        complexity={question?.question_complexity ?? ''}
+                        popularity={question?.question_popularity ?? 0}
+                    />
                     </Box>
                     <Box width="100%">
                         <CodeEditor />
