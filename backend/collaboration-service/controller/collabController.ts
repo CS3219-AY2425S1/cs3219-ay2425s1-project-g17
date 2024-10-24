@@ -1,31 +1,39 @@
 import { Request, Response } from 'express';
+import axios from 'axios';
 import fs from 'fs';
+import { generateToken } from "../utils/tokenGenerator"
+
+const fetchRandomQuestion = async (difficulty: string, category: string, token: string) => {
+    try {
+        const apiUrl = `http://localhost:4000/questions/random?difficulty=${difficulty}&category=${category}`;
+        const headers = { 
+            Authorization: `Bearer ${token}` 
+        };
+        const response = await axios.get(apiUrl, { headers });
+        return response.data;
+    } catch (error) {
+        return error;
+    }
+};
 
 export const createCollaborationRoom = async (req: Request, res: Response) => {
     try {
-        const user_1 = req.body.user_1;
-        const user_2 = req.body.user_2;
+        const user1Id = req.body.user1Id;
+        const user2Id = req.body.user2Id;
         const category = req.body.category;
         const difficulty = req.body.difficulty;
-        console.log(req)
-        console.log(req.body)
-        console.log(user_1);
-        console.log(user_2);
-        console.log(category);
-        console.log(difficulty);
 
-        res.status(200).json({"message": "success"});
+        const bearerToken = generateToken(user1Id);
+        const questionRes = await fetchRandomQuestion(difficulty, category, bearerToken);
 
-        // const maxIdQuestion = await Question.findOne({}, {}, { sort: { question_id: -1 } });
-        // const newQuestionId = maxIdQuestion ? maxIdQuestion.question_id + 1 : 1;
-
-        // const question = new Question({
-        //     ...questionData,
-        //     question_id: newQuestionId
-        // });
-        
-        // await question.save();
-        // res.status(201).json(question);
+        if (questionRes.question_id == null) {
+            res.status(questionRes.status).json({
+                error: questionRes 
+            });
+        } else {
+            console.log(questionRes);
+            res.status(200).json({"message": "success"});
+        }
     } catch (error) {
         console.error('Error creating collaboration room:', error);
         res.status(400).json({ error: (error as Error).message });
