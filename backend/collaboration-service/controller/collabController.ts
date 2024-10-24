@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 const fetchRandomQuestion = async (difficulty: string, category: string, token: string) => {
     try {
-        const apiUrl = `http://localhost:4000/questions/random?difficulty=${difficulty}&category=${category}`;
+        const apiUrl = `http://question-service:4000/questions/random?difficulty=${difficulty}&category=${category}`;
         const headers = { 
             Authorization: `Bearer ${token}` 
         };
@@ -44,8 +44,9 @@ export const createCollaborationRoom = async (req: Request, res: Response) => {
         const difficulty = req.body.difficulty;
 
         const bearerToken = generateToken(user1Id);
+        console.log(bearerToken);
         const questionRes = await fetchRandomQuestion(difficulty, category, bearerToken);
-
+        console.log(questionRes);
         if (questionRes.question_id == null) {
             res.status(questionRes.status).json({ error: questionRes });
         } else {

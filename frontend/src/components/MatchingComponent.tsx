@@ -159,14 +159,13 @@ const MatchingComponent = () => {
         timerIntervalRef.current = timerInterval;
     };
 
-    // TODO: navigate to collaboration page
     const startCountdown = (count: number) => {
         setCountdown(count);
         const countdownInterval = setInterval(() => {
             setCountdown((prev) => {
                 if (prev === 1) {
                     clearInterval(countdownInterval);
-                    // navigate('/collaboration');
+                    navigate('/collaboration');
                     return 0;
                 }
                 return prev ? prev - 1 : 0;
