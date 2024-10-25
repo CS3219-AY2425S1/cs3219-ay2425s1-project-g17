@@ -89,9 +89,7 @@ const CollaborationPage = () => {
                 
                 const question = await getQuestionInfo(questionId);
                 setQuestion(question);
-
-                const partnerName = data.session.partner;
-                setPartnerName(partnerName);
+                setPartnerName(data.session.partner);
 
                 const partnerProfPic = data.session.partner_pic;
                 const partnerProfPicUrl = await getSignedImageURL(partnerProfPic);
@@ -103,7 +101,6 @@ const CollaborationPage = () => {
                 setSessionId(data.sessionId);
                 const roomId = data.sessionId
                 socket.emit('joinSession', { userId, roomId });
-
                 console.log(data.session);
             } catch (error) {
                 console.error('Failed to fetch session:', error);

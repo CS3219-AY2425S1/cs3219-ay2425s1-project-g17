@@ -64,7 +64,7 @@ export const createCollaborationRoom = async (req: Request, res: Response) => {
 const getParter = async (userId: string) => {
     try {
         const bearerToken = generateToken(userId);
-        const apiUrl = `http://localhost:4001/users/${userId}`;
+        const apiUrl = `http://user-service:4001/users/${userId}`;
         const headers = { 
             Authorization: `Bearer ${bearerToken}` 
         };
