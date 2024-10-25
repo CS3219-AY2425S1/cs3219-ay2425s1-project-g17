@@ -59,9 +59,20 @@ async function disconnectUser(userId: string) {
     }
 }
 
+// Function to submit attempt
+async function submitAttempt(sessionId: string) {
+    try {
+        const response = await collabApi.post(`/submit`, {sessionId});
+        return response.data;
+    } catch (error) {
+        handleAxiosError(error);
+    }
+}
+
 export {
     getSessionInfo,
     getQuestionInfo,
     shuffleQuestion,
-    disconnectUser
+    disconnectUser,
+    submitAttempt
 }

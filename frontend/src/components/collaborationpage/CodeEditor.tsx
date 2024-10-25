@@ -15,33 +15,30 @@ import {
 } from '@mui/material';
 
 import io from "socket.io-client";
+import Popup from './Popup';
 
+interface CodeEditorProps {
+    onConfirmSubmission: () => void;
+}
+const CodeEditor: React.FC<CodeEditorProps> = ({ 
+    onConfirmSubmission
+ }) => {
 
-const CodeEditor = () => {
-    const socket = io("http://localhost:4003");
-
-    //TODO: Update Room ID
-    const room = "TESTROOMID123"
-    //socket.emit("join_room", room);
     const [language, setLanguage] = useState('javascript'); 
     const [code, setCode] = useState(`var message = 'Hello, World!';\nconsole.log(message);`); 
     const [isSnackbarOpen, setIsSnackbarOpen] = useState(false); 
-    const [isPopupOpen, setIsPopupOpen] = useState(false); 
+    const [isSubmissionPopupOpen, setIsSubmissionPopupOpen] = useState(false);
 
-    const handleSave = () => {
+    const onSave = () => {
         setIsSnackbarOpen(true); 
     };
 
-    const handleSubmit = () => {
-        setIsPopupOpen(true);
-    };
-
-    const handleConfirmSubmit = () => {
-        setIsPopupOpen(false);
+    const onSubmit = () => {
+        setIsSubmissionPopupOpen(true);
     };
 
     const handleClosePopup = () => {
-        setIsPopupOpen(false); 
+        setIsSubmissionPopupOpen(false); 
     };
 
     const handleCloseSnackbar = () => {
@@ -69,23 +66,23 @@ const CodeEditor = () => {
         }
     };
 
-    const sendMessage = (message: string) => {
-        socket.emit("send_message", { message, room });
-    };
+    // const sendMessage = (message: string) => {
+    //     socket.emit("send_message", { message, room });
+    // };
 
-    const handleEditorChange = (value: string | undefined) => {
-        if (value !== undefined) {
-            setCode(value); 
-            sendMessage(value)
-        }
-    }
+    // const handleEditorChange = (value: string | undefined) => {
+    //     if (value !== undefined) {
+    //         setCode(value); 
+    //         sendMessage(value)
+    //     }
+    // }
 
-    useEffect(() => {
-        socket.on("receive_message", (data) => {
-          console.log(data.message);
-          setCode(data.message);
-        });
-      }, [socket]);
+    // useEffect(() => {
+    //     socket.on("receive_message", (data) => {
+    //       console.log(data.message);
+    //       setCode(data.message);
+    //     });
+    //   }, [socket]);
 
     return (
         <Box height="90%" display="flex" flexDirection="column">
@@ -125,7 +122,7 @@ const CodeEditor = () => {
                 <Button 
                     variant="contained" 
                     color="success" 
-                    onClick={handleSave} 
+                    onClick={onSave} 
                     sx={{ marginRight: '8px', borderRadius: 2 }} 
                 >
                     Save
@@ -133,7 +130,7 @@ const CodeEditor = () => {
                 <Button 
                     variant="contained" 
                     color="primary" 
-                    onClick={handleSubmit} 
+                    onClick={onSubmit} 
                     sx={{ borderRadius: 2 }}
                 >
                     Submit
@@ -150,49 +147,13 @@ const CodeEditor = () => {
                 Your code has been saved!
             </Alert>
         </Snackbar>
-
-        <Dialog
-            open={isPopupOpen}
-            onClose={handleClosePopup}
-            fullWidth={false}  
-            maxWidth="xs" 
-            PaperProps={{
-                sx: {
-                    padding: 2,
-                    borderRadius: '12px',
-                },
-            }}
-        >
-            <DialogTitle sx={{ textAlign: 'center', fontWeight: 'bold' }}>
-                Submit Code
-            </DialogTitle>
-            <DialogContent>
-                <DialogContentText
-                    sx={{ textAlign: 'center' }}
-                >
-                    Dom has clicked on submit. <br />
-                    Would you like to confirm the submission and end the session?           
-                </DialogContentText>
-            </DialogContent>
-            <DialogActions sx={{ justifyContent: 'center' }}>
-                <Button
-                    onClick={handleClosePopup}
-                    color="secondary"
-                    variant="outlined"
-                    sx={{ borderRadius: 5 }}
-                >
-                    Cancel
-                </Button>
-                <Button
-                    onClick={handleConfirmSubmit}
-                    color="primary"
-                    variant="contained"
-                    sx={{ borderRadius: 5 }}
-                >
-                    Confirm
-                </Button>
-            </DialogActions>
-        </Dialog>
+        <Popup
+            isOpen={isSubmissionPopupOpen}
+            onConfirmDisconnect={onConfirmSubmission}
+            onCloseDisconnect ={handleClosePopup}
+            title="Submit"
+            description="Are you sure you want to submit? Once submitted, you won’t be able to make further changes."
+            />
       </Box>
     );
 };

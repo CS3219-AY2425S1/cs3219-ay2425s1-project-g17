@@ -6,7 +6,7 @@ import IconButton from '@mui/material/IconButton';
 import Avatar from '@mui/material/Avatar';
 import { useNavigate } from 'react-router-dom';
 import { getQuestionInfo, shuffleQuestion, disconnectUser } from '../../services/collaboration-service/CollaborationService';
-import DisconnectPopup from './DisconnectPopup';
+import Popup from './Popup';
 
 interface ExampleProps {
     id: number;
@@ -111,10 +111,11 @@ const Header: React.FC<HeaderProps> = ({
             >
                 Disconnect
             </Button>
-            <DisconnectPopup
+            <Popup
                 isOpen={isDisconnectPopupOpen}
                 onConfirmDisconnect={handleConfirmDisconnect}
                 onCloseDisconnect ={handleCloseDisconnectPopup}
+                title="Disconnect"
                 description="If you disconnect, you won't be able to rejoin this session."
             />
         </Box>

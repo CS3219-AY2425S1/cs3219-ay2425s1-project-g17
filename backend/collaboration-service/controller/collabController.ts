@@ -160,3 +160,14 @@ export const disconnectUser = async (req: Request, res: Response) => {
         res.status(400).json({ error: (error as Error).message });
     }
 };
+
+export const submitAttempt = async (req: Request, res: Response) => {
+    try {
+        const sessionId = req.body.sessionId;
+        await redisClient.del(sessionId);
+        res.status(200).json({"message": "successfully disconnected"});
+    } catch (error) {
+        console.error('Error submitting', error);
+        res.status(400).json({ error: (error as Error).message });
+    }
+};

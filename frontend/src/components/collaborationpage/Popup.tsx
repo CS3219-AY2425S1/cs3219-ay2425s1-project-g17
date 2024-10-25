@@ -8,15 +8,17 @@ import {
     DialogTitle 
 } from '@mui/material';
 
-interface DisconnectProps {
+interface PopupProps {
     isOpen: boolean;
+    title: string,
     description: string
     onConfirmDisconnect: () => void;
     onCloseDisconnect: () => void;
 }
 
-const DisconnectPopup: React.FC<DisconnectProps> = ({ 
+const DisconnectPopup: React.FC<PopupProps> = ({ 
     isOpen,
+    title,
     description,
     onConfirmDisconnect, 
     onCloseDisconnect
@@ -35,7 +37,7 @@ const DisconnectPopup: React.FC<DisconnectProps> = ({
             }}
         >
             <DialogTitle sx={{ textAlign: 'center', fontWeight: 'bold' }}>
-                Disconnect?
+                {`${title}?`}
             </DialogTitle>
             <DialogContent>
                 <DialogContentText
@@ -59,7 +61,7 @@ const DisconnectPopup: React.FC<DisconnectProps> = ({
                     variant="contained"
                     sx={{ borderRadius: 5 }}
                 >
-                    Disconnect
+                    {title}
                 </Button>
             </DialogActions>
         </Dialog>

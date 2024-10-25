@@ -6,11 +6,11 @@ import QuestionPanel from '../../components/collaborationpage/QuestionPanel';
 import Header from '../../components/collaborationpage/Header';
 import { Box } from '@mui/material';
 import DragHandleIcon from '@mui/icons-material/DragHandle';
-import { getSessionInfo, getQuestionInfo, disconnectUser } from '../../services/collaboration-service/CollaborationService';
+import { getSessionInfo, getQuestionInfo, disconnectUser, submitAttempt } from '../../services/collaboration-service/CollaborationService';
 import { getSignedImageURL } from '../../services/user-service/UserService';
 import socket from "../../context/socket"
 import { useNavigate } from 'react-router-dom';
-import DisconnectPopup from '../../components/collaborationpage/DisconnectPopup';
+import Popup from '../../components/collaborationpage/Popup';
 
 interface ExampleProps {
     id: number;
@@ -38,6 +38,7 @@ const CollaborationPage = () => {
     const [ownProfPicUrl, setOwnProfPicUrl] = React.useState('');
     const [sessionId, setSessionId] = React.useState('');
     const [isDisconnectPopupOpen, setIsDisconnectPopupOpen] = useState(false);
+    const [isSubmissionPopupOpen, setIsSubmissionPopupOpen] = useState(false);
 
     const userId = localStorage.getItem('id') || '';
     const ownProfPic = localStorage.getItem('profileImage') || '';
@@ -61,8 +62,23 @@ const CollaborationPage = () => {
         return
     }
 
+    const handleConfirmSubmission = () => {
+        socket.emit("submit", sessionId);
+    };
+
+    const handleSubmitForBothUser = () => {
+        // TODO: Save attempt (History Service)
+        submitAttempt(sessionId);
+        socket.emit("confirmSubmit", sessionId);
+        navigate('/dashboard');
+    }
+
     const handleCloseDisconnect = () => {
         setIsDisconnectPopupOpen(false);
+    };
+
+    const handleCloseSubmission = () => {
+        setIsSubmissionPopupOpen(false);
     };
 
     React.useEffect(() => {
@@ -106,6 +122,14 @@ const CollaborationPage = () => {
 
         socket.on("disconnectUser", async (_) => {
             setIsDisconnectPopupOpen(true);
+        });
+
+        socket.on("submit", async (_) => {
+            setIsSubmissionPopupOpen(true);
+        });
+
+        socket.on("confirmSubmit", async (_) => {
+            navigate('/dashboard');
         });
       }, [socket]);
 
@@ -159,15 +183,25 @@ const CollaborationPage = () => {
                     />
                     </Box>
                     <Box width="100%">
-                        <CodeEditor />
+                        <CodeEditor
+                            onConfirmSubmission={handleConfirmSubmission}
+                        />
                     </Box>
                 </Split>
             </Box>
-            <DisconnectPopup
+            <Popup
                 isOpen={isDisconnectPopupOpen}
                 onConfirmDisconnect={handleConfirmDisconnectAsWell}
                 onCloseDisconnect ={handleCloseDisconnect}
+                title="Disconnect"
                 description={`${partnerName} has disconnected. Do you wish to quit?`}
+            />
+            <Popup
+                isOpen={isSubmissionPopupOpen}
+                onConfirmDisconnect={handleSubmitForBothUser}
+                onCloseDisconnect ={handleCloseSubmission}
+                title="Submit"
+                description={`${partnerName} wants to submit. Do you wish to submit as well?`}
             />
             <style>{`
                 .custom-gutter {

@@ -36,6 +36,16 @@ io.on("connection", (socket) => {
       console.log(`User: ${userId} is disconnecting from ${sessionId}`);
       socket.to(sessionId).emit('disconnectUser', "-");
     });
+
+    socket.on('submit',  (sessionId) => {
+      console.log(`Submit question signal received for session: ${sessionId}`);
+      socket.to(sessionId).emit('submit', "-");
+    });
+
+    socket.on('confirmSubmit',  (sessionId) => {
+      console.log(`Confirm Submit question signal received for session: ${sessionId}`);
+      socket.to(sessionId).emit('confirmSubmit', "-");
+    });
   });
 
 export { httpServer, io };
