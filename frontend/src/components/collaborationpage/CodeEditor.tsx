@@ -1,17 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Editor } from "@monaco-editor/react";
 import {
-    Tabs,
-    Tab,
     Box,
     Button,
     Snackbar,
     Alert,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogContentText,
-    DialogTitle,
     Typography,
     Paper,
     FormControl,
@@ -20,7 +13,6 @@ import {
     SelectChangeEvent
 } from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import CodeIcon from '@mui/icons-material/Code';
 import { Terminal, Clear } from '@mui/icons-material'
 
 interface CodeEditorProps {
@@ -125,52 +117,53 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
     //   }, [socket]);
 
     return (
-        <Paper sx={{ height: "64vh", display: "flex", flexDirection: "column" }}>
-            <Box display="flex" justifyContent="space-between" padding={1} alignItems="center">
-                <FormControl variant="standard" sx={{ minWidth: 120 }}>
-                    <Select
-                        labelId="language-select-label"
-                        value={language}
-                        sx={{ fontSize: '14px' }}
-                        onChange={handleLanguageChange}
-                    >
-                        <MenuItem value="javascript">JavaScript</MenuItem>
-                        <MenuItem value="cpp">C++</MenuItem>
-                        <MenuItem value="python">Python</MenuItem>
-                        <MenuItem value="java">Java</MenuItem>
-                    </Select>
-                </FormControl>
+        <>
+            <Paper sx={{ height: "64vh", display: "flex", flexDirection: "column" }}>
+                <Box display="flex" justifyContent="space-between" padding={1} alignItems="center">
+                    <FormControl variant="standard" sx={{ minWidth: 120 }}>
+                        <Select
+                            labelId="language-select-label"
+                            value={language}
+                            sx={{ fontSize: '14px' }}
+                            onChange={handleLanguageChange}
+                        >
+                            <MenuItem value="javascript">JavaScript</MenuItem>
+                            <MenuItem value="cpp">C++</MenuItem>
+                            <MenuItem value="python">Python</MenuItem>
+                            <MenuItem value="java">Java</MenuItem>
+                        </Select>
+                    </FormControl>
 
-                {/* Run and Submit Buttons */}
-                <Box display="flex" justifyContent="right" padding={1} gap={2}>
-                    <Button
-                        variant="contained"
-                        color="success"
-                        onClick={handleRunCode}
-                        sx={{ marginRight: '8px', textTransform: 'none', color: 'white' }}
-                        startIcon={<PlayArrowIcon />}
-                    >
-                        Run
-                    </Button>
+                    {/* Run and Submit Buttons */}
+                    <Box display="flex" justifyContent="right" padding={1} gap={2}>
+                        <Button
+                            variant="contained"
+                            color="success"
+                            onClick={handleRunCode}
+                            sx={{ marginRight: '8px', textTransform: 'none', color: 'white' }}
+                            startIcon={<PlayArrowIcon />}
+                        >
+                            Run
+                        </Button>
+                    </Box>
                 </Box>
-            </Box>
 
+                <Editor
+                    language={language}
+                    theme="vs-dark"
+                    value={code}
+                    options={{
+                        fontSize: 14,
+                        formatOnType: true,
+                        autoClosingBrackets: "languageDefined",
+                        minimap: { enabled: false },
+                        padding: { top: 8 },
 
-            <Editor
-                language={language}
-                theme="vs-dark"
-                value={code}
-                options={{
-                    fontSize: 14,
-                    formatOnType: true,
-                    autoClosingBrackets: "languageDefined",
-                    minimap: { enabled: false },
-                    padding: { top: 8 },
+                    }}
+                //onChange={handleEditorChange}
+                />
+            </Paper>
 
-                }}
-                height="55vh"
-            //onChange={handleEditorChange}
-            />
 
             {/* Console Output Section */}
             <Paper sx={{ height: "23.75vh", display: "flex", flexDirection: "column", mt: 2 }}>
@@ -234,7 +227,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
                     Your code has been run!
                 </Alert>
             </Snackbar>
-        </Paper>
+        </>
     );
 };
 

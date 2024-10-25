@@ -190,15 +190,9 @@ const CollaborationPage = () => {
                 isOpen={isDisconnectPopupOpen}
                 onConfirmDisconnect={handleConfirmDisconnectAsWell}
                 onCloseDisconnect ={handleCloseDisconnect}
-                title="Disconnect"
-                description={`${partnerName} has disconnected. Do you wish to quit?`}
-            />
-            <Popup
-                isOpen={isSubmissionPopupOpen}
-                onConfirmDisconnect={handleSubmitForBothUser}
-                onCloseDisconnect ={handleCloseSubmission}
-                title="Submit"
-                description={`${partnerName} wants to submit. Do you wish to submit as well?`}
+                title="Disconnect room?"
+                description={`${partnerName} has disconnected. Do you wish to disconnect?`}
+                option ={["Cancel", "Disconnect"]}
             />
             <style>{`
                 .custom-gutter {

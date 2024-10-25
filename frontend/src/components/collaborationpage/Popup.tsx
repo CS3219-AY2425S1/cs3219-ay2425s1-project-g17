@@ -1,11 +1,9 @@
 import React from 'react';
-import { 
+import {
     Button,
-    Dialog, 
-    DialogActions, 
-    DialogContent, 
-    DialogContentText, 
-    DialogTitle 
+    Typography,
+    Box,
+    Modal
 } from '@mui/material';
 
 interface PopupProps {
@@ -14,57 +12,48 @@ interface PopupProps {
     description: string
     onConfirmDisconnect: () => void;
     onCloseDisconnect: () => void;
+    option: string[];
 }
 
-const DisconnectPopup: React.FC<PopupProps> = ({ 
+const DisconnectPopup: React.FC<PopupProps> = ({
     isOpen,
     title,
     description,
-    onConfirmDisconnect, 
-    onCloseDisconnect
- }) => {
+    onConfirmDisconnect,
+    onCloseDisconnect,
+    option
+}) => {
     return (
-        <Dialog
-            open={isOpen}
-            onClose={onCloseDisconnect}
-            fullWidth={false}  
-            maxWidth="xs" 
-            PaperProps={{
-                sx: {
-                    padding: 2,
-                    borderRadius: '12px',
-                },
-            }}
-        >
-            <DialogTitle sx={{ textAlign: 'center', fontWeight: 'bold' }}>
-                {`${title}?`}
-            </DialogTitle>
-            <DialogContent>
-                <DialogContentText
-                    sx={{ textAlign: 'center' }}
-                >
-                    {description}
-                </DialogContentText>
-            </DialogContent>
-            <DialogActions sx={{ justifyContent: 'center' }}>
-                <Button
-                    onClick={onCloseDisconnect}
-                    color="secondary"
-                    variant="outlined"
-                    sx={{ borderRadius: 5 }}
-                >
-                    Cancel
-                </Button>
-                <Button
-                    onClick={onConfirmDisconnect}
-                    color="primary"
-                    variant="contained"
-                    sx={{ borderRadius: 5 }}
-                >
+        <Modal open={isOpen} onClose={onCloseDisconnect}>
+            <Box
+                sx={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    width: 400,
+                    bgcolor: 'background.paper',
+                    boxShadow: 24,
+                    p: 4,
+                    borderRadius: 3,
+                }}
+            >
+                <Typography variant="h6" sx={{ mb: 2 }}>
                     {title}
-                </Button>
-            </DialogActions>
-        </Dialog>
+                </Typography>
+                <Typography sx={{ mb: 4 }}>
+                    {description}
+                </Typography>
+                <Box sx={{ display: 'flex', justifyContent: 'right', gap: 2 }}>
+                    <Button variant="outlined" onClick={onCloseDisconnect}>
+                        {option[0]}
+                    </Button>
+                    <Button variant="contained" color="error" onClick={onConfirmDisconnect}>
+                        {option[1]}
+                    </Button>
+                </Box>
+            </Box>
+        </Modal>
     );
 
 }

@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { Typography, Button, Box } from '@mui/material';
 import ShuffleIcon from '@mui/icons-material/Shuffle';
 import DisconnectIcon from '@mui/icons-material/PowerSettingsNew';
-import IconButton from '@mui/material/IconButton';
 import Avatar from '@mui/material/Avatar';
 import { useNavigate } from 'react-router-dom';
 import { getQuestionInfo, shuffleQuestion, disconnectUser } from '../../services/collaboration-service/CollaborationService';
 import Popup from './Popup';
+import Tooltip from '@mui/material/Tooltip';
 
 interface ExampleProps {
     id: number;
@@ -27,31 +27,32 @@ interface QuestionProps {
 }
 
 interface HeaderProps {
-    partnerName: string; 
+    partnerName: string;
     partnerProfPicUrl: string;
     ownProfPicUrl: string;
     onShuffleQuestion: (newData: QuestionProps) => void;
     onConfirmDisconnect: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ 
-    partnerName, 
-    partnerProfPicUrl, 
+const Header: React.FC<HeaderProps> = ({
+    partnerName,
+    partnerProfPicUrl,
     ownProfPicUrl,
     onShuffleQuestion,
     onConfirmDisconnect
- }) => {
+}) => {
 
     const [isDisconnectPopupOpen, setIsDisconnectPopupOpen] = useState(false);
-    
+    const username = localStorage.getItem('username') || '';
+
     const navigate = useNavigate();
 
     const onDisconnect = () => {
-        setIsDisconnectPopupOpen(true); 
+        setIsDisconnectPopupOpen(true);
     };
 
     const handleCloseDisconnectPopup = () => {
-        setIsDisconnectPopupOpen(false); 
+        setIsDisconnectPopupOpen(false);
     };
 
     const handleConfirmDisconnect = () => {
@@ -96,27 +97,32 @@ const Header: React.FC<HeaderProps> = ({
             <Typography color="textPrimary">
                 You are connected with <strong>{partnerName}</strong>
             </Typography>
-            <IconButton sx={{ p: 0 }}>
-                <Avatar src={ownProfPicUrl} sx={{ bgcolor: "white" }} />
-            </IconButton>
-            <IconButton sx={{ p: 0 }}>
+
+            <Box display="flex" alignItems="center" gap={2}>
+                <Tooltip title={username}>
+                    <Avatar src={ownProfPicUrl} sx={{ bgcolor: "white" }} alt='potato' />
+                </Tooltip>
+                <Tooltip title={partnerName}>
                 <Avatar src={partnerProfPicUrl} sx={{ bgcolor: "white" }} />
-            </IconButton>
-            <Button
-                variant="outlined"
-                color="error"
-                onClick={onDisconnect}
-                sx={{ textTransform: 'none', fontWeight: 'bold' }}
-                startIcon={<DisconnectIcon />}
-            >
-                Disconnect
-            </Button>
+                </Tooltip>
+                <Button
+                    variant="outlined"
+                    color="error"
+                    onClick={onDisconnect}
+                    sx={{ textTransform: 'none', fontWeight: 'bold' }}
+                    startIcon={<DisconnectIcon />}
+                >
+                    Disconnect
+                </Button>
+            </Box>
+
             <Popup
                 isOpen={isDisconnectPopupOpen}
                 onConfirmDisconnect={handleConfirmDisconnect}
-                onCloseDisconnect ={handleCloseDisconnectPopup}
-                title="Disconnect"
-                description="If you disconnect, you won't be able to rejoin this session."
+                onCloseDisconnect={handleCloseDisconnectPopup}
+                title="Disconnect room?"
+                description="You won't be able to rejoin this session."
+                option={["Cancel", "Disconnect"]}
             />
         </Box>
     );
