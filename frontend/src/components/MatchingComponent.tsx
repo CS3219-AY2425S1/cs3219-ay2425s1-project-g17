@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-    Paper,
     Box,
     Button,
     TextField,
@@ -180,148 +179,187 @@ const MatchingComponent = () => {
         setCountdown(null);
     };
 
+    const containerRef = useRef<HTMLDivElement | null>(null);
+    const [isFixed, setIsFixed] = useState(false);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            const container = containerRef.current;
+            if (!container) return;
+
+            const containerTop = container.getBoundingClientRect().top;
+
+            if (containerTop <= 10) {
+                setIsFixed(true); 
+            } else {
+                setIsFixed(false);
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        };
+    }, []);
+
     return (
         <>
-            <Box sx={{
-                bgcolor: 'background.paper',
-                boxShadow: 24,
-                p: 2,
-                height: "35%", 
-                width: "25%",
-                display: 'flex', 
-                flexDirection: 'column', 
-                position: 'fixed',
-                transform: 'translate(-7%, 0)',
-            }}>
-
-                <Typography variant="h5" sx={{ marginBottom: 2, fontWeight: 'bold', color: 'white', fontSize: '18px' }}>
-                    Find a Match
-                </Typography>
-
-                <Box component="form" sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                    <Autocomplete
-                        size='small'
-                        options={availableCategories}
-                        value={category}
-                        onChange={(event, newValue) => setCategory(newValue)}
-                        renderInput={(params) => <TextField {...params} label="Category" variant="outlined" />}
-                    />
-                    <FormControl size='small' variant="outlined" fullWidth>
-                        <InputLabel>Select Difficulty</InputLabel>
-                        <Select
-                            value={difficulty}
-                            onChange={(e) => setDifficulty(e.target.value)}
-                            label="Select Difficulty"
-                        >
-                            <MenuItem value="EASY">Easy</MenuItem>
-                            <MenuItem value="MEDIUM">Medium</MenuItem>
-                            <MenuItem value="HARD">Hard</MenuItem>
-                        </Select>
-                    </FormControl>
-                    <Box sx={{ display: 'flex', justifyContent: 'right', alignItems: 'center' }}>
-                        <Button
-                            variant="contained"
-                            color="secondary"
-                            onClick={handleSendRequest}
-                            startIcon={<PersonSearchIcon />}
-                            sx={{ color: "white" }}
-                        >
-                            Match
-                        </Button>
-                    </Box>
-                </Box>
-            </Box>
-
-            {/* View Modal */}
-            <Modal open={open}>
-                <Box
+            <div ref={containerRef}>
+                {isFixed && ( 
+                    <Box
                     sx={{
-                        position: 'absolute',
-                        top: '50%',
-                        left: '50%',
-                        transform: 'translate(-50%, -50%)',
-                        width: '30%',
-                        bgcolor: 'background.paper',
-                        boxShadow: 24,
-                        p: 4,
-                        borderRadius: 3,
-                        maxHeight: '80vh',
-                        overflowY: 'auto',
+                        width: "25vw",
+                        display: 'flex',
+                        position: 'relative',
                     }}
                 >
-                    <Box sx={{
+
+                </Box>)}
+                <Box
+                    sx={{
+                        bgcolor: 'background.paper',
+                        boxShadow: 24,
+                        p: 2,
+                        height: "35vh",
+                        width: "25vw",
                         display: 'flex',
                         flexDirection: 'column',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                    }}>
-                        {matchStatus === 'searching' && <CircularProgress size="3rem" color="secondary" />}
-                        {matchStatus === 'success' && <MoodIcon sx={{ color: 'success.main', fontSize: 60 }} />}
-                        {matchStatus === 'timeout' && <MoodBadIcon sx={{ color: 'error.main', fontSize: 60 }} />}
-                        <Typography
-                            mt={3}
-                            variant="body1"
-                            color={resultMessage.includes("Successfully matched") ? "success.main" : resultMessage.includes("timed out") ? "error.main" : "white"}
-                            textAlign="center"
-                        >
-                            {resultMessage}
-                        </Typography>
+                        position: isFixed ? 'fixed' : 'relative',
+                        top: isFixed ? '10px' : 'auto',
+                        zIndex: 2,
+                    }}
+                >
 
-                        {matchStatus === 'searching' && <Typography mt={2} variant="body2" textAlign="center">
-                            Time in queue: {timer}s
-                        </Typography>}
+                    <Typography variant="h5" sx={{ marginBottom: 2, fontWeight: 'bold', color: 'white', fontSize: '18px' }}>
+                        Find a Match
+                    </Typography>
 
-                        {countdown !== null && (
-                            <Typography mt={2} variant="body2" textAlign="center">
-                                {countdown > 0 ? `You will be redirected in ${countdown}...` : null}
-                            </Typography>
-                        )}
-                        <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
-                            {matchStatus !== 'success' && (
-                                <Button
-                                    variant="outlined"
-                                    color="secondary"
-                                    onClick={handleCancelRequest}
-                                    sx={{ color: "white" }}
-                                >Cancel
-                                </Button>
-                            )}
-                            {matchStatus === 'timeout' && (
-                                <Button
-                                    variant="contained"
-                                    color="error"
-                                    onClick={() => {
-                                        resetMatch();
-                                        handleSendRequest();
-                                    }}
-                                >
-                                    Retry
-                                </Button>
-                            )}
+                    <Box component="form" sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                        <Autocomplete
+                            size='small'
+                            options={availableCategories}
+                            value={category}
+                            onChange={(event, newValue) => setCategory(newValue)}
+                            renderInput={(params) => <TextField {...params} label="Category" variant="outlined" />}
+                        />
+                        <FormControl size='small' variant="outlined" fullWidth>
+                            <InputLabel>Select Difficulty</InputLabel>
+                            <Select
+                                value={difficulty}
+                                onChange={(e) => setDifficulty(e.target.value)}
+                                label="Select Difficulty"
+                            >
+                                <MenuItem value="EASY">Easy</MenuItem>
+                                <MenuItem value="MEDIUM">Medium</MenuItem>
+                                <MenuItem value="HARD">Hard</MenuItem>
+                            </Select>
+                        </FormControl>
+                        <Box sx={{ display: 'flex', justifyContent: 'right', alignItems: 'center' }}>
+                            <Button
+                                variant="contained"
+                                color="secondary"
+                                onClick={handleSendRequest}
+                                startIcon={<PersonSearchIcon />}
+                                sx={{ color: "white" }}
+                            >
+                                Match
+                            </Button>
                         </Box>
                     </Box>
                 </Box>
-            </Modal>
 
-            <Snackbar open={snackbarCategoryOpen} autoHideDuration={6000} onClose={handleSnackbarCategoryClose}>
-                <Alert
-                    onClose={handleSnackbarCategoryClose}
-                    severity="error"
-                    variant="filled"
-                >
-                    Please select a category
-                </Alert>
-            </Snackbar>
+                {/* View Modal */}
+                <Modal open={open}>
+                    <Box
+                        sx={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            width: '30%',
+                            bgcolor: 'background.paper',
+                            boxShadow: 24,
+                            p: 4,
+                            borderRadius: 3,
+                            maxHeight: '80vh',
+                            overflowY: 'auto',
+                        }}
+                    >
+                        <Box sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                        }}>
+                            {matchStatus === 'searching' && <CircularProgress size="3rem" color="secondary" />}
+                            {matchStatus === 'success' && <MoodIcon sx={{ color: 'success.main', fontSize: 60 }} />}
+                            {matchStatus === 'timeout' && <MoodBadIcon sx={{ color: 'error.main', fontSize: 60 }} />}
+                            <Typography
+                                mt={3}
+                                variant="body1"
+                                color={resultMessage.includes("Successfully matched") ? "success.main" : resultMessage.includes("timed out") ? "error.main" : "white"}
+                                textAlign="center"
+                            >
+                                {resultMessage}
+                            </Typography>
 
-            <Snackbar open={snackbarDifficultyOpen} autoHideDuration={6000} onClose={handleSnackbarDifficultyClose}>
-                <Alert
-                    onClose={handleSnackbarDifficultyClose}
-                    severity="error"
-                    variant="filled"
-                >
-                    Please select a difficulty
-                </Alert>
-            </Snackbar>
+                            {matchStatus === 'searching' && <Typography mt={2} variant="body2" textAlign="center">
+                                Time in queue: {timer}s
+                            </Typography>}
+
+                            {countdown !== null && (
+                                <Typography mt={2} variant="body2" textAlign="center">
+                                    {countdown > 0 ? `You will be redirected in ${countdown}...` : null}
+                                </Typography>
+                            )}
+                            <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
+                                {matchStatus !== 'success' && (
+                                    <Button
+                                        variant="outlined"
+                                        color="secondary"
+                                        onClick={handleCancelRequest}
+                                        sx={{ color: "white" }}
+                                    >Cancel
+                                    </Button>
+                                )}
+                                {matchStatus === 'timeout' && (
+                                    <Button
+                                        variant="contained"
+                                        color="error"
+                                        onClick={() => {
+                                            resetMatch();
+                                            handleSendRequest();
+                                        }}
+                                    >
+                                        Retry
+                                    </Button>
+                                )}
+                            </Box>
+                        </Box>
+                    </Box>
+                </Modal>
+
+                <Snackbar open={snackbarCategoryOpen} autoHideDuration={6000} onClose={handleSnackbarCategoryClose}>
+                    <Alert
+                        onClose={handleSnackbarCategoryClose}
+                        severity="error"
+                        variant="filled"
+                    >
+                        Please select a category
+                    </Alert>
+                </Snackbar>
+
+                <Snackbar open={snackbarDifficultyOpen} autoHideDuration={6000} onClose={handleSnackbarDifficultyClose}>
+                    <Alert
+                        onClose={handleSnackbarDifficultyClose}
+                        severity="error"
+                        variant="filled"
+                    >
+                        Please select a difficulty
+                    </Alert>
+                </Snackbar>
+            </div>
         </>
     );
 }

@@ -83,7 +83,7 @@ const Header: React.FC<HeaderProps> = ({
         >
             <Box display="flex" alignItems="center" gap={1}>
                 <Button
-                    variant="contained"
+                    variant="outlined"
                     color="primary"
                     onClick={onShuffleQuestions}
                     sx={{ textTransform: 'none', fontWeight: 'bold' }}
@@ -103,7 +103,7 @@ const Header: React.FC<HeaderProps> = ({
                 <Avatar src={partnerProfPicUrl} sx={{ bgcolor: "white" }} />
             </IconButton>
             <Button
-                variant="contained"
+                variant="outlined"
                 color="error"
                 onClick={onDisconnect}
                 sx={{ textTransform: 'none', fontWeight: 'bold' }}

@@ -1,53 +1,93 @@
 import React, { useState, useEffect } from 'react';
 import { Editor } from "@monaco-editor/react";
-import { 
+import {
     Tabs,
-    Tab, 
-    Box, 
-    Button, 
-    Snackbar, 
-    Alert, 
-    Dialog, 
-    DialogActions, 
-    DialogContent, 
-    DialogContentText, 
-    DialogTitle 
+    Tab,
+    Box,
+    Button,
+    Snackbar,
+    Alert,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    Typography,
+    Paper,
+    FormControl,
+    Select,
+    MenuItem,
+    SelectChangeEvent
 } from '@mui/material';
-
-import io from "socket.io-client";
-import Popup from './Popup';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import CodeIcon from '@mui/icons-material/Code';
+import { Terminal, Clear } from '@mui/icons-material'
 
 interface CodeEditorProps {
     onConfirmSubmission: () => void;
 }
-const CodeEditor: React.FC<CodeEditorProps> = ({ 
+
+const CodeEditor: React.FC<CodeEditorProps> = ({
     onConfirmSubmission
- }) => {
+}) => {
+    const [language, setLanguage] = useState<string>('javascript');
+    const [code, setCode] = useState<string>(`var message = 'Hello, World!';\nconsole.log(message);`);
+    const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false);
+    const [isPopupOpen, setIsPopupOpen] = useState<boolean>(false);
 
-    const [language, setLanguage] = useState('javascript'); 
-    const [code, setCode] = useState(`var message = 'Hello, World!';\nconsole.log(message);`); 
-    const [isSnackbarOpen, setIsSnackbarOpen] = useState(false); 
-    const [isSubmissionPopupOpen, setIsSubmissionPopupOpen] = useState(false);
+    const handleRunCode = () => {
+        setConsoleOutput('');
+        setConsoleError('');
 
-    const onSave = () => {
-        setIsSnackbarOpen(true); 
+        if (language === 'javascript') {
+            try {
+                // Temporarily override console.log to capture its output
+                const logOutput: string[] = [];
+                const originalConsoleLog = console.log;
+
+                console.log = (msg: any) => {
+                    if (typeof msg === 'object') {
+                        logOutput.push(JSON.stringify(msg));
+                    } else {
+                        logOutput.push(msg.toString());
+                    }
+                };
+
+                // Evaluate the code
+                eval(code);
+
+                // Restore original console.log after execution
+                console.log = originalConsoleLog;
+
+                // Set the captured log output
+                setConsoleOutput(logOutput.join('\n') || "Code executed successfully");
+
+            } catch (err: any) {
+                setConsoleError(`${err}`);
+            }
+        } else {
+            setConsoleError('Code execution is only supported for JavaScript.');
+        }
+
+        setIsSnackbarOpen(true);
     };
 
-    const onSubmit = () => {
-        setIsSubmissionPopupOpen(true);
-    };
+    const [consoleOutput, setConsoleOutput] = useState<string>('');
+    const [consoleError, setConsoleError] = useState<string>('');
 
-    const handleClosePopup = () => {
-        setIsSubmissionPopupOpen(false); 
+    const handleClearConsole = () => {
+        setConsoleOutput('');
+        setConsoleError('');
     };
 
     const handleCloseSnackbar = () => {
-        setIsSnackbarOpen(false); 
+        setIsSnackbarOpen(false);
     };
 
-    const handleLanguageChange = (event: React.SyntheticEvent, newValue: string) => {
+    const handleLanguageChange = (event: SelectChangeEvent<string>) => {
+        const newValue = event.target.value as string;
         setLanguage(newValue);
-    
+
         switch (newValue) {
             case 'cpp':
                 setCode(`#include <iostream>\n\nint main() {\n   std::cout << "Hello, World!";\n   return 0;\n}`);
@@ -85,76 +125,116 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
     //   }, [socket]);
 
     return (
-        <Box height="90%" display="flex" flexDirection="column">
-            <Tabs
-                value={language}
-                onChange={handleLanguageChange}
-                indicatorColor="primary"
-                textColor="primary"
-                centered
-            >
-            <Tab label="JavaScript" value="javascript" />
-            <Tab label="C++" value="cpp" />
-            <Tab label="Python" value="python" />
-            <Tab label="Java" value="java" />
-        </Tabs>
+        <Paper sx={{ height: "64vh", display: "flex", flexDirection: "column" }}>
+            <Box display="flex" justifyContent="space-between" padding={1} alignItems="center">
+                <FormControl variant="standard" sx={{ minWidth: 120 }}>
+                    <Select
+                        labelId="language-select-label"
+                        value={language}
+                        sx={{ fontSize: '14px' }}
+                        onChange={handleLanguageChange}
+                    >
+                        <MenuItem value="javascript">JavaScript</MenuItem>
+                        <MenuItem value="cpp">C++</MenuItem>
+                        <MenuItem value="python">Python</MenuItem>
+                        <MenuItem value="java">Java</MenuItem>
+                    </Select>
+                </FormControl>
 
-        <Editor
-            language={language} 
-            theme="vs-dark"
-            value={code}
-            options={{
-                fontSize: 14,
-                formatOnType: true,
-                autoClosingBrackets: "languageDefined",
-                minimap: { enabled: false },
-                padding: { top: 8 }, 
-
-            }}
-            //onChange={handleEditorChange}
-        />
-
-        <Box display="flex" justifyContent="space-between" padding={2} gap={10}>
-            <Button variant="outlined" color="secondary" sx={{ borderRadius: 2 }}>
-                Show Console
-            </Button>
-            <Box>
-                <Button 
-                    variant="contained" 
-                    color="success" 
-                    onClick={onSave} 
-                    sx={{ marginRight: '8px', borderRadius: 2 }} 
-                >
-                    Save
-                </Button>
-                <Button 
-                    variant="contained" 
-                    color="primary" 
-                    onClick={onSubmit} 
-                    sx={{ borderRadius: 2 }}
-                >
-                    Submit
-                </Button>
+                {/* Run and Submit Buttons */}
+                <Box display="flex" justifyContent="right" padding={1} gap={2}>
+                    <Button
+                        variant="contained"
+                        color="success"
+                        onClick={handleRunCode}
+                        sx={{ marginRight: '8px', textTransform: 'none', color: 'white' }}
+                        startIcon={<PlayArrowIcon />}
+                    >
+                        Run
+                    </Button>
+                </Box>
             </Box>
-        </Box>
 
-        <Snackbar
-            open={isSnackbarOpen}
-            autoHideDuration={3000}
-            onClose={handleCloseSnackbar}
-        >
-            <Alert onClose={handleCloseSnackbar} severity="success">
-                Your code has been saved!
-            </Alert>
-        </Snackbar>
-        <Popup
-            isOpen={isSubmissionPopupOpen}
-            onConfirmDisconnect={onConfirmSubmission}
-            onCloseDisconnect ={handleClosePopup}
-            title="Submit"
-            description="Are you sure you want to submit? Once submitted, you won’t be able to make further changes."
+
+            <Editor
+                language={language}
+                theme="vs-dark"
+                value={code}
+                options={{
+                    fontSize: 14,
+                    formatOnType: true,
+                    autoClosingBrackets: "languageDefined",
+                    minimap: { enabled: false },
+                    padding: { top: 8 },
+
+                }}
+                height="55vh"
+            //onChange={handleEditorChange}
             />
-      </Box>
+
+            {/* Console Output Section */}
+            <Paper sx={{ height: "23.75vh", display: "flex", flexDirection: "column", mt: 2 }}>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        p: 1,
+                        borderBottom: '1px solid',
+                        borderColor: 'grey.800',
+                    }}
+                >
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <Terminal sx={{ mr: 1 }} />
+                        <Typography variant="subtitle2">Console</Typography>
+                    </Box>
+                    <Button
+                        size="small"
+                        startIcon={<Clear />}
+                        onClick={handleClearConsole}
+                        sx={{ color: 'grey.300' }}
+                    >
+                        Clear
+                    </Button>
+                </Box>
+                <Box sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                    flexGrow: 1
+                }}>
+                    <Paper sx={{
+                        backgroundColor: '#1e1e1e',
+                        color: '#fff',
+                        overflowY: "auto",
+                        width: "100%",
+                        height: "100%",
+                        padding: 2,
+                    }}>
+                        {consoleOutput && (
+                            <Typography sx={{ color: 'white', fontFamily: 'JetBrains Mono, monospace', whiteSpace: 'pre-wrap' }}>
+                                {consoleOutput}
+                            </Typography>
+                        )}
+                        {consoleError && (
+                            <Typography sx={{ color: '#FF4500', fontFamily: 'JetBrains Mono, monospace', whiteSpace: 'pre-wrap' }}>
+                                {consoleError}
+                            </Typography>
+                        )}
+                    </Paper>
+                </Box>
+            </Paper>
+
+            {/* Snackbar and Popup Dialog */}
+            <Snackbar
+                open={isSnackbarOpen}
+                autoHideDuration={3000}
+                onClose={handleCloseSnackbar}
+            >
+                <Alert onClose={handleCloseSnackbar} severity="success">
+                    Your code has been run!
+                </Alert>
+            </Snackbar>
+        </Paper>
     );
 };
 
