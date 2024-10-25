@@ -6,6 +6,7 @@ import {
     TextField,
     Typography,
 } from '@mui/material';
+import { motion } from 'framer-motion';
 import { getAllQuestions, getFilteredQuestions, getAvailableCategories } from '../services/question-service/QuestionService';
 import SearchBar from '../components/questionpage/SearchBar';
 import QuestionTable from '../components/questionpage/QuestionTable';
@@ -190,9 +191,18 @@ function DashboardPage() {
                     display: 'flex',
                     flexDirection: 'column',
                 }}>
-                <Typography variant="h5" align="left" sx={{ mt: 4, ml: 3 }}>
-                    <b>Hi, Welcome back {username}!</b>
-                </Typography>
+
+                {/* Animate the welcome message */}
+                <motion.div
+                    initial={{ opacity: 0, y: -50 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5 }}
+                >
+                    <Typography variant="h5" align="left" sx={{ m: 4 }}>
+                        <b>Hi, Welcome back {username}!</b>
+                    </Typography>
+                </motion.div>
+
                 <Container
                     maxWidth={false}
                     sx={{
@@ -202,19 +212,6 @@ function DashboardPage() {
                         flexDirection: 'row',
                     }}
                 >
-
-                    <Box sx={{
-                        flex: 1, 
-                        display: 'flex',
-                        flexDirection: 'row',
-                        pt: "20px",
-                        top: 20,
-                        zIndex: 1000,
-                    }}>
-                        <MatchingComponent />
-                    </Box>
-
-
                     <Container
                         maxWidth="xl"
                         sx={{
@@ -225,93 +222,124 @@ function DashboardPage() {
                             flex: 3
                         }}
                     >
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                flexDirection: 'row',
-                            }}
+                        {/* Tending Questions and AttemptedProgress */}
+                        <motion.div
+                            initial={{ opacity: 0, x: -100 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.5 }}
                         >
-                            <TrendingQuestions questions={allQuestions} />
-                            <AttemptedProgress />
-                        </Box>
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    flexDirection: 'row',
+                                }}
+                            >
+                                <TrendingQuestions questions={allQuestions} />
+                                <AttemptedProgress />
+                            </Box>
+                        </motion.div>
 
-                        <Box sx={{ paddingTop: '20px', display: 'flex', gap: 2, alignItems: 'center' }}>
-                            <Autocomplete
-                                multiple
-                                size="small"
-                                options={availableCategories}
-                                value={selectedCategories}
-                                onChange={(event, newValue) => setSelectedCategories(newValue)}
-                                renderInput={(params) => (
-                                    <TextField
-                                        {...params}
-                                        label="Category"
-                                        sx={{
-                                            minWidth: 150,
-                                            maxWidth: 400,
-                                            "& label": {
-                                                color: "primary.main",
-                                            },
-                                            "& label.Mui-focused": {
-                                                color: "primary.main",
-                                            }
-                                        }}
-                                    />
-                                )}
-                                sx={{ minWidth: 150, maxWidth: 400 }}
-                            />
+                        {/* filters */}
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ duration: 0.4 }}
+                        >
+                            <Box sx={{ paddingTop: '20px', display: 'flex', gap: 2, alignItems: 'center' }}>
+                                <Autocomplete
+                                    multiple
+                                    size="small"
+                                    options={availableCategories}
+                                    value={selectedCategories}
+                                    onChange={(event, newValue) => setSelectedCategories(newValue)}
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            label="Category"
+                                            sx={{
+                                                minWidth: 150,
+                                                maxWidth: 400,
+                                                "& label": {
+                                                    color: "primary.main",
+                                                },
+                                                "& label.Mui-focused": {
+                                                    color: "primary.main",
+                                                }
+                                            }}
+                                        />
+                                    )}
+                                    sx={{ minWidth: 150, maxWidth: 400 }}
+                                />
 
-                            <Autocomplete
-                                size="small"
-                                options={complexities}
-                                value={selectedComplexity}
-                                onChange={(event, newValue) => setSelectedComplexity(newValue)}
-                                getOptionLabel={(option) => option.label}
-                                renderInput={(params) => (
-                                    <TextField
-                                        {...params}
-                                        label="Complexity"
-                                        sx={{
-                                            minWidth: 150,
-                                            maxWidth: 400,
-                                            "& label": {
-                                                color: "primary.main",
-                                            },
-                                            "& label.Mui-focused": {
-                                                color: "primary.main",
-                                            }
-                                        }}
-                                    />
-                                )}
-                                sx={{ minWidth: 150, maxWidth: 400 }}
-                                renderOption={(props, option) => (
-                                    <li {...props} style={{ color: option.color }}>
-                                        {option.label}
-                                    </li>
-                                )}
-                            />
+                                <Autocomplete
+                                    size="small"
+                                    options={complexities}
+                                    value={selectedComplexity}
+                                    onChange={(event, newValue) => setSelectedComplexity(newValue)}
+                                    getOptionLabel={(option) => option.label}
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            label="Complexity"
+                                            sx={{
+                                                minWidth: 150,
+                                                maxWidth: 400,
+                                                "& label": {
+                                                    color: "primary.main",
+                                                },
+                                                "& label.Mui-focused": {
+                                                    color: "primary.main",
+                                                }
+                                            }}
+                                        />
+                                    )}
+                                    sx={{ minWidth: 150, maxWidth: 400 }}
+                                    renderOption={(props, option) => (
+                                        <li {...props} style={{ color: option.color }}>
+                                            {option.label}
+                                        </li>
+                                    )}
+                                />
 
-                            {/* Search Bar Component */}
-                            <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+                                <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+                            </Box>
+                        </motion.div>
 
-                        </Box>
-
-                        {/* Question Table Component */}
-                        <Box sx={{ paddingTop: '20px' }}>
-                            <QuestionTable
-                                filteredQuestions={questions}
-                                categories={categories}
-                                page={page}
-                                rowsPerPage={rowsPerPage}
-                                isEditMode={false}
-                                handleChangePage={handleChangePage}
-                                handleChangeRowsPerPage={handleChangeRowsPerPage}
-                            />
-                        </Box>
+                        {/* Question Table */}
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ duration: 0.6 }}
+                        >
+                            <Box sx={{ paddingTop: '20px' }}>
+                                <QuestionTable
+                                    filteredQuestions={questions}
+                                    categories={categories}
+                                    page={page}
+                                    rowsPerPage={rowsPerPage}
+                                    isEditMode={false}
+                                    handleChangePage={handleChangePage}
+                                    handleChangeRowsPerPage={handleChangeRowsPerPage}
+                                />
+                            </Box>
+                        </motion.div>
 
                     </Container>
+
+                    {/* MatchingComponent */}
+                    <Box sx={{
+                        flex: 1,
+                        display: 'flex',
+                        flexDirection: 'row',
+                        top: 20,
+                        zIndex: 1000,
+                    }}>
+                        <MatchingComponent />
+                    </Box>
+
+
                 </Container>
-            </Container>
+            </Container >
         </>
     );
 }
