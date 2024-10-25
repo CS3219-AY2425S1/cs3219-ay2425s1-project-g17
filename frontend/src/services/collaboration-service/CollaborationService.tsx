@@ -49,8 +49,19 @@ async function shuffleQuestion(id: string) {
     }
 }
 
+// Function to disconnect user
+async function disconnectUser(userId: string) {
+    try {
+        const response = await collabApi.post(`/disconnect`, {userId});
+        return response.data;
+    } catch (error) {
+        handleAxiosError(error);
+    }
+}
+
 export {
     getSessionInfo,
     getQuestionInfo,
-    shuffleQuestion
+    shuffleQuestion,
+    disconnectUser
 }

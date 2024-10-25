@@ -20,7 +20,7 @@ const io = new Server(httpServer, {
 });
 
 io.on("connection", (socket) => {
-    console.log(`User Connected: ${socket.id}`);
+    //console.log(`User Connected: ${socket.id}`);
   
     socket.on('joinSession', ({ userId, roomId }) => {
       socket.join(roomId);
@@ -30,6 +30,11 @@ io.on("connection", (socket) => {
     socket.on('shuffleQuestion', (sessionId) => {
       console.log(`Shuffle question signal received for session: ${sessionId}`);
       socket.to(sessionId).emit('shuffle', "-");
+    });
+
+    socket.on('disconnectUser', ({sessionId, userId}) => {
+      console.log(`User: ${userId} is disconnecting from ${sessionId}`);
+      socket.to(sessionId).emit('disconnectUser', "-");
     });
   });
 

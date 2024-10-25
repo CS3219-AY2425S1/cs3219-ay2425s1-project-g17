@@ -7,8 +7,8 @@ import { v4 as uuidv4 } from 'uuid';
 const fetchRandomQuestion = async (difficulty: string, category: string, token: string) => {
     try {
         // for docker
-        //const apiUrl = `http://question-service:4000/questions/random?difficulty=${difficulty}&category=${category}`;
-        const apiUrl = `http://localhost:4000/questions/random?difficulty=${difficulty}&category=${category}`;
+        const apiUrl = `http://question-service:4000/questions/random?difficulty=${difficulty}&category=${category}`;
+        //const apiUrl = `http://localhost:4000/questions/random?difficulty=${difficulty}&category=${category}`;
         const headers = { 
             Authorization: `Bearer ${token}` 
         };
@@ -126,3 +126,37 @@ export const shuffleQuestion = async (req: Request, res: Response) => {
     await redisClient.hset(sessionId, 'questionId', newQuestionId);
     res.status(200).json({"question_id": newQuestionId});
 }
+
+
+export const disconnectUser = async (req: Request, res: Response) => {
+    try {
+        const userId = req.body.userId;
+        const sessionData = await getSessionData(userId);
+        const sessionId = sessionData?.sessionId;
+
+        if (!sessionId) {
+            res.status(440).json("Session Expired")
+            return
+        }
+
+        if (sessionData?.session.user1Id == userId) {
+            // Check if other user have already been disconnected
+            if (sessionData?.session.user2Id == "") {
+                await redisClient.del(sessionId);
+            } else {
+                await redisClient.hset(sessionId, 'user1Id', "");
+            }
+        } else if (sessionData?.session.user2Id == userId) {
+            if (sessionData?.session.user1Id == "") {
+                await redisClient.del(sessionId);
+            } else {
+                await redisClient.hset(sessionId, 'user2Id', ""); 
+            }
+        }
+
+        res.status(200).json({"message": "successfully disconnected"});
+    } catch (error) {
+        console.error('Error disconnecting', error);
+        res.status(400).json({ error: (error as Error).message });
+    }
+};

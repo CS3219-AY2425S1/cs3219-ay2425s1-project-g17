@@ -1,12 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Typography, Button, Box } from '@mui/material';
 import ShuffleIcon from '@mui/icons-material/Shuffle';
 import DisconnectIcon from '@mui/icons-material/PowerSettingsNew';
 import IconButton from '@mui/material/IconButton';
 import Avatar from '@mui/material/Avatar';
 import { useNavigate } from 'react-router-dom';
-import { getQuestionInfo } from '../../services/collaboration-service/CollaborationService';
-import { shuffleQuestion } from '../../services/collaboration-service/CollaborationService';
+import { getQuestionInfo, shuffleQuestion, disconnectUser } from '../../services/collaboration-service/CollaborationService';
+import DisconnectPopup from './DisconnectPopup';
 
 interface ExampleProps {
     id: number;
@@ -30,33 +30,45 @@ interface HeaderProps {
     partnerName: string; 
     partnerProfPicUrl: string;
     ownProfPicUrl: string;
-    onUpdateData: (newData: QuestionProps) => void;
+    onShuffleQuestion: (newData: QuestionProps) => void;
+    onConfirmDisconnect: () => void;
 }
 
 const Header: React.FC<HeaderProps> = ({ 
     partnerName, 
     partnerProfPicUrl, 
     ownProfPicUrl,
-    onUpdateData
+    onShuffleQuestion,
+    onConfirmDisconnect
  }) => {
 
+    const [isDisconnectPopupOpen, setIsDisconnectPopupOpen] = useState(false);
+    
     const navigate = useNavigate();
 
-    // TODO: Implement disconnect functionality
     const onDisconnect = () => {
-        // Disconnect the user from the partner
-        navigate('/dashboard');
-        return;
+        setIsDisconnectPopupOpen(true); 
     };
 
-    // TODO: Implement shuffle functionality
+    const handleCloseDisconnectPopup = () => {
+        setIsDisconnectPopupOpen(false); 
+    };
+
+    const handleConfirmDisconnect = () => {
+        const userId = localStorage.getItem('id') || '';
+        disconnectUser(userId);
+        onConfirmDisconnect();
+        navigate('/dashboard');
+        return
+    };
+
     const onShuffleQuestions = async () => {
         const userId = localStorage.getItem('id') || '';
         const shuffleRes = await shuffleQuestion(userId);
         const newQuestionId = shuffleRes.question_id;
         const question = await getQuestionInfo(newQuestionId);
         console.log(question);
-        onUpdateData(question);
+        onShuffleQuestion(question);
     };
 
     return (
@@ -99,6 +111,12 @@ const Header: React.FC<HeaderProps> = ({
             >
                 Disconnect
             </Button>
+            <DisconnectPopup
+                isOpen={isDisconnectPopupOpen}
+                onConfirmDisconnect={handleConfirmDisconnect}
+                onCloseDisconnect ={handleCloseDisconnectPopup}
+                description="If you disconnect, you won't be able to rejoin this session."
+            />
         </Box>
     );
 };

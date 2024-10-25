@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Split from 'react-split';
 import { createRoot } from 'react-dom/client';
 import CodeEditor from '../../components/collaborationpage/CodeEditor';
@@ -6,9 +6,11 @@ import QuestionPanel from '../../components/collaborationpage/QuestionPanel';
 import Header from '../../components/collaborationpage/Header';
 import { Box } from '@mui/material';
 import DragHandleIcon from '@mui/icons-material/DragHandle';
-import { getSessionInfo, getQuestionInfo } from '../../services/collaboration-service/CollaborationService';
+import { getSessionInfo, getQuestionInfo, disconnectUser } from '../../services/collaboration-service/CollaborationService';
 import { getSignedImageURL } from '../../services/user-service/UserService';
-import io from "socket.io-client";
+import socket from "../../context/socket"
+import { useNavigate } from 'react-router-dom';
+import DisconnectPopup from '../../components/collaborationpage/DisconnectPopup';
 
 interface ExampleProps {
     id: number;
@@ -35,15 +37,32 @@ const CollaborationPage = () => {
     const [partnerProfPicUrl, setPartnerProfPicUrl] = React.useState('');
     const [ownProfPicUrl, setOwnProfPicUrl] = React.useState('');
     const [sessionId, setSessionId] = React.useState('');
+    const [isDisconnectPopupOpen, setIsDisconnectPopupOpen] = useState(false);
 
     const userId = localStorage.getItem('id') || '';
     const ownProfPic = localStorage.getItem('profileImage') || '';
 
-    const socket = io("http://localhost:4003");
+    const navigate = useNavigate();
 
     const handleShuffleQuestion = (newData: QuestionProps) => {
         setQuestion(newData); 
         socket.emit("shuffleQuestion", sessionId);
+    };
+
+    // Function for user that click disconnect on their own
+    const handleConfirmDisconnect = () => {
+        socket.emit("disconnectUser", {sessionId, userId});
+    };
+
+    // Function for user that click disconnect when other user disconnects first
+    const handleConfirmDisconnectAsWell = () => {
+        disconnectUser(userId);
+        navigate('/dashboard');
+        return
+    }
+
+    const handleCloseDisconnect = () => {
+        setIsDisconnectPopupOpen(false);
     };
 
     React.useEffect(() => {
@@ -84,6 +103,10 @@ const CollaborationPage = () => {
             const question = await getQuestionInfo(questionId);
             setQuestion(question);
         });
+
+        socket.on("disconnectUser", async (_) => {
+            setIsDisconnectPopupOpen(true);
+        });
       }, [socket]);
 
 
@@ -93,7 +116,8 @@ const CollaborationPage = () => {
                 partnerName={partnerName}
                 partnerProfPicUrl={partnerProfPicUrl}
                 ownProfPicUrl={ownProfPicUrl}
-                onUpdateData={handleShuffleQuestion}
+                onShuffleQuestion={handleShuffleQuestion}
+                onConfirmDisconnect={handleConfirmDisconnect}
             />
             <Box height="90vh"
             sx={{
@@ -139,7 +163,12 @@ const CollaborationPage = () => {
                     </Box>
                 </Split>
             </Box>
-
+            <DisconnectPopup
+                isOpen={isDisconnectPopupOpen}
+                onConfirmDisconnect={handleConfirmDisconnectAsWell}
+                onCloseDisconnect ={handleCloseDisconnect}
+                description={`${partnerName} has disconnected. Do you wish to quit?`}
+            />
             <style>{`
                 .custom-gutter {
                     display: flex;
