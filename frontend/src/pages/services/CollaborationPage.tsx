@@ -38,7 +38,7 @@ const CollaborationPage = () => {
     const [ownProfPicUrl, setOwnProfPicUrl] = React.useState('');
     const [sessionId, setSessionId] = React.useState('');
     const [isDisconnectPopupOpen, setIsDisconnectPopupOpen] = useState(false);
-    const [isSubmissionPopupOpen, setIsSubmissionPopupOpen] = useState(false);
+    const [sessionNotFoundOpen, setSessionNotFoundOpen] = useState(false);
 
     const userId = localStorage.getItem('id') || '';
     const ownProfPic = localStorage.getItem('profileImage') || '';
@@ -56,11 +56,16 @@ const CollaborationPage = () => {
     };
 
     // Function for user that click disconnect when other user disconnects first
-    const handleConfirmDisconnectAsWell = () => {
-        disconnectUser(userId);
-        navigate('/dashboard');
-        return
-    }
+    const handleConfirmDisconnectAsWell = async () => {
+        const userId = localStorage.getItem('id') || '';
+        try {
+            await disconnectUser(userId);
+            setTimeout(() => navigate('/dashboard'), 200);
+        } catch (error) {
+            console.error("Failed to disconnect:", error);
+        }
+    };
+    
 
     const handleConfirmSubmission = () => {
         socket.emit("submit", sessionId);
@@ -77,9 +82,9 @@ const CollaborationPage = () => {
         setIsDisconnectPopupOpen(false);
     };
 
-    const handleCloseSubmission = () => {
-        setIsSubmissionPopupOpen(false);
-    };
+    const handleSessionInactive = () => {
+        navigate('/dashboard');
+    }
 
     React.useEffect(() => {
         async function fetchSessionInfo() {
@@ -102,7 +107,9 @@ const CollaborationPage = () => {
                 const roomId = data.sessionId
                 socket.emit('joinSession', { userId, roomId });
                 console.log(data.session);
+                setSessionNotFoundOpen(false);
             } catch (error) {
+                setSessionNotFoundOpen(true);
                 console.error('Failed to fetch session:', error);
             }
         }
@@ -121,13 +128,14 @@ const CollaborationPage = () => {
             setIsDisconnectPopupOpen(true);
         });
 
-        socket.on("submit", async (_) => {
-            setIsSubmissionPopupOpen(true);
-        });
+        // TODO: to be removed
+        // socket.on("submit", async (_) => {
+        //     setIsSubmissionPopupOpen(true);
+        // });
 
-        socket.on("confirmSubmit", async (_) => {
-            navigate('/dashboard');
-        });
+        // socket.on("confirmSubmit", async (_) => {
+        //     navigate('/dashboard');
+        // });
       }, [socket]);
 
 
@@ -191,8 +199,17 @@ const CollaborationPage = () => {
                 onConfirmDisconnect={handleConfirmDisconnectAsWell}
                 onCloseDisconnect ={handleCloseDisconnect}
                 title="Disconnect room?"
-                description={`${partnerName} has disconnected. Do you wish to disconnect?`}
-                option ={["Cancel", "Disconnect"]}
+                description={`${partnerName} has disconnected. Please confirm to disconnect as well.`}
+                option ={[null, "Disconnect"]}
+            />
+
+            <Popup
+                isOpen={sessionNotFoundOpen}
+                onConfirmDisconnect={handleSessionInactive}
+                onCloseDisconnect ={() => setSessionNotFoundOpen(false)}
+                title="Session not found"
+                description={`It seems that the session is not found. Please return to dashboard.`}
+                option ={[null, "return to dashboard"]}
             />
             <style>{`
                 .custom-gutter {

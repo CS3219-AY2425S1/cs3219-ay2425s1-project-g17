@@ -3,10 +3,10 @@ import { Typography, Button, Box } from '@mui/material';
 import ShuffleIcon from '@mui/icons-material/Shuffle';
 import DisconnectIcon from '@mui/icons-material/PowerSettingsNew';
 import Avatar from '@mui/material/Avatar';
-import { useNavigate } from 'react-router-dom';
 import { getQuestionInfo, shuffleQuestion, disconnectUser } from '../../services/collaboration-service/CollaborationService';
 import Popup from './Popup';
 import Tooltip from '@mui/material/Tooltip';
+import { useNavigate } from 'react-router-dom';
 
 interface ExampleProps {
     id: number;
@@ -42,10 +42,10 @@ const Header: React.FC<HeaderProps> = ({
     onConfirmDisconnect
 }) => {
 
+    const navigate = useNavigate();
+
     const [isDisconnectPopupOpen, setIsDisconnectPopupOpen] = useState(false);
     const username = localStorage.getItem('username') || '';
-
-    const navigate = useNavigate();
 
     const onDisconnect = () => {
         setIsDisconnectPopupOpen(true);
@@ -55,14 +55,17 @@ const Header: React.FC<HeaderProps> = ({
         setIsDisconnectPopupOpen(false);
     };
 
-    const handleConfirmDisconnect = () => {
-        const userId = localStorage.getItem('id') || '';
-        disconnectUser(userId);
-        onConfirmDisconnect();
-        navigate('/dashboard');
-        return
+    const handleConfirmDisconnect = async () => {
+        try {
+            const userId = localStorage.getItem('id') || '';
+            await disconnectUser(userId);
+            onConfirmDisconnect();
+            navigate('/dashboard');
+        } catch (error) {
+            console.error('Error disconnecting user:', error);
+        }
     };
-
+    
     const onShuffleQuestions = async () => {
         const userId = localStorage.getItem('id') || '';
         const shuffleRes = await shuffleQuestion(userId);

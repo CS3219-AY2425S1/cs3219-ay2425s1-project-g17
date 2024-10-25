@@ -12,7 +12,7 @@ interface PopupProps {
     description: string
     onConfirmDisconnect: () => void;
     onCloseDisconnect: () => void;
-    option: string[];
+    option: (string | null)[];
 }
 
 const DisconnectPopup: React.FC<PopupProps> = ({
@@ -24,7 +24,7 @@ const DisconnectPopup: React.FC<PopupProps> = ({
     option
 }) => {
     return (
-        <Modal open={isOpen} onClose={onCloseDisconnect}>
+        <Modal open={isOpen}>
             <Box
                 sx={{
                     position: 'absolute',
@@ -45,12 +45,12 @@ const DisconnectPopup: React.FC<PopupProps> = ({
                     {description}
                 </Typography>
                 <Box sx={{ display: 'flex', justifyContent: 'right', gap: 2 }}>
-                    <Button variant="outlined" onClick={onCloseDisconnect}>
+                    {!!option[0] && (<Button variant="outlined" onClick={onCloseDisconnect}>
                         {option[0]}
-                    </Button>
-                    <Button variant="contained" color="error" onClick={onConfirmDisconnect}>
+                    </Button>)}
+                    {!!option[1] && (<Button variant="contained" onClick={onConfirmDisconnect} color="error">
                         {option[1]}
-                    </Button>
+                    </Button>)}
                 </Box>
             </Box>
         </Modal>

@@ -90,20 +90,20 @@ const QuestionPanel: React.FC<QuestionPanelProps>  = ({
                 </Markdown>
             </Box>
             <Box sx={{ mt: 2, color: 'white' }}>
-                {example?.map((example) => (
-                    <Box key={example.id} sx={{ mt: 2 }}>
+                {example?.map((eg, index) => (
+                    <Box key={eg.id} sx={{ mt: 2 }}>
                         <Typography sx={{ color: 'white', fontFamily: 'JetBrains Mono, monospace', fontSize: '12px' }}>
-                            Example {example.id + 1}
+                            Example {index + 1}
                         </Typography>
                         <Typography sx={{ color: 'white', fontFamily: 'JetBrains Mono, monospace', fontSize: '12px' }}>
-                            Input: {example.input}
+                            Input: {eg.input}
                         </Typography>
                         <Typography sx={{ color: 'white', fontFamily: 'JetBrains Mono, monospace', fontSize: '12px' }}>
-                            Output: {example.output}
+                            Output: {eg.output}
                         </Typography>
-                        {example.explanation && (
+                        {eg.explanation && (
                             <Typography sx={{ color: 'white', fontFamily: 'JetBrains Mono, monospace', fontSize: '12px' }}>
-                                Explanation: {example.explanation}
+                                Explanation: {eg.explanation}
                             </Typography>
                         )}
                     </Box>
