@@ -65,11 +65,6 @@ const CollaborationPage = () => {
             console.error("Failed to disconnect:", error);
         }
     };
-    
-
-    const handleConfirmSubmission = () => {
-        socket.emit("submit", sessionId);
-    };
 
     const handleSubmitForBothUser = () => {
         // TODO: Save attempt (History Service)
@@ -127,15 +122,6 @@ const CollaborationPage = () => {
         socket.on("disconnectUser", async (_) => {
             setIsDisconnectPopupOpen(true);
         });
-
-        // TODO: to be removed
-        // socket.on("submit", async (_) => {
-        //     setIsSubmissionPopupOpen(true);
-        // });
-
-        // socket.on("confirmSubmit", async (_) => {
-        //     navigate('/dashboard');
-        // });
       }, [socket]);
 
 
@@ -188,9 +174,11 @@ const CollaborationPage = () => {
                     />
                     </Box>
                     <Box width="100%">
-                        <CodeEditor
-                            onConfirmSubmission={handleConfirmSubmission}
-                        />
+                    {sessionId === '' ? (
+                        <div>Loading...</div>
+                    ) : (
+                        <CodeEditor sessionId={sessionId} />
+                    )}
                     </Box>
                 </Split>
             </Box>

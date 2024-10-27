@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Editor } from "@monaco-editor/react";
 import {
     Box,
@@ -14,19 +14,43 @@ import {
 } from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { Terminal, Clear } from '@mui/icons-material'
+import * as Y from "yjs"
+import { WebrtcProvider } from 'y-webrtc';
+import { MonacoBinding } from 'y-monaco';
+import * as monaco from 'monaco-editor';
 
 interface CodeEditorProps {
-    onConfirmSubmission: () => void;
+    sessionId: string;
 }
 
 const CodeEditor: React.FC<CodeEditorProps> = ({
-    onConfirmSubmission
+    sessionId
 }) => {
     const [language, setLanguage] = useState<string>('javascript');
     const [code, setCode] = useState<string>(`var message = 'Hello, World!';\nconsole.log(message);`);
     const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false);
-    const [isPopupOpen, setIsPopupOpen] = useState<boolean>(false);
 
+    const doc = new Y.Doc();
+
+    const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
+
+    const handleEditorDidMount = (editor: monaco.editor.IStandaloneCodeEditor, monaco: typeof import('monaco-editor')) => {
+        editorRef.current = editor;
+        const provider = new WebrtcProvider(sessionId, doc, {
+            signaling: ["ws://localhost:4003"]
+        });
+        const type = doc.getText("monaco");
+        const binding = new MonacoBinding(
+            type, 
+            editorRef.current.getModel() as monaco.editor.ITextModel, 
+            new Set([editorRef.current]), 
+            provider.awareness
+        );
+        editor.onDidChangeModelContent(() => {
+            setCode(editor.getValue());
+        });
+    }
+    
     const handleRunCode = () => {
         setConsoleOutput('');
         setConsoleError('');
@@ -98,24 +122,6 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
         }
     };
 
-    // const sendMessage = (message: string) => {
-    //     socket.emit("send_message", { message, room });
-    // };
-
-    // const handleEditorChange = (value: string | undefined) => {
-    //     if (value !== undefined) {
-    //         setCode(value); 
-    //         sendMessage(value)
-    //     }
-    // }
-
-    // useEffect(() => {
-    //     socket.on("receive_message", (data) => {
-    //       console.log(data.message);
-    //       setCode(data.message);
-    //     });
-    //   }, [socket]);
-
     return (
         <>
             <Paper sx={{ height: "64vh", display: "flex", flexDirection: "column" }}>
@@ -147,7 +153,6 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
                         </Button>
                     </Box>
                 </Box>
-
                 <Editor
                     language={language}
                     theme="vs-dark"
@@ -158,9 +163,8 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
                         autoClosingBrackets: "languageDefined",
                         minimap: { enabled: false },
                         padding: { top: 8 },
-
                     }}
-                //onChange={handleEditorChange}
+                    onMount={handleEditorDidMount}
                 />
             </Paper>
 

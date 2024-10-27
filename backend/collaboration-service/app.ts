@@ -4,24 +4,24 @@ import { Server } from "socket.io";
 import cors from "cors";
 import bodyParser from "body-parser";
 import collaborationRoutes from './routes/collaborationRoutes';
-
-
+import { wss } from "./utils/websocket";
 
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 app.use('/collaboration', collaborationRoutes);
 const httpServer = createServer(app);
+
 const io = new Server(httpServer, {
   cors: {
     origin: "*", 
     methods: ["GET", "POST"]
-  }
+  },
+  destroyUpgrade: false
 });
 
-io.on("connection", (socket) => {
-    //console.log(`User Connected: ${socket.id}`);
-  
+
+io.on("connection", (socket) => {  
     socket.on('joinSession', ({ userId, roomId }) => {
       socket.join(roomId);
       console.log(`User ${userId} joined room ${roomId}`);
@@ -36,16 +36,24 @@ io.on("connection", (socket) => {
       console.log(`User: ${userId} is disconnecting from ${sessionId}`);
       socket.to(sessionId).emit('disconnectUser', "-");
     });
-
-    socket.on('submit',  (sessionId) => {
-      console.log(`Submit question signal received for session: ${sessionId}`);
-      socket.to(sessionId).emit('submit', "-");
-    });
-
-    socket.on('confirmSubmit',  (sessionId) => {
-      console.log(`Confirm Submit question signal received for session: ${sessionId}`);
-      socket.to(sessionId).emit('confirmSubmit', "-");
-    });
   });
 
-export { httpServer, io };
+
+
+  httpServer.removeAllListeners("upgrade");
+
+  httpServer.on("upgrade", (req, socket, head) => {
+    console.log(req.url)
+    if (req.url == "/") {
+      wss.handleUpgrade(req, socket, head, (ws) => {
+        wss.emit("connection", ws, req);
+      });
+    } else if (req.url?.startsWith("/socket.io/")) {
+      const engineReq = req as any; 
+      io.engine.handleUpgrade(engineReq, socket, head);
+    } else {
+      socket.destroy();
+    }
+  });
+
+export { httpServer };
