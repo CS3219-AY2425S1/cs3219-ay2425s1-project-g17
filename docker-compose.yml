@@ -8,12 +8,14 @@ services:
     container_name: frontend # Defining the name of the container.
     ports:
       - "3000:80" # Maps port 3000 on the host to port 80 in the container, making the app accessible on the host.
+    env_file:
+      - ./frontend/.env # Specifying the .env file for frontend
     restart: unless-stopped # Restarts the container irrespective of the exit code but stops restarting when the service is stopped or removed.
     networks:
       - frontend-network # Connects the frontend to the 'frontend-network' network.
 
   question-service:
-    image: ngyaodong/peerprep-question:latest
+    image: ngyaodong/peerprep-question:latest # Pulling the latest question-service image from Docker Hub
     container_name: question-service # Defining the name of the container.
     ports:
       - "4000:4000" # Maps port 4000 on the host to port 4000 in the container, making the app accessible on the host.
@@ -24,7 +26,7 @@ services:
       - backend-network # Connects the question-service to the 'backend-network' network.
 
   user-service:
-    image: ngyaodong/peerprep-user:latest
+    image: ngyaodong/peerprep-user:latest # Pulling the latest user-service image from Docker Hub
     container_name: user-service # Defining the name of the container.
     ports:
       - "4001:4001" # Maps port 4001 on the host to port 4001 in the container, making the app accessible on the host.
@@ -35,7 +37,7 @@ services:
       - backend-network # Connects the user-service to the 'backend-network' network.
       
   matching-service:
-    image: ngyaodong/peerprep-matching:latest
+    image: ngyaodong/peerprep-matching:latest # Pulling the latest matching-service image from Docker Hub
     container_name: matching-service # Defining the name of the container.
     ports:
       - "4002:4002" # Maps port 4002 on the host to port 4002 in the container, making the app accessible on the host.
@@ -46,8 +48,10 @@ services:
       - backend-network # Connects the matching-service to the 'backend-network' network.
       
   # collaboration-service:
-  #   image: ngyaodong/peerprep-collab:latest
+  #   image: ngyaodong/peerprep-collab:latest # Pulling the latest collaboration-service image from Docker Hub
   #   container_name: collaboration-service # Defining the name of the container.
+  #   depends_on:
+  #     - question-service # Specifying that matching-service requires question-service for communication
   #   ports:
   #     - "4003:4003" # Maps port 4003 on the host to port 4003 in the container, making the app accessible on the host.
   #   env_file:
@@ -55,7 +59,18 @@ services:
   #   restart: unless-stopped # Restarts the container irrespective of the exit code but stops restarting when the service is stopped or removed.
   #   networks:
   #     - backend-network # Connects the collaboration-service to the 'backend-network' network.
-      
+
+  history-service:
+    image: ngyaodong/peerprep-history:latest # Pulling the latest history-service image from Docker Hub
+    container_name: history-service # Defining the name of the container.
+    ports:
+      - "4004:4004" # Maps port 4004 on the host to port 4004 in the container, making the app accessible on the host.
+    env_file:
+      - ./backend/history-service/.env # Specifying the .env file for history-service
+    restart: unless-stopped # Restarts the container irrespective of the exit code but stops restarting when the service is stopped or removed.
+    networks:
+      - backend-network # Connects the history-service to the 'backend-network' network.
+
 networks:
   frontend-network: # Defines a network named 'frontend-network'
     driver: bridge # Uses the bridge driver for the network, which is the default and most common network type in Docker.

@@ -17,9 +17,5 @@ data
 test
 coverage
 
-# Ignore env files.
-.env
-.env.*
-
 # Ignore awseb files.
 .elasticbeanstalk

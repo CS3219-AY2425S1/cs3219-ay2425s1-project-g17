@@ -48,6 +48,13 @@ jobs:
               #   task_def_name: collaboration
               #   container_name: collaboration
               #   service_name: collaboration
+              # - name: Deploy History Service
+              #   context: ./backend/history-service
+              #   dockerfile: Dockerfile
+              #   repository: peerprep-history
+              #   task_def_name: history
+              #   container_name: history
+              #   service_name: history
 
         steps:
             - name: Checkout repository
@@ -84,28 +91,28 @@ jobs:
                 aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
                 aws-region: ap-southeast-1
 
-            # - name: Download task def
-            #   run: |
-            #     aws ecs describe-task-definition \
-            #     --task-definition ${{ matrix.task_def_name }} \
-            #     --query taskDefinition \
-            #     --output json > taskDefinition.json
+            - name: Download task def
+              run: |
+                aws ecs describe-task-definition \
+                --task-definition ${{ matrix.task_def_name }} \
+                --query taskDefinition \
+                --output json > taskDefinition.json
               
-            # - name: Fill in the new image ID in the Amazon ECS task definition
-            #   id: task-def
-            #   uses: aws-actions/amazon-ecs-render-task-definition@v1
-            #   with:
-            #     task-definition: taskDefinition.json
-            #     container-name: ${{ matrix.container_name }}
-            #     image: ${{ steps.echo-image.outputs.image }}
+            - name: Fill in the new image ID in the Amazon ECS task definition
+              id: task-def
+              uses: aws-actions/amazon-ecs-render-task-definition@v1
+              with:
+                task-definition: taskDefinition.json
+                container-name: ${{ matrix.container_name }}
+                image: ${{ steps.echo-image.outputs.image }}
         
-            # - name: Deploy Amazon ECS task definition
-            #   uses: aws-actions/amazon-ecs-deploy-task-definition@v2
-            #   env:
-            #     ECS_SERVICE: ${{ matrix.service_name }}
-            #     ECS_CLUSTER: PeerPrep
-            #   with:
-            #     task-definition: ${{ steps.task-def.outputs.task-definition }}
-            #     service: ${{ env.ECS_SERVICE }}
-            #     cluster: ${{ env.ECS_CLUSTER }}
-            #     wait-for-service-stability: true
+            - name: Deploy Amazon ECS task definition
+              uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+              env:
+                ECS_SERVICE: ${{ matrix.service_name }}
+                ECS_CLUSTER: PeerPrep
+              with:
+                task-definition: ${{ steps.task-def.outputs.task-definition }}
+                service: ${{ env.ECS_SERVICE }}
+                cluster: ${{ env.ECS_CLUSTER }}
+                wait-for-service-stability: true
