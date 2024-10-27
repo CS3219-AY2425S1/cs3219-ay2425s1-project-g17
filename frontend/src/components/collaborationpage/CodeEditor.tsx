@@ -18,6 +18,7 @@ import * as Y from "yjs"
 import { WebrtcProvider } from 'y-webrtc';
 import { MonacoBinding } from 'y-monaco';
 import * as monaco from 'monaco-editor';
+import socket from "../../context/socket"
 
 interface CodeEditorProps {
     sessionId: string;
@@ -101,10 +102,12 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
     };
 
     const handleLanguageChange = (event: SelectChangeEvent<string>) => {
-        const newValue = event.target.value as string;
-        setLanguage(newValue);
+        const newLanguage = event.target.value as string;
+        console.log(newLanguage);
+        socket.emit("changeLanguage", {sessionId, newLanguage});
+        setLanguage(newLanguage);
 
-        switch (newValue) {
+        switch (newLanguage) {
             case 'cpp':
                 setCode(`#include <iostream>\n\nint main() {\n   std::cout << "Hello, World!";\n   return 0;\n}`);
                 break;
@@ -122,6 +125,12 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
         }
     };
 
+
+    React.useEffect(() => {
+        socket.on("changeLanguage", async (language) => {
+            setLanguage(language);
+        });
+      }, [socket]);
     return (
         <>
             <Paper sx={{ height: "64vh", display: "flex", flexDirection: "column" }}>

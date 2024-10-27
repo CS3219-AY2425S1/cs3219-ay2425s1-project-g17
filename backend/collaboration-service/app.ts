@@ -36,6 +36,11 @@ io.on("connection", (socket) => {
       console.log(`User: ${userId} is disconnecting from ${sessionId}`);
       socket.to(sessionId).emit('disconnectUser', "-");
     });
+
+    socket.on('changeLanguage', ({sessionId, newLanguage}) => {
+      console.log(`Language change to ${newLanguage} for session: ${sessionId}`);
+      socket.to(sessionId).emit('changeLanguage', newLanguage);
+    });
   });
 
 
