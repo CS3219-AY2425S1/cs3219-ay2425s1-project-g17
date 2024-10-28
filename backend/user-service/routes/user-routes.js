@@ -5,6 +5,7 @@ import {
   deleteUser,
   getAllUsers,
   getUser,
+  getUsernameById,
   updateUser,
   updateUserPrivilege,
   uploadProfilePicture,
@@ -23,6 +24,8 @@ router.get("/", verifyAccessToken, verifyIsAdmin, getAllUsers);
 router.patch("/:id/privilege", verifyAccessToken, verifyIsAdmin, updateUserPrivilege);
 
 router.post("/", createUser);
+
+router.get("/username/:id", verifyAccessToken, getUsernameById);
 
 router.get("/:id", verifyAccessToken, verifyIsOwnerOrAdmin, getUser);
 

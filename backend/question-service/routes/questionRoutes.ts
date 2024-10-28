@@ -6,7 +6,8 @@ import {
     updateQuestionById,
     deleteQuestionById,
     getQuestionCategories,
-    uploadQuestions
+    uploadQuestions,
+    getRandomQuestion
 } from '../controller/questionController';
 import { verifyAccessToken, uploadMiddleware } from '../middleware/questionMiddleware';  
 
@@ -15,6 +16,7 @@ const router = express.Router();
 // Get endpoints
 router.get('/', verifyAccessToken, getAllQuestions);
 router.get('/categories', verifyAccessToken, getQuestionCategories);
+router.get('/random', verifyAccessToken, getRandomQuestion);
 router.get('/:id', verifyAccessToken, getQuestionById);
 
 // Post endpoints

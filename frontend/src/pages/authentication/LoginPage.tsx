@@ -1,16 +1,16 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Checkbox from '@mui/material/Checkbox';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import FormLabel from '@mui/material/FormLabel';
 import FormControl from '@mui/material/FormControl';
+import FormLabel from '@mui/material/FormLabel';
 import Link from '@mui/material/Link';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import { Container, CircularProgress } from '@mui/material';
+import { Container, CircularProgress, InputAdornment, IconButton } from '@mui/material';
 import { loginUser, verifyToken } from '../../services/user-service/UserService';
 import { AuthContext } from '../../context/AuthContext';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 export default function SignIn() {
     const authContext = React.useContext(AuthContext);
@@ -23,6 +23,7 @@ export default function SignIn() {
     const [passwordError, setPasswordError] = React.useState(false);
     const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
     const [loading, setLoading] = React.useState(false);
+    const [showPassword, setShowPassword] = React.useState(false);
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -76,6 +77,10 @@ export default function SignIn() {
         return isValid;
     };
 
+    const handleClickShowPassword = () => {
+        setShowPassword((prev) => !prev);
+    };
+
     return (
         <Container
             sx={{
@@ -118,8 +123,11 @@ export default function SignIn() {
                         }}
                     >
                         <FormControl>
-                            <FormLabel htmlFor="email">Email</FormLabel>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', pb: 1 }}>
+                                <FormLabel htmlFor="email">Email</FormLabel>
+                            </Box>
                             <TextField
+                                size="small"
                                 error={emailError}
                                 helperText={emailErrorMessage}
                                 id="email"
@@ -134,7 +142,7 @@ export default function SignIn() {
                             />
                         </FormControl>
                         <FormControl>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', pb: 1 }}>
                                 <FormLabel htmlFor="password">Password</FormLabel>
                             </Box>
                             <TextField
@@ -142,24 +150,33 @@ export default function SignIn() {
                                 helperText={passwordErrorMessage}
                                 name="password"
                                 placeholder="••••••••••••"
-                                type="password"
+                                type={showPassword ? 'text' : 'password'} // Toggle between text and password
                                 id="password"
                                 autoComplete="current-password"
                                 required
                                 fullWidth
                                 variant="outlined"
+                                size="small"
+                                InputProps={{
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <IconButton
+                                                onClick={handleClickShowPassword}
+                                                edge="end"
+                                            >
+                                                {showPassword ? <VisibilityOff /> : <Visibility />}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    ),
+                                }}
                             />
                         </FormControl>
-                        <FormControlLabel
-                            control={<Checkbox value="remember" color="primary" />}
-                            label="Remember me"
-                        />
                         <Button
                             type="submit"
                             color="secondary"
                             fullWidth
                             variant="contained"
-                            sx={{ padding: '10px 0', fontSize: '16px', color: 'white' }}
+                            sx={{ color: 'white' }}
                         >
                             Sign in
                         </Button>

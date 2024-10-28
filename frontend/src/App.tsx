@@ -8,7 +8,7 @@ import { AuthProvider, AuthContext } from "./context/AuthContext";
 function App() {
   const themeOptions: ThemeOptions = {
     typography: {
-      fontFamily: 'Roboto, sans-serif, Arial, JetBrains Mono',
+      fontFamily: 'Open Sans, FontAwesome, Roboto, sans-serif, Arial, JetBrains Mono',
     },
     palette: {
       mode: 'dark',
@@ -28,8 +28,6 @@ function App() {
       },
     },
   };
-
-  // #9AC143 green
 
   const theme = createTheme(themeOptions);
 
@@ -53,5 +51,7 @@ function App() {
     </ThemeProvider>
   );
 }
-
 export default App;
+
+
+  // #9AC143 green
