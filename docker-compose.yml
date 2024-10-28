@@ -68,6 +68,18 @@ services:
      restart: unless-stopped # Restarts the container irrespective of the exit code but stops restarting when the service is stopped or removed.
      networks:
        - backend-network # Connects the collaboration-service to the 'backend-network' network.
+       
+  history-service:
+    build: 
+      context: ./backend/history-service # Path to the directory containing the Dockerfile for building the history-service image.
+    container_name: history-service # Defining the name of the container.
+    ports:
+      - "4004:4004" # Maps port 4004 on the host to port 4004 in the container, making the app accessible on the host.
+    env_file:
+      - ./backend/history-service/.env # Specifying the .env file for history-service
+    restart: unless-stopped # Restarts the container irrespective of the exit code but stops restarting when the service is stopped or removed.
+    networks:
+      - backend-network # Connects the history-service to the 'backend-network' network.
       
 networks:
   frontend-network: # Defines a network named 'frontend-network'

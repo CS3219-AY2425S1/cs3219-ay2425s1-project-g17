@@ -228,6 +228,7 @@ const MatchingComponent = () => {
         };
     }, []);
 
+
     const handleRejoinSession = () => {
         navigate('/collaboration');
     }

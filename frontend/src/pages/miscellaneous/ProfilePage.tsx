@@ -13,6 +13,7 @@ import {
 import EditIcon from '@mui/icons-material/Edit';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
+import HistoryTable from '../../components/profilepage/HistoryTable';
 import { AuthContext } from '../../context/AuthContext';
 import { updateUsername, updateEmail, updatePassword, deleteUser, updateProfilePicture, getSignedImageURL } from '../../services/user-service/UserService';
 
@@ -462,6 +463,13 @@ export default function ProfilePage() {
                             <Button variant="outlined" color="error" onClick={handleDeleteOpen}>Delete Account</Button>
                         </Box>
                     </Paper>
+                </Box>
+
+                <Box>
+                    <HistoryTable 
+                        userId={localStorage.getItem('id') || ''} 
+                        token={localStorage.getItem('token') || ''}
+                    />
                 </Box>
             </Container>
 
