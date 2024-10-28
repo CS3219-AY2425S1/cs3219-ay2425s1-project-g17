@@ -77,6 +77,25 @@ export async function getUser(req, res) {
   }
 }
 
+export async function getUsernameById(req, res) {
+  try {
+    const userId = req.params.id;
+    if (!isValidObjectId(userId)) {
+      return res.status(404).json({ message: `User ${userId} not found` });
+    }
+
+    const user = await _findUserById(userId);
+    if (!user) {
+      return res.status(404).json({ message: `User ${userId} not found` });
+    } else {
+      return res.status(200).json({ message: `Found user`, data: formatUserResponse(user).username });
+    }
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Unknown error when getting user!" });
+  }
+}
+
 export async function getAllUsers(req, res) {
   try {
     const users = await _findAllUsers();
