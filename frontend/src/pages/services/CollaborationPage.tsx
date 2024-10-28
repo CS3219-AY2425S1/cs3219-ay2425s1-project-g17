@@ -38,6 +38,7 @@ const CollaborationPage = () => {
     const [ownProfPicUrl, setOwnProfPicUrl] = React.useState('');
     const [sessionId, setSessionId] = React.useState('');
     const [isDisconnectPopupOpen, setIsDisconnectPopupOpen] = useState(false);
+    const [isSubmitPopupOpen, setIsSubmitPopupOpen] = useState(false);
     const [sessionNotFoundOpen, setSessionNotFoundOpen] = useState(false);
 
     const userId = localStorage.getItem('id') || '';
@@ -51,30 +52,45 @@ const CollaborationPage = () => {
     };
 
     // Function for user that click disconnect on their own
-    const handleConfirmDisconnect = () => {
+    const handleConfirmDisconnect = async () => {
         socket.emit("disconnectUser", {sessionId, userId});
-    };
-
-    // Function for user that click disconnect when other user disconnects first
-    const handleConfirmDisconnectAsWell = async () => {
-        const userId = localStorage.getItem('id') || '';
         try {
-            await disconnectUser(userId);
+            await disconnectUser(sessionId);
             setTimeout(() => navigate('/dashboard'), 200);
         } catch (error) {
             console.error("Failed to disconnect:", error);
         }
     };
 
-    const handleSubmitForBothUser = () => {
+    const handleConfirmSubmit = async () => {
+        socket.emit("disconnectUser", {sessionId, userId});
+        try {
+            await disconnectUser(sessionId);
+            setTimeout(() => navigate('/dashboard'), 200);
+        } catch (error) {
+            console.error("Failed to submit:", error);
+        }
+    };
+
+    // Function for user that click disconnect when other user disconnects first
+    const handleConfirmDisconnectAsWell = async () => {
+        setTimeout(() => navigate('/dashboard'), 200);
+    };
+
+    const handleConfirmSubmitAsWell = () => {
+        setTimeout(() => navigate('/dashboard'), 200);
         // TODO: Save attempt (History Service)
-        submitAttempt(sessionId);
-        socket.emit("confirmSubmit", sessionId);
-        navigate('/dashboard');
+        // submitAttempt(sessionId);
+        // socket.emit("confirmSubmit", sessionId);
+        // navigate('/dashboard');
     }
 
     const handleCloseDisconnect = () => {
         setIsDisconnectPopupOpen(false);
+    };
+
+    const handleCloseSubmitPopup = () => {
+        setIsSubmitPopupOpen(false);
     };
 
     const handleSessionInactive = () => {
@@ -176,7 +192,10 @@ const CollaborationPage = () => {
                     {sessionId === '' ? (
                         <div>Loading...</div>
                     ) : (
-                        <CodeEditor sessionId={sessionId} />
+                        <CodeEditor 
+                            sessionId={sessionId}
+                            onConfirmSubmission={handleConfirmSubmit}
+                        />
                     )}
                     </Box>
                 </Split>
@@ -188,6 +207,14 @@ const CollaborationPage = () => {
                 title="Disconnect room?"
                 description={`${partnerName} has disconnected. Please confirm to disconnect as well.`}
                 option ={[null, "Disconnect"]}
+            />
+             <Popup
+                isOpen={isSubmitPopupOpen}
+                onConfirmDisconnect={handleConfirmSubmitAsWell}
+                onCloseDisconnect ={handleCloseSubmitPopup}
+                title="Submit"
+                description="Are you sure you want to submit? Once submitted, you won’t be able to make further changes."
+                option={["Cancel", "Confirm"]}
             />
 
             <Popup

@@ -56,14 +56,7 @@ const Header: React.FC<HeaderProps> = ({
     };
 
     const handleConfirmDisconnect = async () => {
-        try {
-            const userId = localStorage.getItem('id') || '';
-            await disconnectUser(userId);
-            onConfirmDisconnect();
-            navigate('/dashboard');
-        } catch (error) {
-            console.error('Error disconnecting user:', error);
-        }
+        onConfirmDisconnect();
     };
     
     const onShuffleQuestions = async () => {

@@ -128,30 +128,12 @@ export const shuffleQuestion = async (req: Request, res: Response) => {
 
 export const disconnectUser = async (req: Request, res: Response) => {
     try {
-        const userId = req.body.userId;
-        const sessionData = await getSessionData(userId);
-        const sessionId = sessionData?.sessionId;
-
+        const sessionId = req.body.sessionId;
         if (!sessionId) {
             res.status(440).json("Session Expired")
             return
         }
-
-        if (sessionData?.session.user1Id == userId) {
-            // Check if other user have already been disconnected
-            if (sessionData?.session.user2Id == "") {
-                await redisClient.del(sessionId);
-            } else {
-                await redisClient.hset(sessionId, 'user1Id', "");
-            }
-        } else if (sessionData?.session.user2Id == userId) {
-            if (sessionData?.session.user1Id == "") {
-                await redisClient.del(sessionId);
-            } else {
-                await redisClient.hset(sessionId, 'user2Id', ""); 
-            }
-        }
-
+        await redisClient.del(sessionId);
         res.status(200).json({"message": "successfully disconnected"});
     } catch (error) {
         console.error('Error disconnecting', error);

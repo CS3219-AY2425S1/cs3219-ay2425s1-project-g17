@@ -14,23 +14,31 @@ import {
 } from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { Terminal, Clear } from '@mui/icons-material'
+import PublishIcon from '@mui/icons-material/Publish';
 import * as Y from "yjs"
 import { WebrtcProvider } from 'y-webrtc';
 import { MonacoBinding } from 'y-monaco';
 import * as monaco from 'monaco-editor';
 import socket from "../../context/socket"
-import { cacheCode, getCacheCode } from '../../services/collaboration-service/CollaborationService';
+import { cacheCode, getCacheCode, disconnectUser } from '../../services/collaboration-service/CollaborationService';
+import Popup from './Popup';
+import { useNavigate } from 'react-router-dom';
 
 interface CodeEditorProps {
     sessionId: string;
+    onConfirmSubmission: () => void;
 }
 
 const CodeEditor: React.FC<CodeEditorProps> = ({
-    sessionId
+    sessionId,
+    onConfirmSubmission
 }) => {
     const [language, setLanguage] = useState<string>('javascript');
     const [code, setCode] = useState<string>('');
     const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false);
+    const [isSubmitPopupOpen, setIsSubmitPopupOpen] = useState(false);
+
+    const navigate = useNavigate();
 
     const doc = new Y.Doc();
 
@@ -66,8 +74,21 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
         editor.onDidChangeModelContent(async () => {
             setCode(editor.getValue());
         });
-
     }
+
+    const handleCloseSubmitPopup = () => {
+        setIsSubmitPopupOpen(false);
+    };
+
+
+    const handleSubmitCode = () => {
+        setIsSubmitPopupOpen(true);
+    }
+
+    const handleSubmitCodePopup = () => {
+        onConfirmSubmission();
+    }
+
     
     const handleRunCode = () => {
         setConsoleOutput('');
@@ -188,6 +209,15 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
                         >
                             Run
                         </Button>
+                        <Button
+                            variant="contained"
+                            color="success"
+                            onClick={handleSubmitCode}
+                            sx={{ marginRight: '8px', textTransform: 'none', color: 'white' }}
+                            startIcon={<PublishIcon />}
+                        >
+                            Submit
+                        </Button>
                     </Box>
                 </Box>
                 <Editor
@@ -268,6 +298,14 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
                     Your code has been run!
                 </Alert>
             </Snackbar>
+            <Popup
+                isOpen={isSubmitPopupOpen}
+                onConfirmDisconnect={handleSubmitCodePopup}
+                onCloseDisconnect ={handleCloseSubmitPopup}
+                title="Submit"
+                description="Are you sure you want to submit? Once submitted, you won’t be able to make further changes."
+                option={["Cancel", "Confirm"]}
+            />
         </>
     );
 };
