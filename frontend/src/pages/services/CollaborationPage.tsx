@@ -11,6 +11,7 @@ import { getSignedImageURL } from '../../services/user-service/UserService';
 import socket from "../../context/socket"
 import { useNavigate } from 'react-router-dom';
 import Popup from '../../components/collaborationpage/Popup';
+import CircularProgress from '@mui/material/CircularProgress';
 
 interface ExampleProps {
     id: number;
@@ -38,7 +39,6 @@ const CollaborationPage = () => {
     const [ownProfPicUrl, setOwnProfPicUrl] = React.useState('');
     const [sessionId, setSessionId] = React.useState('');
     const [isDisconnectPopupOpen, setIsDisconnectPopupOpen] = useState(false);
-    const [isSubmitPopupOpen, setIsSubmitPopupOpen] = useState(false);
     const [sessionNotFoundOpen, setSessionNotFoundOpen] = useState(false);
 
     const userId = localStorage.getItem('id') || '';
@@ -115,7 +115,7 @@ const CollaborationPage = () => {
             }
         }
         fetchSessionInfo();
-    }, []);
+    }, [ownProfPic, userId]);
 
     React.useEffect(() => {
         socket.on("shuffle", async (_) => {
@@ -128,7 +128,7 @@ const CollaborationPage = () => {
         socket.on("disconnectUser", async (_) => {
             setIsDisconnectPopupOpen(true);
         });
-      }, [socket]);
+      }, [socket, userId]);
 
 
     return (
@@ -170,6 +170,7 @@ const CollaborationPage = () => {
                 >
                     <Box width="100%">
                     <QuestionPanel
+                        key={question?.question_id}
                         id={question?.question_id ?? 0} 
                         title={question?.question_title ?? ''}
                         description={question?.question_description ?? ''}
@@ -181,7 +182,15 @@ const CollaborationPage = () => {
                     </Box>
                     <Box width="100%">
                     {sessionId === '' ? (
-                        <div>Loading...</div>
+                        <Box
+                        sx={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            height: '100%',
+                        }}>
+                            <CircularProgress color="secondary"/>
+                        </Box>
                     ) : (
                         <CodeEditor 
                             sessionId={sessionId}

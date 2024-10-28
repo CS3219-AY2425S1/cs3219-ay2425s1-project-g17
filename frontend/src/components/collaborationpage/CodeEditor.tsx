@@ -10,7 +10,8 @@ import {
     FormControl,
     Select,
     MenuItem,
-    SelectChangeEvent
+    SelectChangeEvent,
+    CircularProgress
 } from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { Terminal, Clear } from '@mui/icons-material'
@@ -22,6 +23,7 @@ import * as monaco from 'monaco-editor';
 import socket from "../../context/socket"
 import { cacheCode, getCacheCode } from '../../services/collaboration-service/CollaborationService';
 import Popup from './Popup';
+import { executeCode } from '../../services/codeexecution-service/CodeExecutionService';
 
 interface CodeEditorProps {
     sessionId: string;
@@ -36,6 +38,17 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
     const [code, setCode] = useState<string>('');
     const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false);
     const [isSubmitPopupOpen, setIsSubmitPopupOpen] = useState(false);
+    const [consoleOutput, setConsoleOutput] = useState<string>('');
+    const [consoleError, setConsoleError] = useState<string>('');
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+
+    // Boilerplate code for different languages
+    const boilerplateCode: { [key: string]: string } = {
+        javascript: `function solution() {\n\t// Your code here\n}`,
+        cpp: `#include <iostream>\n\nint solution() {\n\t// Your code here\n\treturn 0;\n}`,
+        python: `def solution():\n\t# Your code here\n\tpass`,
+        java: `public class Solution {\n\tpublic static void solution() {\n\t\t// Your code here\n\t}\n}`,
+    };
 
     const doc = new Y.Doc();
 
@@ -49,9 +62,9 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
         });
         const type = doc.getText("monaco");
         const binding = new MonacoBinding(
-            type, 
-            editorRef.current.getModel() as monaco.editor.ITextModel, 
-            new Set([editorRef.current]), 
+            type,
+            editorRef.current.getModel() as monaco.editor.ITextModel,
+            new Set([editorRef.current]),
             provider.awareness
         );
 
@@ -60,11 +73,26 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
         const cachedCode = cachedCodeData.code;
         const currLanguage = cachedCodeData.currLanguage;
 
-        if (cachedCode != "") {
+        // Boilerplate definitions for each language
+        const boilerplateMap: { [key: string]: string } = {
+            javascript: 'function solution() {\n  // your code here\n}',
+            python: 'def solution():\n    # your code here',
+            java: 'class Solution {\n  public void solution() {\n    // your code here\n  }\n}',
+            cpp: 'void solution() {\n  // your code here\n}'
+        };
+
+        // Check if the boilerplate for the current language already exists in the editor
+        const currentBoilerplate = boilerplateMap[currLanguage] || '';
+        const hasBoilerplate = editor.getValue().includes(currentBoilerplate.trim());
+
+        // Add boilerplate only if it doesn’t already exist and no cached code
+        if (!hasBoilerplate && !cachedCode) {
+            editor.setValue(currentBoilerplate);
+        } else if (cachedCode) {
             setCode(cachedCode);
         }
 
-        if (currLanguage != "") {
+        if (currLanguage !== "") {
             setLanguage(currLanguage);
         }
 
@@ -82,46 +110,24 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
         setIsSubmitPopupOpen(false);
     }
 
-    
-    const handleRunCode = () => {
+
+    const handleRunCode = async () => {
         setConsoleOutput('');
         setConsoleError('');
 
-        if (language === 'javascript') {
-            try {
-                // Temporarily override console.log to capture its output
-                const logOutput: string[] = [];
-                const originalConsoleLog = console.log;
+        setIsLoading(true);
+        const { output, error } = await executeCode(code, language);
+        setIsLoading(false);
 
-                console.log = (msg: any) => {
-                    if (typeof msg === 'object') {
-                        logOutput.push(JSON.stringify(msg));
-                    } else {
-                        logOutput.push(msg.toString());
-                    }
-                };
-
-                // Evaluate the code
-                eval(code);
-
-                // Restore original console.log after execution
-                console.log = originalConsoleLog;
-
-                // Set the captured log output
-                setConsoleOutput(logOutput.join('\n') || "Code executed successfully");
-
-            } catch (err: any) {
-                setConsoleError(`${err}`);
-            }
-        } else {
-            setConsoleError('Code execution is only supported for JavaScript.');
+        if (output) {
+            setConsoleOutput(output);
         }
-
+        if (error) {
+            setConsoleError(error);
+        }
         setIsSnackbarOpen(true);
     };
 
-    const [consoleOutput, setConsoleOutput] = useState<string>('');
-    const [consoleError, setConsoleError] = useState<string>('');
 
     const handleClearConsole = () => {
         setConsoleOutput('');
@@ -134,7 +140,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
 
     const handleLanguageChange = async (event: SelectChangeEvent<string>) => {
         const newLanguage = event.target.value as string;
-        socket.emit("changeLanguage", {sessionId, newLanguage});
+        socket.emit("changeLanguage", { sessionId, newLanguage });
         await cacheCode(sessionId, code, language, newLanguage);
         const cachedCodeData = await getCacheCode(sessionId, newLanguage);
         const cachedCode = cachedCodeData.code;
@@ -142,7 +148,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
         if (cachedCode != null) {
             setCode(cachedCode);
         } else {
-            setCode('');
+            setCode(boilerplateCode[newLanguage] || ''); // Set the boilerplate code if no cached code is available
         }
     };
 
@@ -171,7 +177,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
         socket.on("changeLanguage", async (language) => {
             setLanguage(language);
         });
-      }, [socket]);
+    }, []);
 
     return (
         <>
@@ -195,9 +201,9 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
                     <Box display="flex" justifyContent="right" padding={1} gap={2}>
                         <Button
                             variant="contained"
-                            color="success"
+                            color="primary"
                             onClick={handleRunCode}
-                            sx={{ marginRight: '8px', textTransform: 'none', color: 'white' }}
+                            sx={{ textTransform: 'none', color: 'black' }}
                             startIcon={<PlayArrowIcon />}
                         >
                             Run
@@ -242,7 +248,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
                     }}
                 >
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <Terminal sx={{ mr: 1 }} />
+                        { isLoading ? <CircularProgress size="24px" sx={{ mr: 1 }} /> : <Terminal sx={{ mr: 1 }} />}
                         <Typography variant="subtitle2">Console</Typography>
                     </Box>
                     <Button
@@ -294,10 +300,11 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
             <Popup
                 isOpen={isSubmitPopupOpen}
                 onConfirmDisconnect={onConfirmSubmission}
-                onCloseDisconnect ={handleCloseSubmitPopup}
-                title="Submit"
-                description="Are you sure you want to submit? Once submitted, you won’t be able to make further changes."
-                option={["Cancel", "Confirm"]}
+                onCloseDisconnect={handleCloseSubmitPopup}
+                title="Submit code?"
+                description="Once submitted, no further changes can be made, and the session will close for both participants."
+                option={["Cancel", "Submit"]}
+                button_color='secondary'
             />
         </>
     );

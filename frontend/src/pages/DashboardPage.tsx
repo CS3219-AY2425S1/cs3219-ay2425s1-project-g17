@@ -236,7 +236,7 @@ function DashboardPage() {
                                 }}
                             >
                                 <TrendingQuestions questions={allQuestions} />
-                                <AttemptedProgress />
+                                <AttemptedProgress questions={allQuestions}/>
                             </Box>
                         </motion.div>
 
