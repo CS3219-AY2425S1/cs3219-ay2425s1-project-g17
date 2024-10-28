@@ -1,28 +1,45 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Typography, Button, Box } from '@mui/material';
 import ShuffleIcon from '@mui/icons-material/Shuffle';
 import DisconnectIcon from '@mui/icons-material/PowerSettingsNew';
-import { useNavigate } from 'react-router-dom';
+import Avatar from '@mui/material/Avatar';
+import Popup from './Popup';
+import Tooltip from '@mui/material/Tooltip';
 
-const Header = () => {
+interface HeaderProps {
+    partnerName: string;
+    partnerProfPicUrl: string;
+    ownProfPicUrl: string;
+    onShuffleQuestion: () => void;
+    onConfirmDisconnect: () => void;
+}
 
-    const navigate = useNavigate();
+const Header: React.FC<HeaderProps> = ({
+    partnerName,
+    partnerProfPicUrl,
+    ownProfPicUrl,
+    onShuffleQuestion,
+    onConfirmDisconnect
+}) => {
 
-    // TODO: Implement disconnect functionality
+    const [isDisconnectPopupOpen, setIsDisconnectPopupOpen] = useState(false);
+    const username = localStorage.getItem('username') || '';
+
     const onDisconnect = () => {
-        // Disconnect the user from the partner
-        navigate('/dashboard');
-        return;
+        setIsDisconnectPopupOpen(true);
     };
 
-    // TODO: Implement shuffle functionality
-    const onShuffleQuestions = () => {
-        // Logic to shuffle questions goes here
-        console.log("Shuffling questions...");
+    const handleCloseDisconnectPopup = () => {
+        setIsDisconnectPopupOpen(false);
     };
 
-    // TODO: Replace with actual partner name
-    const partnerName = 'John Doe';
+    const handleConfirmDisconnect = async () => {
+        onConfirmDisconnect();
+    };
+    
+    const onShuffleQuestions = async () => {
+        onShuffleQuestion();
+    };
 
     return (
         <Box
@@ -36,7 +53,7 @@ const Header = () => {
         >
             <Box display="flex" alignItems="center" gap={1}>
                 <Button
-                    variant="contained"
+                    variant="outlined"
                     color="primary"
                     onClick={onShuffleQuestions}
                     sx={{ textTransform: 'none', fontWeight: 'bold' }}
@@ -50,15 +67,32 @@ const Header = () => {
                 You are connected with <strong>{partnerName}</strong>
             </Typography>
 
-            <Button
-                variant="contained"
-                color="error"
-                onClick={onDisconnect}
-                sx={{ textTransform: 'none', fontWeight: 'bold' }}
-                startIcon={<DisconnectIcon />}
-            >
-                Disconnect
-            </Button>
+            <Box display="flex" alignItems="center" gap={2}>
+                <Tooltip title={username}>
+                    <Avatar src={ownProfPicUrl} sx={{ bgcolor: "white" }} alt='potato' />
+                </Tooltip>
+                <Tooltip title={partnerName}>
+                <Avatar src={partnerProfPicUrl} sx={{ bgcolor: "white" }} />
+                </Tooltip>
+                <Button
+                    variant="outlined"
+                    color="error"
+                    onClick={onDisconnect}
+                    sx={{ textTransform: 'none', fontWeight: 'bold' }}
+                    startIcon={<DisconnectIcon />}
+                >
+                    Disconnect
+                </Button>
+            </Box>
+
+            <Popup
+                isOpen={isDisconnectPopupOpen}
+                onConfirmDisconnect={handleConfirmDisconnect}
+                onCloseDisconnect={handleCloseDisconnectPopup}
+                title="Disconnect room?"
+                description="You won't be able to rejoin this session."
+                option={["Cancel", "Disconnect"]}
+            />
         </Box>
     );
 };

@@ -20,41 +20,25 @@ interface QuestionPanelProps {
     id: number;
     title: string;
     description: string;
-    example: ExampleProps[];
+    example?: ExampleProps[];
     categories: string[];
     complexity: string;
     popularity: number;
 }
 
-// TODO: Get Question from question-service
-const fakeQuestionPanelData: QuestionPanelProps = {
-    id: 1,
-    title: "Two Sum",
-    description: "Given an array of integers `nums` and an integer `target`, return indices of the two numbers such that they add up to the target. You may assume that each input would have exactly one solution, and you may not use the same element twice.",
-    example: [
-        {
-            id: 0,
-            input: "[2, 7, 11, 15], target = 9",
-            output: "[0, 1]",
-            explanation: "Because nums[0] + nums[1] = 2 + 7 = 9, we return [0, 1]."
-        },
-        {
-            id: 1,
-            input: "[3, 2, 4], target = 6",
-            output: "[1, 2]",
-            explanation: "Because nums[1] + nums[2] = 2 + 4 = 6, we return [1, 2]."
-        }
-    ],
-    categories: ["Array", "Hash Table"],
-    complexity: "EASY",
-    popularity: 20,
-};
-
 const getComplexityColor = (complexity: keyof typeof complexityColors) => {
     return complexityColors[complexity] || 'black';
 };
 
-const QuestionPanel = () => {
+const QuestionPanel: React.FC<QuestionPanelProps>  = ({
+    id,
+    title,
+    description,
+    example,
+    categories,
+    complexity,
+    popularity
+}) => {
     return (
         <Paper
             sx={{
@@ -66,20 +50,20 @@ const QuestionPanel = () => {
             }}
         >
             <Typography variant="h6" component="h2" sx={{ color: 'white', marginBottom: 0.5 }}>
-                {fakeQuestionPanelData.id + '. ' + fakeQuestionPanelData.title}
+                {id + '. ' + title}
             </Typography>
             <Box
                 sx={{ display: 'flex', alignItems: 'center', marginBottom: 1 }}
             >
                 <Typography
                     sx={{
-                        color: getComplexityColor(fakeQuestionPanelData.complexity as keyof typeof complexityColors),
+                        color: getComplexityColor(complexity as keyof typeof complexityColors),
                         fontWeight: 'bold',
                         fontSize: '12px',
                         marginRight: 2,
                     }}
                 >
-                    {fakeQuestionPanelData.complexity}
+                    {complexity}
                 </Typography>
 
                 <WhatshotIcon sx={{ color: 'orange', fontSize: 16, marginRight: 0.5 }} />
@@ -87,12 +71,12 @@ const QuestionPanel = () => {
                     variant="body1"
                     sx={{ color: 'white', fontWeight: 'bold', fontSize: '12px' }} 
                 >
-                    {fakeQuestionPanelData.popularity}
+                    {popularity}
                 </Typography>
             </Box>
 
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                {fakeQuestionPanelData.categories?.map((category) => (
+                {categories?.map((category) => (
                     <Chip
                         key={category}
                         label={category}
@@ -102,24 +86,24 @@ const QuestionPanel = () => {
             </Box>
             <Box sx={{ fontSize: '14px' }}> 
                 <Markdown>
-                    {fakeQuestionPanelData.description}
+                    {description}
                 </Markdown>
             </Box>
             <Box sx={{ mt: 2, color: 'white' }}>
-                {fakeQuestionPanelData.example?.map((example) => (
-                    <Box key={example.id} sx={{ mt: 2 }}>
+                {example?.map((eg, index) => (
+                    <Box key={eg.id} sx={{ mt: 2 }}>
                         <Typography sx={{ color: 'white', fontFamily: 'JetBrains Mono, monospace', fontSize: '12px' }}>
-                            Example {example.id + 1}
+                            Example {index + 1}
                         </Typography>
                         <Typography sx={{ color: 'white', fontFamily: 'JetBrains Mono, monospace', fontSize: '12px' }}>
-                            Input: {example.input}
+                            Input: {eg.input}
                         </Typography>
                         <Typography sx={{ color: 'white', fontFamily: 'JetBrains Mono, monospace', fontSize: '12px' }}>
-                            Output: {example.output}
+                            Output: {eg.output}
                         </Typography>
-                        {example.explanation && (
+                        {eg.explanation && (
                             <Typography sx={{ color: 'white', fontFamily: 'JetBrains Mono, monospace', fontSize: '12px' }}>
-                                Explanation: {example.explanation}
+                                Explanation: {eg.explanation}
                             </Typography>
                         )}
                     </Box>

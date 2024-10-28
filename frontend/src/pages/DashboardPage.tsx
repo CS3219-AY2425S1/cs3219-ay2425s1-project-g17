@@ -222,6 +222,7 @@ function DashboardPage() {
                             flex: 3
                         }}
                     >
+
                         {/* Tending Questions and AttemptedProgress */}
                         <motion.div
                             initial={{ opacity: 0, x: -100 }}
@@ -325,6 +326,7 @@ function DashboardPage() {
                         </motion.div>
 
                     </Container>
+
 
                     {/* MatchingComponent */}
                     <Box sx={{
