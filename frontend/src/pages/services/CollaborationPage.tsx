@@ -6,7 +6,7 @@ import QuestionPanel from '../../components/collaborationpage/QuestionPanel';
 import Header from '../../components/collaborationpage/Header';
 import { Box } from '@mui/material';
 import DragHandleIcon from '@mui/icons-material/DragHandle';
-import { getSessionInfo, getQuestionInfo, disconnectUser, submitAttempt } from '../../services/collaboration-service/CollaborationService';
+import { getSessionInfo, getQuestionInfo, disconnectUser, shuffleQuestion } from '../../services/collaboration-service/CollaborationService';
 import { getSignedImageURL } from '../../services/user-service/UserService';
 import socket from "../../context/socket"
 import { useNavigate } from 'react-router-dom';
@@ -46,9 +46,12 @@ const CollaborationPage = () => {
 
     const navigate = useNavigate();
 
-    const handleShuffleQuestion = (newData: QuestionProps) => {
-        setQuestion(newData); 
+    const handleShuffleQuestion = async () => {
         socket.emit("shuffleQuestion", sessionId);
+        const shuffleRes = await shuffleQuestion(userId);
+        const newQuestionId = shuffleRes.question_id;
+        const question = await getQuestionInfo(newQuestionId);
+        setQuestion(question); 
     };
 
     // Function for user that click disconnect on their own
@@ -63,34 +66,22 @@ const CollaborationPage = () => {
     };
 
     const handleConfirmSubmit = async () => {
-        socket.emit("disconnectUser", {sessionId, userId});
         try {
+            socket.emit("disconnectUser", {sessionId, userId});
             await disconnectUser(sessionId);
             setTimeout(() => navigate('/dashboard'), 200);
         } catch (error) {
             console.error("Failed to submit:", error);
-        }
+        }      
     };
 
     // Function for user that click disconnect when other user disconnects first
-    const handleConfirmDisconnectAsWell = async () => {
+    const handleConfirmDisconnectAsWell = () => {
         setTimeout(() => navigate('/dashboard'), 200);
     };
-
-    const handleConfirmSubmitAsWell = () => {
-        setTimeout(() => navigate('/dashboard'), 200);
-        // TODO: Save attempt (History Service)
-        // submitAttempt(sessionId);
-        // socket.emit("confirmSubmit", sessionId);
-        // navigate('/dashboard');
-    }
 
     const handleCloseDisconnect = () => {
         setIsDisconnectPopupOpen(false);
-    };
-
-    const handleCloseSubmitPopup = () => {
-        setIsSubmitPopupOpen(false);
     };
 
     const handleSessionInactive = () => {
@@ -208,15 +199,6 @@ const CollaborationPage = () => {
                 description={`${partnerName} has disconnected. Please confirm to disconnect as well.`}
                 option ={[null, "Disconnect"]}
             />
-             <Popup
-                isOpen={isSubmitPopupOpen}
-                onConfirmDisconnect={handleConfirmSubmitAsWell}
-                onCloseDisconnect ={handleCloseSubmitPopup}
-                title="Submit"
-                description="Are you sure you want to submit? Once submitted, you won’t be able to make further changes."
-                option={["Cancel", "Confirm"]}
-            />
-
             <Popup
                 isOpen={sessionNotFoundOpen}
                 onConfirmDisconnect={handleSessionInactive}

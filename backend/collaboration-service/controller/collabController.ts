@@ -50,7 +50,7 @@ export const createCollaborationRoom = async (req: Request, res: Response) => {
         if (questionRes.question_id == null) {
             res.status(questionRes.status).json({ error: questionRes });
         } else {
-            const sessionId = await saveCollaborationRoom(user1Id, user2Id, questionRes.question_id, category, difficulty);
+            const sessionId = await saveCollaborationRoom(user1Id, user2Id, questionRes._id, category, difficulty);
             res.status(200).json(sessionId);
         }
     } catch (error) {
@@ -141,17 +141,6 @@ export const disconnectUser = async (req: Request, res: Response) => {
     }
 };
 
-export const submitAttempt = async (req: Request, res: Response) => {
-    try {
-        const sessionId = req.body.sessionId;
-        await redisClient.del(sessionId);
-        res.status(200).json({"message": "successfully disconnected"});
-    } catch (error) {
-        console.error('Error submitting', error);
-        res.status(400).json({ error: (error as Error).message });
-    }
-};
-
 export const getCacheCode = async (req: Request, res: Response) => {
     const sessionId = req.params.id;
     let language = req.params.language;
@@ -168,7 +157,6 @@ export const cacheCode = async (req: Request, res: Response) => {
         const code = req.body.code;
         const language = req.body.language;
         const newLanguage = req.body.newLanguage;
-
         await redisClient.hset(sessionId, language, code); 
         await redisClient.hset(sessionId, "currLanguage", newLanguage); 
         res.status(200).json({"message": "code cached"});

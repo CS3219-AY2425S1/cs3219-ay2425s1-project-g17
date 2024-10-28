@@ -59,16 +59,6 @@ async function disconnectUser(sessionId: string) {
     }
 }
 
-// Function to submit attempt
-async function submitAttempt(sessionId: string) {
-    try {
-        const response = await collabApi.post(`/submit`, {sessionId});
-        return response.data;
-    } catch (error) {
-        handleAxiosError(error);
-    }
-}
-
 // Function to get cached code
 async function getCacheCode(id: string, language: string) {
     try {
@@ -94,7 +84,6 @@ export {
     getQuestionInfo,
     shuffleQuestion,
     disconnectUser,
-    submitAttempt,
     getCacheCode,
     cacheCode
 }

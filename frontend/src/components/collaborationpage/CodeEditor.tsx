@@ -20,9 +20,8 @@ import { WebrtcProvider } from 'y-webrtc';
 import { MonacoBinding } from 'y-monaco';
 import * as monaco from 'monaco-editor';
 import socket from "../../context/socket"
-import { cacheCode, getCacheCode, disconnectUser } from '../../services/collaboration-service/CollaborationService';
+import { cacheCode, getCacheCode } from '../../services/collaboration-service/CollaborationService';
 import Popup from './Popup';
-import { useNavigate } from 'react-router-dom';
 
 interface CodeEditorProps {
     sessionId: string;
@@ -37,8 +36,6 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
     const [code, setCode] = useState<string>('');
     const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false);
     const [isSubmitPopupOpen, setIsSubmitPopupOpen] = useState(false);
-
-    const navigate = useNavigate();
 
     const doc = new Y.Doc();
 
@@ -76,17 +73,13 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
         });
     }
 
-    const handleCloseSubmitPopup = () => {
-        setIsSubmitPopupOpen(false);
-    };
-
-
     const handleSubmitCode = () => {
         setIsSubmitPopupOpen(true);
     }
 
-    const handleSubmitCodePopup = () => {
-        onConfirmSubmission();
+
+    const handleCloseSubmitPopup = () => {
+        setIsSubmitPopupOpen(false);
     }
 
     
@@ -300,7 +293,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
             </Snackbar>
             <Popup
                 isOpen={isSubmitPopupOpen}
-                onConfirmDisconnect={handleSubmitCodePopup}
+                onConfirmDisconnect={onConfirmSubmission}
                 onCloseDisconnect ={handleCloseSubmitPopup}
                 title="Submit"
                 description="Are you sure you want to submit? Once submitted, you won’t be able to make further changes."

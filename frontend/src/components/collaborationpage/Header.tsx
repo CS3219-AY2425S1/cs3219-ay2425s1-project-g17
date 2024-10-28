@@ -3,34 +3,14 @@ import { Typography, Button, Box } from '@mui/material';
 import ShuffleIcon from '@mui/icons-material/Shuffle';
 import DisconnectIcon from '@mui/icons-material/PowerSettingsNew';
 import Avatar from '@mui/material/Avatar';
-import { getQuestionInfo, shuffleQuestion, disconnectUser } from '../../services/collaboration-service/CollaborationService';
 import Popup from './Popup';
 import Tooltip from '@mui/material/Tooltip';
-import { useNavigate } from 'react-router-dom';
-
-interface ExampleProps {
-    id: number;
-    input: string;
-    output: string;
-    explanation: string;
-}
-
-interface QuestionProps {
-    _id: string;
-    question_id: number;
-    question_title: string;
-    question_description: string;
-    question_example: ExampleProps[];
-    question_categories: string[];
-    question_complexity: string;
-    question_popularity: number;
-}
 
 interface HeaderProps {
     partnerName: string;
     partnerProfPicUrl: string;
     ownProfPicUrl: string;
-    onShuffleQuestion: (newData: QuestionProps) => void;
+    onShuffleQuestion: () => void;
     onConfirmDisconnect: () => void;
 }
 
@@ -41,8 +21,6 @@ const Header: React.FC<HeaderProps> = ({
     onShuffleQuestion,
     onConfirmDisconnect
 }) => {
-
-    const navigate = useNavigate();
 
     const [isDisconnectPopupOpen, setIsDisconnectPopupOpen] = useState(false);
     const username = localStorage.getItem('username') || '';
@@ -60,11 +38,7 @@ const Header: React.FC<HeaderProps> = ({
     };
     
     const onShuffleQuestions = async () => {
-        const userId = localStorage.getItem('id') || '';
-        const shuffleRes = await shuffleQuestion(userId);
-        const newQuestionId = shuffleRes.question_id;
-        const question = await getQuestionInfo(newQuestionId);
-        onShuffleQuestion(question);
+        onShuffleQuestion();
     };
 
     return (
