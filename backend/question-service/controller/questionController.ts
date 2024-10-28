@@ -37,8 +37,8 @@ export const getAllQuestions = async (req: Request, res: Response) => {
 
 export const getQuestionById = async (req: Request, res: Response) => {
     try {
-        const questionId = toNumber(req.params.id);
-        const question = await Question.findOne({ question_id: questionId });
+        const questionId = req.params.id;
+        const question = await Question.findById(questionId);
         if (question) {
             res.status(200).json(question);
         } else {
