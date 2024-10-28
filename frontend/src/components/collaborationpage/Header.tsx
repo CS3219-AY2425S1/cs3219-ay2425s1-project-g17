@@ -71,7 +71,6 @@ const Header: React.FC<HeaderProps> = ({
         const shuffleRes = await shuffleQuestion(userId);
         const newQuestionId = shuffleRes.question_id;
         const question = await getQuestionInfo(newQuestionId);
-        console.log(question);
         onShuffleQuestion(question);
     };
 

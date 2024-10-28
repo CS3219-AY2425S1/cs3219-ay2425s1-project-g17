@@ -6,9 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 const fetchRandomQuestion = async (difficulty: string, category: string, token: string) => {
     try {
-        // for docker
         const apiUrl = `http://question-service:4000/questions/random?difficulty=${difficulty}&category=${category}`;
-        //const apiUrl = `http://localhost:4000/questions/random?difficulty=${difficulty}&category=${category}`;
         const headers = { 
             Authorization: `Bearer ${token}` 
         };
@@ -19,17 +17,19 @@ const fetchRandomQuestion = async (difficulty: string, category: string, token: 
     }
 };
 
-const saveCollaborationRoom = async (user1Id: string, user2Id: string, questionId: any, category: string, difficulty: string) => {
+const saveCollaborationRoom = async (user1Id: string, user2Id: string, questionId: any, category: string, difficulty: string, currLanguage: string = "javascript", javascript: string = "") => {
     try {
+
         const sessionId = uuidv4(); 
         const sessionData = {
             user1Id,
             user2Id,
             questionId, 
             category,
-            difficulty
+            difficulty,
+            currLanguage,
+            javascript
         };
-
         await redisClient.hset(`session:${sessionId}`, sessionData);
         console.log('Session saved to Redis:', sessionId);
         return sessionId;
@@ -46,9 +46,7 @@ export const createCollaborationRoom = async (req: Request, res: Response) => {
         const difficulty = req.body.difficulty;
 
         const bearerToken = generateToken(user1Id);
-        console.log(bearerToken);
         const questionRes = await fetchRandomQuestion(difficulty, category, bearerToken);
-        console.log(questionRes);
         if (questionRes.question_id == null) {
             res.status(questionRes.status).json({ error: questionRes });
         } else {
@@ -168,6 +166,32 @@ export const submitAttempt = async (req: Request, res: Response) => {
         res.status(200).json({"message": "successfully disconnected"});
     } catch (error) {
         console.error('Error submitting', error);
+        res.status(400).json({ error: (error as Error).message });
+    }
+};
+
+export const getCacheCode = async (req: Request, res: Response) => {
+    const sessionId = req.params.id;
+    let language = req.params.language;
+    const sessionData = await redisClient.hgetall(sessionId);
+    if (language == "noLanguage") {
+        language = sessionData["currLanguage"];
+    }
+    res.status(200).json({"code": sessionData[language], "currLanguage": sessionData["currLanguage"]});
+}
+
+export const cacheCode = async (req: Request, res: Response) => {
+    try {
+        const sessionId = req.body.sessionId;
+        const code = req.body.code;
+        const language = req.body.language;
+        const newLanguage = req.body.newLanguage;
+
+        await redisClient.hset(sessionId, language, code); 
+        await redisClient.hset(sessionId, "currLanguage", newLanguage); 
+        res.status(200).json({"message": "code cached"});
+    } catch (error) {
+        console.error('Error caching', error);
         res.status(400).json({ error: (error as Error).message });
     }
 };

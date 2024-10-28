@@ -101,7 +101,6 @@ const CollaborationPage = () => {
                 setSessionId(data.sessionId);
                 const roomId = data.sessionId
                 socket.emit('joinSession', { userId, roomId });
-                console.log(data.session);
                 setSessionNotFoundOpen(false);
             } catch (error) {
                 setSessionNotFoundOpen(true);

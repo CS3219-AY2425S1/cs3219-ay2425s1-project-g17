@@ -69,10 +69,32 @@ async function submitAttempt(sessionId: string) {
     }
 }
 
+// Function to get cached code
+async function getCacheCode(id: string, language: string) {
+    try {
+        const response = await collabApi.get(`/cache/${id}/${language}`);
+        return response.data;
+    } catch (error) {
+        handleAxiosError(error);
+    }
+}
+
+// Function to cache the code
+async function cacheCode(sessionId: string, code: string, language: string, newLanguage: string) {
+    try {
+        const response = await collabApi.post(`/cache`, {sessionId, code ,language, newLanguage});
+        return response.data;
+    } catch (error) {
+        handleAxiosError(error);
+    }
+}
+
 export {
     getSessionInfo,
     getQuestionInfo,
     shuffleQuestion,
     disconnectUser,
-    submitAttempt
+    submitAttempt,
+    getCacheCode,
+    cacheCode
 }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { Editor } from "@monaco-editor/react";
 import {
     Box,
@@ -19,6 +19,7 @@ import { WebrtcProvider } from 'y-webrtc';
 import { MonacoBinding } from 'y-monaco';
 import * as monaco from 'monaco-editor';
 import socket from "../../context/socket"
+import { cacheCode, getCacheCode } from '../../services/collaboration-service/CollaborationService';
 
 interface CodeEditorProps {
     sessionId: string;
@@ -28,15 +29,16 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
     sessionId
 }) => {
     const [language, setLanguage] = useState<string>('javascript');
-    const [code, setCode] = useState<string>(`var message = 'Hello, World!';\nconsole.log(message);`);
+    const [code, setCode] = useState<string>('');
     const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false);
 
     const doc = new Y.Doc();
 
     const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
 
-    const handleEditorDidMount = (editor: monaco.editor.IStandaloneCodeEditor, monaco: typeof import('monaco-editor')) => {
+    const handleEditorDidMount = async (editor: monaco.editor.IStandaloneCodeEditor, monaco: typeof import('monaco-editor')) => {
         editorRef.current = editor;
+
         const provider = new WebrtcProvider(sessionId, doc, {
             signaling: ["ws://localhost:4003"]
         });
@@ -47,9 +49,24 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
             new Set([editorRef.current]), 
             provider.awareness
         );
-        editor.onDidChangeModelContent(() => {
+
+        const defaultLanguage = "noLanguage";
+        const cachedCodeData = await getCacheCode(sessionId, defaultLanguage);
+        const cachedCode = cachedCodeData.code;
+        const currLanguage = cachedCodeData.currLanguage;
+
+        if (cachedCode != "") {
+            setCode(cachedCode);
+        }
+
+        if (currLanguage != "") {
+            setLanguage(currLanguage);
+        }
+
+        editor.onDidChangeModelContent(async () => {
             setCode(editor.getValue());
         });
+
     }
     
     const handleRunCode = () => {
@@ -101,36 +118,47 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
         setIsSnackbarOpen(false);
     };
 
-    const handleLanguageChange = (event: SelectChangeEvent<string>) => {
+    const handleLanguageChange = async (event: SelectChangeEvent<string>) => {
         const newLanguage = event.target.value as string;
-        console.log(newLanguage);
         socket.emit("changeLanguage", {sessionId, newLanguage});
+        await cacheCode(sessionId, code, language, newLanguage);
+        const cachedCodeData = await getCacheCode(sessionId, newLanguage);
+        const cachedCode = cachedCodeData.code;
         setLanguage(newLanguage);
-
-        switch (newLanguage) {
-            case 'cpp':
-                setCode(`#include <iostream>\n\nint main() {\n   std::cout << "Hello, World!";\n   return 0;\n}`);
-                break;
-            case 'java':
-                setCode(`public class Main {\n   public static void main(String[] args) {\n      System.out.println("Hello, World!");\n   }\n}`);
-                break;
-            case 'python':
-                setCode(`print("Hello, World!")`);
-                break;
-            case 'javascript':
-                setCode(`var message = 'Hello, World!';\nconsole.log(message);`);
-                break;
-            default:
-                setCode('');
+        if (cachedCode != null) {
+            setCode(cachedCode);
+        } else {
+            setCode('');
         }
     };
 
+    React.useEffect(() => {
+        // Add event listeners for refreshing or navigating away
+        const handleBeforeUnload = async (event: BeforeUnloadEvent) => {
+            await cacheCode(sessionId, code, language, language);
+
+        };
+
+        const handlePopState = async () => {
+            await cacheCode(sessionId, code, language, language);
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        window.addEventListener('popstate', handlePopState);
+
+        // Cleanup listeners on unmount
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+            window.removeEventListener('popstate', handlePopState);
+        };
+    });
 
     React.useEffect(() => {
         socket.on("changeLanguage", async (language) => {
             setLanguage(language);
         });
       }, [socket]);
+
     return (
         <>
             <Paper sx={{ height: "64vh", display: "flex", flexDirection: "column" }}>

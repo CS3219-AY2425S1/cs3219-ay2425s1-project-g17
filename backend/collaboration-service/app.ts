@@ -10,6 +10,14 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 app.use('/collaboration', collaborationRoutes);
+
+app.get('/', (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  console.log("Sending Greetings!");
+  res.json({
+    message: "Hello World from collaboration-service"
+  });
+});
+
 const httpServer = createServer(app);
 
 const io = new Server(httpServer, {
@@ -42,8 +50,6 @@ io.on("connection", (socket) => {
       socket.to(sessionId).emit('changeLanguage', newLanguage);
     });
   });
-
-
 
   httpServer.removeAllListeners("upgrade");
 
