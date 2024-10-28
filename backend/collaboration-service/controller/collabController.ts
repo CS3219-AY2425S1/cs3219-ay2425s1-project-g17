@@ -19,7 +19,6 @@ const fetchRandomQuestion = async (difficulty: string, category: string, token: 
 
 const saveCollaborationRoom = async (user1Id: string, user2Id: string, questionId: any, category: string, difficulty: string, currLanguage: string = "javascript", javascript: string = "") => {
     try {
-
         const sessionId = uuidv4(); 
         const sessionData = {
             user1Id,
@@ -94,7 +93,6 @@ const getSessionData = async (userId: string) => {
 export const getCollaborationRoom = async (req: Request, res: Response) => {
     const userId = req.params.id;
     const sessionData = await getSessionData(userId)
-    console.log(sessionData);
     res.status(200).json(sessionData);
 }
 
@@ -118,7 +116,7 @@ export const shuffleQuestion = async (req: Request, res: Response) => {
 
     while (newQuestionId == questionId) {
         newQuestion = await fetchRandomQuestion(difficulty, category, bearerToken);
-        newQuestionId = newQuestion.question_id;
+        newQuestionId = newQuestion._id;
     }
 
     await redisClient.hset(sessionId, 'questionId', newQuestionId);
