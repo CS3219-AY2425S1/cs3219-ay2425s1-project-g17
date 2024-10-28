@@ -222,7 +222,8 @@ function DashboardPage() {
                             flex: 3
                         }}
                     >
-                        {/* Wrap the TrendingQuestions and AttemptedProgress in motion.div */}
+
+                        {/* Tending Questions and AttemptedProgress */}
                         <motion.div
                             initial={{ opacity: 0, x: -100 }}
                             animate={{ opacity: 1, x: 0 }}
@@ -239,7 +240,7 @@ function DashboardPage() {
                             </Box>
                         </motion.div>
 
-                        {/* Animate the filters */}
+                        {/* filters */}
                         <motion.div
                             initial={{ opacity: 0, scale: 0.8 }}
                             animate={{ opacity: 1, scale: 1 }}
@@ -305,7 +306,7 @@ function DashboardPage() {
                             </Box>
                         </motion.div>
 
-                        {/* Animate the Question Table */}
+                        {/* Question Table */}
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
@@ -326,8 +327,8 @@ function DashboardPage() {
 
                     </Container>
 
-                    {/* Animate the MatchingComponent */}
 
+                    {/* MatchingComponent */}
                     <Box sx={{
                         flex: 1,
                         display: 'flex',
