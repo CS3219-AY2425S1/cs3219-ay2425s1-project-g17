@@ -3,6 +3,7 @@ import Split from 'react-split';
 import { createRoot } from 'react-dom/client';
 import CodeEditor from '../../components/collaborationpage/CodeEditor';
 import QuestionPanel from '../../components/collaborationpage/QuestionPanel';
+import ChatComponent from '../../components/ChatComponent';
 import Header from '../../components/collaborationpage/Header';
 import { Box } from '@mui/material';
 import DragHandleIcon from '@mui/icons-material/DragHandle';
@@ -177,8 +178,13 @@ const CollaborationPage = () => {
                         categories={question?.question_categories ?? []}
                         complexity={question?.question_complexity ?? ''}
                         popularity={question?.question_popularity ?? 0}
+                        
                     />
+                        <Box width="100%">
+                            <ChatComponent/>
+                        </Box>
                     </Box>
+                    
                     <Box width="100%">
                     {sessionId === '' ? (
                         <div>Loading...</div>

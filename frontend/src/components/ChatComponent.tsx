@@ -43,19 +43,21 @@ const ChatComponent: React.FC = () => {
         joinSession();
       }, []);
     return (
-        <Paper elevation={4} sx={{ padding: "20px", maxWidth: "600px", borderRadius: "10px", margin: "auto" }}>
+        <Paper elevation={4} sx={{ padding: "20px", borderRadius: "10px", margin: "auto" }}>
             <Typography variant="h5" mb="20px" color="#9AC143">
                 Chat Room
             </Typography>
             
-            <Box sx={{ mt: 3, mb: 2, maxHeight: "200px", overflowY: "auto", border: "1px solid #ccc", padding: "10px", borderRadius: "8px" }}>
+            <Box sx={{ mt: 3, mb: 2, maxHeight: "130px", overflowY: "auto", border: "1px solid #ccc", padding: "10px", borderRadius: "8px" }}>
                 {chatLog.length === 0 ? (
                     <Typography color="textSecondary" textAlign="center">
                         No messages yet. Start the conversation!
                     </Typography>
                 ) : (
                     chatLog.map((msg, idx) => (
-                        <Typography key={idx} variant="body2">
+                        <Typography key={idx} variant="body2"
+                        sx={{ wordWrap: "break-word", whiteSpace: "pre-wrap" }}
+                        >
                             {msg}
                         </Typography>
                     ))
