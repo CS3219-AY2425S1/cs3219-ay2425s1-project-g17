@@ -3,15 +3,17 @@ import Split from 'react-split';
 import { createRoot } from 'react-dom/client';
 import CodeEditor from '../../components/collaborationpage/CodeEditor';
 import QuestionPanel from '../../components/collaborationpage/QuestionPanel';
+import ChatComponent from '../../components/ChatComponent';
 import Header from '../../components/collaborationpage/Header';
 import { Box } from '@mui/material';
 import DragHandleIcon from '@mui/icons-material/DragHandle';
-import { getSessionInfo, getQuestionInfo, disconnectUser, shuffleQuestion } from '../../services/collaboration-service/CollaborationService';
+import { getSessionInfo, getQuestionInfo, disconnectUser, shuffleQuestion, createHistory } from '../../services/collaboration-service/CollaborationService';
 import { getSignedImageURL } from '../../services/user-service/UserService';
 import socket from "../../context/socket"
 import { useNavigate } from 'react-router-dom';
 import Popup from '../../components/collaborationpage/Popup';
 import CircularProgress from '@mui/material/CircularProgress';
+import { deleteSessionMessages } from "../../services/chat-service/ChatService"
 
 interface ExampleProps {
     id: number;
@@ -32,12 +34,15 @@ interface QuestionProps {
 }
 
 const CollaborationPage = () => {
-    
+    const [code, setCode] = useState<string>('');
     const [question, setQuestion] = React.useState<QuestionProps | null>(null);
     const [partnerName, setPartnerName] = React.useState('');
     const [partnerProfPicUrl, setPartnerProfPicUrl] = React.useState('');
     const [ownProfPicUrl, setOwnProfPicUrl] = React.useState('');
     const [sessionId, setSessionId] = React.useState('');
+    const [partnerId, setPartnerId] = React.useState('');
+    const [questionId, setQuestionId] = React.useState('');
+    const [startTime, setStartTime] = React.useState<Date>(new Date());
     const [isDisconnectPopupOpen, setIsDisconnectPopupOpen] = useState(false);
     const [sessionNotFoundOpen, setSessionNotFoundOpen] = useState(false);
 
@@ -54,11 +59,13 @@ const CollaborationPage = () => {
         setQuestion(question); 
     };
 
-    // Function for user that click disconnect on their own
     const handleConfirmDisconnect = async () => {
         socket.emit("disconnectUser", {sessionId, userId});
         try {
             await disconnectUser(sessionId);
+            await deleteSessionMessages(sessionId);
+            await createHistory(userId, partnerId, questionId, startTime, code);
+            await createHistory(partnerId, userId, questionId, startTime, code);
             setTimeout(() => navigate('/dashboard'), 200);
         } catch (error) {
             console.error("Failed to disconnect:", error);
@@ -69,6 +76,9 @@ const CollaborationPage = () => {
         try {
             socket.emit("disconnectUser", {sessionId, userId});
             await disconnectUser(sessionId);
+            await deleteSessionMessages(sessionId);
+            await createHistory(userId, partnerId, questionId, startTime, code);
+            await createHistory(partnerId, userId, questionId, startTime, code);
             setTimeout(() => navigate('/dashboard'), 200);
         } catch (error) {
             console.error("Failed to submit:", error);
@@ -96,7 +106,13 @@ const CollaborationPage = () => {
                 
                 const question = await getQuestionInfo(questionId);
                 setQuestion(question);
+                setQuestionId(questionId);
                 setPartnerName(data.session.partner);
+                setPartnerId(data.session.partnerId);
+
+                const startTimeString = data.session.startTime;
+                const startTimeDate = new Date(startTimeString);
+                setStartTime(startTimeDate);
 
                 const partnerProfPic = data.session.partner_pic;
                 const partnerProfPicUrl = await getSignedImageURL(partnerProfPic);
@@ -178,8 +194,17 @@ const CollaborationPage = () => {
                         categories={question?.question_categories ?? []}
                         complexity={question?.question_complexity ?? ''}
                         popularity={question?.question_popularity ?? 0}
+                        
                     />
+                    <Box width="100%">  
+                        {sessionId === '' ? ( <div>Loading...</div> ) : (
+                            <ChatComponent
+                                sessionId={sessionId}
+                            />
+                        )}
                     </Box>
+                    </Box>
+                    
                     <Box width="100%">
                     {sessionId === '' ? (
                         <Box
@@ -195,6 +220,7 @@ const CollaborationPage = () => {
                         <CodeEditor 
                             sessionId={sessionId}
                             onConfirmSubmission={handleConfirmSubmit}
+                            onCodeChange={setCode}
                         />
                     )}
                     </Box>

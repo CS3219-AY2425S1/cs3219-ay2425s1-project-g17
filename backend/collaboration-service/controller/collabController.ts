@@ -20,6 +20,8 @@ const fetchRandomQuestion = async (difficulty: string, category: string, token: 
 const saveCollaborationRoom = async (user1Id: string, user2Id: string, questionId: any, category: string, difficulty: string, currLanguage: string = "javascript", javascript: string = "") => {
     try {
         const sessionId = uuidv4(); 
+        const startTime: Date = new Date(); 
+
         const sessionData = {
             user1Id,
             user2Id,
@@ -27,7 +29,8 @@ const saveCollaborationRoom = async (user1Id: string, user2Id: string, questionI
             category,
             difficulty,
             currLanguage,
-            javascript
+            javascript,
+            startTime
         };
         await redisClient.hset(`session:${sessionId}`, sessionData);
         console.log('Session saved to Redis:', sessionId);
@@ -80,11 +83,13 @@ const getSessionData = async (userId: string) => {
             const partner = await getParter(sessionData.user2Id);
             sessionData["partner"] = partner.username;
             sessionData["partner_pic"] = partner.profilePic;
+            sessionData["partnerId"] = sessionData.user2Id;
             return { sessionId: key, session: sessionData };
         } else if (sessionData.user2Id == userId) {
             const partner =  await getParter(sessionData.user1Id);
             sessionData["partner"] = partner.username;
             sessionData["partner_pic"] = partner.profilePic;
+            sessionData["partnerId"] = sessionData.user1Id;
             return { sessionId: key, session: sessionData };
         }
     }
