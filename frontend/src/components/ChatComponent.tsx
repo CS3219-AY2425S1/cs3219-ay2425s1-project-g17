@@ -20,12 +20,11 @@ const ChatComponent: React.FC<ChatProps> = ({
 }) => {
     const [message, setMessage] = useState('');
     const [chatLog, setChatLog] = useState<string[]>([]);
-    const username = localStorage.getItem('username');
+    const username = localStorage.getItem('username') || '';
+    const userId = localStorage.getItem('id') || '';
 
     useEffect(() => {
         socket.on('receiveMessage', ({ message, username }) => {
-            console.log("H");
-            console.log(sessionId);
             setChatLog((prevLog) => [...prevLog, `${username}: ${message}`]);
         });
 
@@ -35,12 +34,12 @@ const ChatComponent: React.FC<ChatProps> = ({
     }, []);
 
     const joinSession = async () => {
-        socket.emit('joinSession', { userId: username, sessionId });
+        socket.emit('joinSession', { userId: userId, sessionId });
     };
 
     const sendMessage = () => {
         if (sessionId && message) {
-            socket.emit('sendMessage', { sessionId, message, username });
+            socket.emit('sendMessage', { sessionId, message, userId, username });
             setChatLog((prevLog) => [...prevLog, `You: ${message}`]);
             setMessage('');
         }
