@@ -11,14 +11,21 @@ import {
 
 const socket = io("http://localhost:4005");  // Update URL if different
 
-const ChatComponent: React.FC = () => {
-    const sessionId = 2; //Update logic to ensure sessionId is same as collaboration session
+interface ChatProps {
+    sessionId: string;
+}
+
+const ChatComponent: React.FC<ChatProps> = ({
+    sessionId
+}) => {
     const [message, setMessage] = useState('');
     const [chatLog, setChatLog] = useState<string[]>([]);
     const username = localStorage.getItem('username');
 
     useEffect(() => {
         socket.on('receiveMessage', ({ message, username }) => {
+            console.log("H");
+            console.log(sessionId);
             setChatLog((prevLog) => [...prevLog, `${username}: ${message}`]);
         });
 

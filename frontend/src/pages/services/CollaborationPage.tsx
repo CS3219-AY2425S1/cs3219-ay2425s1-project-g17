@@ -180,15 +180,17 @@ const CollaborationPage = () => {
                         popularity={question?.question_popularity ?? 0}
                         
                     />
-                        <Box width="100%">
-                            <ChatComponent/>
-                        </Box>
+                    <Box width="100%">  
+                        {sessionId === '' ? ( <div>Loading...</div> ) : (
+                            <ChatComponent
+                                sessionId={sessionId}
+                            />
+                        )}
+                    </Box>
                     </Box>
                     
                     <Box width="100%">
-                    {sessionId === '' ? (
-                        <div>Loading...</div>
-                    ) : (
+                    {sessionId === '' ? ( <div>Loading...</div> ) : (
                         <CodeEditor 
                             sessionId={sessionId}
                             onConfirmSubmission={handleConfirmSubmit}
