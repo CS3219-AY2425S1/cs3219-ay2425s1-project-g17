@@ -4,7 +4,7 @@ import { HistoryModel, QuestionCountModel } from '../model/historyModel';
 export const getHistory = async (req: Request, res: Response) => {
     try {
         const userId = req.params.id;
-        const history = await HistoryModel.find({ $or: [{ userId: userId }, { partnerId: userId }] }, {}, { sort: { startTime: -1 } });
+        const history = await HistoryModel.find({ userId: userId }, {}, { sort: { startTime: -1 } });
         res.status(200).json({
             message: 'Found history',
             data: history.map(formatHistoryResponse)
