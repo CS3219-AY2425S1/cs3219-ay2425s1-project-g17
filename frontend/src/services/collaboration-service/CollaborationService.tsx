@@ -11,8 +11,14 @@ const questionApi = axios.create({
     timeout: 5000,
 });
 
+const historyApi = axios.create({
+    baseURL: "http://localhost:4004/history",
+    timeout: 5000,
+});
+
 applyInterceptors(collabApi);
 applyInterceptors(questionApi);
+applyInterceptors(historyApi);
 
 function handleAxiosError(error: any) {
     console.error('An error occurred:', error.message);
@@ -79,11 +85,23 @@ async function cacheCode(sessionId: string, code: string, language: string, newL
     }
 }
 
+// Function to cache the code
+async function createHistory(userId: string, partnerId: string, questionId: string, startTime: Date, attempt: string) {
+    try {
+        const response = await historyApi.post(`/`, {userId, partnerId ,questionId, startTime, attempt});
+        return response.data;
+    } catch (error) {
+        handleAxiosError(error);
+    }
+}
+// Function to store in history service
+
 export {
     getSessionInfo,
     getQuestionInfo,
     shuffleQuestion,
     disconnectUser,
     getCacheCode,
-    cacheCode
+    cacheCode,
+    createHistory
 }
