@@ -88,7 +88,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
         const hasBoilerplate = editor.getValue().includes(currentBoilerplate.trim());
 
         // Add boilerplate only if it doesn’t already exist and no cached code
-        if (!hasBoilerplate && !cachedCode) {
+        if (!hasBoilerplate && !cachedCode && !editor.getValue()) {
             editor.setValue(currentBoilerplate);
         } else if (cachedCode) {
             setCode(cachedCode);

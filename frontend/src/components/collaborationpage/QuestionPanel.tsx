@@ -45,7 +45,7 @@ const QuestionPanel: React.FC<QuestionPanelProps>  = ({
                 bgcolor: 'background.paper',
                 boxShadow: 24,
                 p: 2,
-                height: '70vh',
+                height: '100%',
                 overflowY: 'auto',
             }}
         >
