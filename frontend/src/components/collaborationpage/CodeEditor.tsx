@@ -26,11 +26,13 @@ import Popup from './Popup';
 interface CodeEditorProps {
     sessionId: string;
     onConfirmSubmission: () => void;
+    onCodeChange: (code: string) => void;
 }
 
 const CodeEditor: React.FC<CodeEditorProps> = ({
     sessionId,
-    onConfirmSubmission
+    onConfirmSubmission,
+    onCodeChange
 }) => {
     const [language, setLanguage] = useState<string>('javascript');
     const [code, setCode] = useState<string>('');
@@ -70,6 +72,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
 
         editor.onDidChangeModelContent(async () => {
             setCode(editor.getValue());
+            onCodeChange(editor.getValue());
         });
     }
 
