@@ -23,4 +23,14 @@ async function getSessionMessages(sessionId: string) {
     }
 }
 
-export { getSessionMessages }
+// Function to delete session messages
+async function deleteSessionMessages(sessionId: string) {
+    try {
+        const response = await chatApi.delete(`/${sessionId}`);
+        return response.data;
+    } catch (error) {
+        handleAxiosError(error);
+    }
+}
+
+export { getSessionMessages, deleteSessionMessages }

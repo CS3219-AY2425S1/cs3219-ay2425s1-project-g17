@@ -12,6 +12,7 @@ import { getSignedImageURL } from '../../services/user-service/UserService';
 import socket from "../../context/socket"
 import { useNavigate } from 'react-router-dom';
 import Popup from '../../components/collaborationpage/Popup';
+import { deleteSessionMessages } from "../../services/chat-service/ChatService"
 
 interface ExampleProps {
     id: number;
@@ -55,11 +56,11 @@ const CollaborationPage = () => {
         setQuestion(question); 
     };
 
-    // Function for user that click disconnect on their own
     const handleConfirmDisconnect = async () => {
         socket.emit("disconnectUser", {sessionId, userId});
         try {
             await disconnectUser(sessionId);
+            await deleteSessionMessages(sessionId);
             setTimeout(() => navigate('/dashboard'), 200);
         } catch (error) {
             console.error("Failed to disconnect:", error);
@@ -70,6 +71,7 @@ const CollaborationPage = () => {
         try {
             socket.emit("disconnectUser", {sessionId, userId});
             await disconnectUser(sessionId);
+            await deleteSessionMessages(sessionId);
             setTimeout(() => navigate('/dashboard'), 200);
         } catch (error) {
             console.error("Failed to submit:", error);

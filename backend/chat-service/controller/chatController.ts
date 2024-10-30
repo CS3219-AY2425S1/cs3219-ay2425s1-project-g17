@@ -8,6 +8,12 @@ export const getSessionMessages = async (req: Request, res: Response) => {
     res.status(200).json(sessionMessages);
 }
 
+export const deleteSessionMessages = async (req: Request, res: Response) => {
+    const sessionId = req.params.id;
+    await redisClient.del(sessionId);
+    res.status(200).json({"message": "successfully deleted"});
+}
+
 const saveMessage = async (message: string, sessionId: string, senderId: string, senderName: string) => {
     const messages = await redisClient.hgetall(sessionId);
     const msgId = Object.keys(messages).length + 1;
