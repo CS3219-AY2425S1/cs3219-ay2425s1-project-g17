@@ -6,8 +6,8 @@ import {
     Button,
     TextField,
     Typography,
-    CircularProgress,
 } from '@mui/material';
+import { getSessionMessages } from "../services/chat-service/ChatService"
 
 const socket = io("http://localhost:4005");  // Update URL if different
 
@@ -46,8 +46,31 @@ const ChatComponent: React.FC<ChatProps> = ({
     };
 
     useEffect(() => {
+        async function fetchSessionMessages() {
+            try {
+                const messages = await getSessionMessages(sessionId);
+                const chatLog = []; 
+                for (const value of Object.values(messages)) {
+                    const { senderId, senderName, message } = JSON.parse(value as string);
+                    console.log(`SenderId: ${senderId}, SenderName: ${senderName}, Message: ${message}`);
+                    if (senderId == userId) {
+                        chatLog.push(`You: ${message}`)
+                    } else {
+                        chatLog.push(`${senderName}: ${message}`);
+                    }
+                }
+                setChatLog(chatLog);
+            } catch (error) {
+                console.error('Failed to fetch messages:', error);
+            }
+        }
         joinSession();
+        if (chatLog.length == 0) {
+            fetchSessionMessages();
+        }
       }, []);
+
+      
     return (
         <Paper elevation={4} sx={{ padding: "20px", borderRadius: "10px", margin: "auto" }}>
             <Typography variant="h5" mb="20px" color="#9AC143">
