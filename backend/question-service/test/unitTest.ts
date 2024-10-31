@@ -208,7 +208,7 @@ describe('Question Service Unit Tests', () => {
                 .set('Authorization', `Bearer ${token}`);
 
             expect(response.status).to.equal(200);
-            expect(response.body).to.have.property('question_id', 1);
+            expect(response.body).to.have.property('question_id', '111111111');
         });
 
         it('should return 400 if difficulty or category is missing', async () => {
