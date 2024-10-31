@@ -19,6 +19,13 @@ const io = new Server(httpServer, {
     }
 });
 
+app.get('/', (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    console.log("Sending Greetings!");
+    res.json({
+      message: "Hello World from chat-service"
+    });
+  });
+
 handleSocketEvents(io);
 
 export { httpServer };

@@ -54,7 +54,6 @@ io.on("connection", (socket) => {
   httpServer.removeAllListeners("upgrade");
 
   httpServer.on("upgrade", (req, socket, head) => {
-    console.log(req.url)
     if (req.url == "/") {
       wss.handleUpgrade(req, socket, head, (ws) => {
         wss.emit("connection", ws, req);
