@@ -1,5 +1,6 @@
 import { DIFFICULTY } from '../model/matchModel';
 import { redisClient } from '../redisClient'; // Import Redis client
+import { generateToken } from "../utils/tokenGenerator"
 import axios from 'axios';
 
 const api = axios.create({
@@ -167,7 +168,12 @@ export function handleAxiosError(error: any) {
 
 export async function sendDetailsToCollab(user1Id: string, user2Id: string, category: string, difficulty: string) {
   try {
-      await api.post('/', {user1Id, user2Id, category, difficulty});
+      const bearerToken = generateToken(user1Id);
+      await api.post('/', {user1Id, user2Id, category, difficulty}, {
+        headers: {
+          Authorization: `Bearer ${bearerToken}`,
+        },
+      });
   } catch (error) {
       throw new Error(handleAxiosError(error));
   }

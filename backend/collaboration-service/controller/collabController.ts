@@ -17,10 +17,12 @@ const fetchRandomQuestion = async (difficulty: string, category: string, token: 
     }
 };
 
-const saveCollaborationRoom = async (user1Id: string, user2Id: string, questionId: any, category: string, difficulty: string, currLanguage: string = "javascript", javascript: string = "") => {
+const saveCollaborationRoom = async (user1Id: string, user2Id: string, questionId: any, category: string, difficulty: string) => {
     try {
         const sessionId = uuidv4(); 
         const startTime: Date = new Date(); 
+        const currLanguage: string = "javascript";
+        const javascript: string = "";
 
         const sessionData = {
             user1Id,
@@ -96,38 +98,47 @@ const getSessionData = async (userId: string) => {
 }
 
 export const getCollaborationRoom = async (req: Request, res: Response) => {
-    const userId = req.params.id;
-    const sessionData = await getSessionData(userId)
-    res.status(200).json(sessionData);
+    try {
+        const userId = req.params.id;
+        const sessionData = await getSessionData(userId)
+        res.status(200).json(sessionData);
+    } catch (error) {
+        console.error('Error getting collaboration room', error);
+        res.status(400).json({ error: (error as Error).message });
+    }
 }
 
 export const shuffleQuestion = async (req: Request, res: Response) => {
-    const userId = req.params.id;
-    const sessionData = await getSessionData(userId);
-    const sessionId = sessionData?.sessionId;
+    try {
+        const userId = req.params.id;
+        const sessionData = await getSessionData(userId);
+        const sessionId = sessionData?.sessionId;
 
-    if (!sessionId) {
-        res.status(440).json("Session Expired")
-        return
+        if (!sessionId) {
+            res.status(440).json("Session Expired")
+            return
+        }
+
+        let newQuestionId = sessionData?.session.questionId;
+        let newQuestion;
+
+        const questionId = sessionData?.session.questionId;
+        const category = sessionData?.session.category || "Algorithms";
+        const difficulty = sessionData?.session.difficulty || "EASY";
+        const bearerToken = generateToken(userId);
+
+        while (newQuestionId == questionId) {
+            newQuestion = await fetchRandomQuestion(difficulty, category, bearerToken);
+            newQuestionId = newQuestion._id;
+        }
+
+        await redisClient.hset(sessionId, 'questionId', newQuestionId);
+        res.status(200).json({"question_id": newQuestionId});
+    } catch (error) {
+        console.error('Error shuffling question', error);
+        res.status(400).json({ error: (error as Error).message });
     }
-
-    let newQuestionId = sessionData?.session.questionId;
-    let newQuestion;
-
-    const questionId = sessionData?.session.questionId;
-    const category = sessionData?.session.category || "Algorithms";
-    const difficulty = sessionData?.session.difficulty || "EASY";
-    const bearerToken = generateToken(userId);
-
-    while (newQuestionId == questionId) {
-        newQuestion = await fetchRandomQuestion(difficulty, category, bearerToken);
-        newQuestionId = newQuestion._id;
-    }
-
-    await redisClient.hset(sessionId, 'questionId', newQuestionId);
-    res.status(200).json({"question_id": newQuestionId});
 }
-
 
 export const disconnectUser = async (req: Request, res: Response) => {
     try {
@@ -145,13 +156,18 @@ export const disconnectUser = async (req: Request, res: Response) => {
 };
 
 export const getCacheCode = async (req: Request, res: Response) => {
-    const sessionId = req.params.id;
-    let language = req.params.language;
-    const sessionData = await redisClient.hgetall(sessionId);
-    if (language == "noLanguage") {
-        language = sessionData["currLanguage"];
+    try {
+        const sessionId = req.params.id;
+        let language = req.params.language;
+        const sessionData = await redisClient.hgetall(sessionId);
+        if (language == "noLanguage") {
+            language = sessionData["currLanguage"];
+        }
+        res.status(200).json({"code": sessionData[language], "currLanguage": sessionData["currLanguage"]});
+    } catch (error) {
+        console.error('Error getting cache', error);
+        res.status(400).json({ error: (error as Error).message });
     }
-    res.status(200).json({"code": sessionData[language], "currLanguage": sessionData["currLanguage"]});
 }
 
 export const cacheCode = async (req: Request, res: Response) => {
