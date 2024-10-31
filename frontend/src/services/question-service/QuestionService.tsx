@@ -46,6 +46,16 @@ async function getAllQuestions() {
     }
 }
 
+// Function to get one question from the API by id
+async function getQuestionById(id: string) {
+    try {
+        const response = await api.get(`/${id}`);
+        return response.data;
+    } catch (error) {
+        handleAxiosError(error);
+    }
+}
+
 // Function to add question to the API
 async function addQuestion(title: string, description: string, example: ExampleProps[], categories: string[], complexity: string, popularity: number) {
     try {
@@ -200,6 +210,7 @@ async function uploadJson(formData: FormData) {
 export {
     getFilteredQuestions,
     getAllQuestions,
+    getQuestionById,
     addQuestion,
     updateQuestion,
     deleteQuestion,

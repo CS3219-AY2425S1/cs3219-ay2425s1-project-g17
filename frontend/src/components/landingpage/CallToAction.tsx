@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Container, Typography, Box, Paper } from '@mui/material';
+import { Button, Container, Typography, Paper } from '@mui/material';
 import { motion } from 'framer-motion';
 
 const CallToAction: React.FC = () => {

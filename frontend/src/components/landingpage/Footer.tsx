@@ -38,16 +38,16 @@ const Footer: React.FC = () => {
 
                 <Box sx={{ display: 'flex', gap: 1 }}>
                     <IconButton color="inherit" aria-label="Facebook">
-                        <FacebookIcon />
+                        <FacebookIcon fontSize='small'/>
                     </IconButton>
                     <IconButton color="inherit" aria-label="Twitter">
-                        <TwitterIcon />
+                        <TwitterIcon fontSize='small'/>
                     </IconButton>
                     <IconButton color="inherit" aria-label="Instagram">
-                        <InstagramIcon />
+                        <InstagramIcon fontSize='small'/>
                     </IconButton>
                     <IconButton color="inherit" aria-label="LinkedIn">
-                        <LinkedInIcon />
+                        <LinkedInIcon fontSize='small'/>
                     </IconButton>
                 </Box>
             </Box>

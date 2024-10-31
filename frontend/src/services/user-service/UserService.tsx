@@ -78,6 +78,20 @@ async function getUserDetails(userid: string, token: string) {
     }
 }
 
+async function getUsernameById(userid: string, token: string) {
+    try {
+        const response = await api.get(`/users/username/${userid}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        throw new Error(handleAxiosError(error));
+    }
+}
+
+
 async function updateUsername(userid: string, token: string, username: string) {
     try {
         const response = await api.patch(`/users/${userid}`, 
@@ -190,6 +204,7 @@ export { createUser,
     updateUsername,
     updateEmail,
     getUserDetails,
+    getUsernameById,
     updatePassword,
     deleteUser,
     updateProfilePicture,
