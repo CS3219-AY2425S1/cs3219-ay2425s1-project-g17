@@ -8,7 +8,7 @@ import { AuthProvider, AuthContext } from "./context/AuthContext";
 function App() {
   const themeOptions: ThemeOptions = {
     typography: {
-      fontFamily: 'Roboto, sans-serif, Arial, JetBrains Mono',
+      fontFamily: 'Open Sans, FontAwesome, Roboto, sans-serif, Arial, JetBrains Mono',
     },
     palette: {
       mode: 'dark',
@@ -42,7 +42,7 @@ function App() {
                 return null;
               }
 
-              const { isAuthenticated } = context; 
+              const { isAuthenticated } = context;
               return isAuthenticated ? <AuthenticatedRoutes /> : <PublicRoutes />;
             }}
           </AuthContext.Consumer>
@@ -51,5 +51,7 @@ function App() {
     </ThemeProvider>
   );
 }
-
 export default App;
+
+
+  // #9AC143 green

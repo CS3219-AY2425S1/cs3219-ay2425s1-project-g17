@@ -1,15 +1,17 @@
 import React, { useContext } from "react";
-import { Route, Routes, Navigate } from "react-router-dom";
+import { Route, Routes, Navigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 
 import Navbar from "../components/AuthenticatedNavbar";
-import QuestionPage from "../pages/services/QuestionPage";
 import NotFoundPage from "../pages/miscellaneous/NotFoundPage";
 import ProfilePage from "../pages/miscellaneous/ProfilePage";
+import DashboardPage from "../pages/DashboardPage";
+import CollaborationPage from "../pages/services/CollaborationPage";
+import Footer from "../components/landingpage/Footer";
 
-// TODO: Add collaboration and matching pages here
 export const AuthenticatedRoutes = () => {
     const authContext = useContext(AuthContext);
+    const location = useLocation();
 
     if (!authContext) {
         throw new Error("AuthContext must be used within an AuthProvider");
@@ -21,16 +23,20 @@ export const AuthenticatedRoutes = () => {
         return <Navigate to="/" replace />;
     }
 
+    const isCollabPage = location.pathname === '/collaboration';
+
     return (
         <>
-            <Navbar />
+            {!isCollabPage && <Navbar />}
             <Routes>
-                <Route path="/" element={<QuestionPage />} />
-                <Route path="/dashboard" element={<QuestionPage />} />
+                <Route path="/" element={<DashboardPage />} />
+                <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/collaboration" element={<CollaborationPage />} />
                 <Route path="/login"/>
                 <Route path="*" element={<NotFoundPage />} />
             </Routes>
+            {!isCollabPage && <Footer />}
         </>
     );
 };
