@@ -2,7 +2,7 @@ import axios from 'axios';
 import applyInterceptors from '../middleware/Interceptor';
 
 const api = axios.create({
-    baseURL: "http://localhost:4002",
+    baseURL: process.env.REACT_APP_MATCHING_URI ?? "http://localhost:4002",
     timeout: 5000,
 });
 

@@ -16,7 +16,7 @@ COPY . .
 # Expose the port the app runs on
 EXPOSE 4002
 
-# Build the question-service
+# Build the matching-service
 RUN npm run build
 
 # Start the application

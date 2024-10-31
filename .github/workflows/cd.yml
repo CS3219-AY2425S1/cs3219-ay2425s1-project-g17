@@ -1,0 +1,126 @@
+name: CD Pipeline
+
+on: 
+  workflow_dispatch: {}
+  push:
+    branches:
+      # - main
+      - MS6
+      - devops/cd
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+        strategy:
+          matrix:
+            include:
+              - name: Deploy Frontend
+                context: ./frontend
+                dockerfile: Dockerfile.prod
+                repository: peerprep-frontend
+                task_def_name: frontend
+                container_name: frontend
+                service_name: frontend
+              - name: Deploy Question Service
+                context: ./backend/question-service
+                dockerfile: Dockerfile
+                repository: peerprep-question
+                task_def_name: question
+                container_name: question
+                service_name: question
+              - name: Deploy User Service
+                context: ./backend/user-service
+                dockerfile: Dockerfile
+                repository: peerprep-user
+                task_def_name: user
+                container_name: user
+                service_name: user
+              - name: Deploy Matching Service
+                context: ./backend/matching-service
+                dockerfile: Dockerfile
+                repository: peerprep-matching
+                task_def_name: matching
+                container_name: matching
+                service_name: matching
+              - name: Deploy Collaboration Service
+                context: ./backend/collaboration-service
+                dockerfile: Dockerfile
+                repository: peerprep-collab
+                task_def_name: collaboration
+                container_name: collaboration
+                service_name: collaboration
+              - name: Deploy History Service
+                context: ./backend/history-service
+                dockerfile: Dockerfile
+                repository: peerprep-history
+                task_def_name: history
+                container_name: history
+                service_name: history
+              - name: Deploy Chat Service
+                context: ./backend/chat-service
+                dockerfile: Dockerfile
+                repository: peerprep-chat
+                task_def_name: chat
+                container_name: chat
+                service_name: chat
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+            
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v3
+
+            - name: Login to Docker Hub
+              uses: docker/login-action@v3
+              with:
+                username: ${{ secrets.DOCKERHUB_USERNAME }}
+                password: ${{ secrets.DOCKERHUB_TOKEN }}  
+            
+            - name: Build and push
+              uses: docker/build-push-action@v6
+              with:
+                context: ${{ matrix.context }}
+                file: ${{ matrix.context }}/${{ matrix.dockerfile }}
+                push: true
+                tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.repository }}:latest
+
+            - name: Echo images to output
+              id: echo-image
+              env:
+                IMAGE_TAG: latest
+              run: |
+                echo "image=${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.repository }}:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+            - name: Configure AWS credentials
+              uses: aws-actions/configure-aws-credentials@v4
+              with:
+                aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                aws-region: ap-southeast-1
+
+            - name: Download task def
+              run: |
+                aws ecs describe-task-definition \
+                --task-definition ${{ matrix.task_def_name }} \
+                --query taskDefinition \
+                --output json > taskDefinition.json
+              
+            - name: Fill in the new image ID in the Amazon ECS task definition
+              id: task-def
+              uses: aws-actions/amazon-ecs-render-task-definition@v1
+              with:
+                task-definition: taskDefinition.json
+                container-name: ${{ matrix.container_name }}
+                image: ${{ steps.echo-image.outputs.image }}
+        
+            - name: Deploy Amazon ECS task definition
+              uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+              env:
+                ECS_SERVICE: ${{ matrix.service_name }}
+                ECS_CLUSTER: PeerPrep
+              with:
+                task-definition: ${{ steps.task-def.outputs.task-definition }}
+                service: ${{ env.ECS_SERVICE }}
+                cluster: ${{ env.ECS_CLUSTER }}
+                wait-for-service-stability: true

@@ -12,6 +12,13 @@ app.use(bodyParser.json());
 
 app.use('/questions', questionRoutes);
 
+app.get('/', (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  console.log("Sending Greetings!");
+  res.json({
+    message: "Hello World from question-service"
+  });
+});
+
 // MongoDB connection
 const connectToMongoDB = async (uri: string, type: string) => {
   try {
