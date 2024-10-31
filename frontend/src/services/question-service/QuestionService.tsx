@@ -154,7 +154,7 @@ async function getFilteredQuestions(
     }
 }
 
-async function sortQuestion(questions: QuestionProps[], sortDirection: String, sortField: String): Promise<QuestionProps[]> {
+async function sortQuestion(questions: QuestionProps[], sortDirection: string, sortField: string): Promise<QuestionProps[]> {
     const complexityOrder: { [key: string]: number } = {
         EASY: 1,
         MEDIUM: 2,

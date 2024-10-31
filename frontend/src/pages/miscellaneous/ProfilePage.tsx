@@ -145,7 +145,7 @@ export default function ProfilePage() {
             }
         };
 
-        return validatePassword(newPassword);;
+        return validatePassword(newPassword);
     };
 
     const handleSaveClick = async (field: 'username' | 'email' | 'password') => {

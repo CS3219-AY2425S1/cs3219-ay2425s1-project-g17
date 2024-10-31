@@ -117,31 +117,25 @@ const AttemptedProgress: React.FC<QuestionsProps> = ({ questions }) => {
         { easy: 0, medium: 0, hard: 0 }
     );
 
-    const attempts = historyData?.reduce(
-        (acc, item) => {
-            const uniqueTitles = new Set(historyData.map(entry => entry.title));
-            uniqueTitles.forEach(title => {
-                const uniqueItem = historyData.find(entry => entry.title === title);
-                if (uniqueItem) {
-                    switch (uniqueItem.complexity) {
-                        case 'EASY':
-                            acc.easy += 1;
-                            break;
-                        case 'MEDIUM':
-                            acc.medium += 1;
-                            break;
-                        case 'HARD':
-                            acc.hard += 1;
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            });
-            return acc;
-        },
-        { easy: 0, medium: 0, hard: 0 }
-    );
+    const attempts = historyData?.reduce((acc, item) => {
+        if (!acc.uniqueTitles.has(item.title)) {
+            acc.uniqueTitles.add(item.title);
+            switch (item.complexity) {
+                case 'EASY':
+                    acc.easy += 1;
+                    break;
+                case 'MEDIUM':
+                    acc.medium += 1;
+                    break;
+                case 'HARD':
+                    acc.hard += 1;
+                    break;
+                default:
+                    break;
+            }
+        }
+        return acc;
+    }, { easy: 0, medium: 0, hard: 0, uniqueTitles: new Set() });
 
     return (
         <Box
