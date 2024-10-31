@@ -5,7 +5,7 @@ on:
   push:
     branches:
       # - main
-      - backend/question-service
+      - MS6
       - devops/ci
 
 env:

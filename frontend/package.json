@@ -36,7 +36,8 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "react-scripts test --watchAll",
+    "lint": "eslint src/**/*.{ts,tsx}",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {

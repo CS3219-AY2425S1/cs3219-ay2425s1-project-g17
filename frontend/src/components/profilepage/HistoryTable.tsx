@@ -56,7 +56,6 @@ interface HistoryTableProps {
 }
 
 const HistoryTable: React.FC<HistoryTableProps> = ({ userId, token }) => {
-    const [currentTime, setCurrentTime] = React.useState(new Date());
     const [selectedEntry, setSelectedEntry] = React.useState<HistoryEntry | null>(null);
     const [modalOpen, setModalOpen] = React.useState(false);
     const [historyData, setHistoryData] = React.useState<HistoryEntry[]>([]);
@@ -121,12 +120,6 @@ const HistoryTable: React.FC<HistoryTableProps> = ({ userId, token }) => {
             }
         };
         fetchData();
-    
-        const timer = setInterval(() => {
-            setCurrentTime(new Date());
-        }, 60000);
-
-        return () => clearInterval(timer);
     }, [userId, processBackendData]);
 
     const handleChangePage = (event: unknown, newPage: number) => {

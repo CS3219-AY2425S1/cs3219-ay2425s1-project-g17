@@ -1,0 +1,48 @@
+name: Backend Chat Service CI
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches:
+      # - main
+      - MS6
+      - devops/ci
+
+env:
+  MONGO_URI_TEST: ${{ secrets.MONGO_URI_TEST }}
+  JWT_SECRET: ${{ secrets.JWT_SECRET }}
+
+jobs:
+  backend-chat-service-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: './backend/chat-service/package-lock.json'
+
+    # Install dependencies
+    - name: Install Backend Chat Service Dependencies
+      working-directory: ./backend/chat-service
+      run: npm ci
+
+    # Compile code
+    - name: Compile Backend Chat Service Code
+      working-directory: ./backend/chat-service
+      run: npm run build
+
+    # Run chat service unit tests
+    - name: Run Backend Chat Service Unit Tests
+      working-directory: ./backend/chat-service
+      run: npm run unit
+
+    # Run chat service integration tests
+    - name: Run Backend Chat Service Integration Tests
+      working-directory: ./backend/chat-service
+      run: npm run integration
