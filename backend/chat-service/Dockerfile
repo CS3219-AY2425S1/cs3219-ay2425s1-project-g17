@@ -16,7 +16,7 @@ COPY . .
 # Expose the port the app runs on
 EXPOSE 4005
 
-# Build the question-service
+# Build the chat-service
 RUN npm run build
 
 # Start the application

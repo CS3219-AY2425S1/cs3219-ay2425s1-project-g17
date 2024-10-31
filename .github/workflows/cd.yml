@@ -5,6 +5,7 @@ on:
   push:
     branches:
       # - main
+      - MS6
       - devops/cd
 
 jobs:
@@ -41,20 +42,27 @@ jobs:
                 task_def_name: matching
                 container_name: matching
                 service_name: matching
-              # - name: Deploy Collaboration Service
-              #   context: ./backend/collaboration-service
-              #   dockerfile: Dockerfile
-              #   repository: peerprep-collab
-              #   task_def_name: collaboration
-              #   container_name: collaboration
-              #   service_name: collaboration
-              # - name: Deploy History Service
-              #   context: ./backend/history-service
-              #   dockerfile: Dockerfile
-              #   repository: peerprep-history
-              #   task_def_name: history
-              #   container_name: history
-              #   service_name: history
+              - name: Deploy Collaboration Service
+                context: ./backend/collaboration-service
+                dockerfile: Dockerfile
+                repository: peerprep-collab
+                task_def_name: collaboration
+                container_name: collaboration
+                service_name: collaboration
+              - name: Deploy History Service
+                context: ./backend/history-service
+                dockerfile: Dockerfile
+                repository: peerprep-history
+                task_def_name: history
+                container_name: history
+                service_name: history
+              - name: Deploy Chat Service
+                context: ./backend/chat-service
+                dockerfile: Dockerfile
+                repository: peerprep-chat
+                task_def_name: chat
+                container_name: chat
+                service_name: chat
 
         steps:
             - name: Checkout repository
