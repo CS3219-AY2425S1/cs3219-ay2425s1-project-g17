@@ -3,6 +3,7 @@ import axios from 'axios';
 import { generateToken } from "../utils/tokenGenerator"
 import { redisClient } from "../redisClient"
 import { v4 as uuidv4 } from 'uuid';
+import * as Y from "yjs"
 
 const fetchRandomQuestion = async (difficulty: string, category: string, token: string) => {
     try {
@@ -17,12 +18,25 @@ const fetchRandomQuestion = async (difficulty: string, category: string, token: 
     }
 };
 
+const createDefaultYJSDoc = async () => {
+    const defaultJsCode = `function solution() {\n\t// Your code here\n}`;
+    const defaultTextName = "monaco";
+
+    const templateDocument = new Y.Doc();
+    const templateText = templateDocument.getText(defaultTextName);
+    templateText.insert(0, defaultJsCode);
+    const buffer = Buffer.from(Y.encodeStateAsUpdate(templateDocument));
+    const base64 = buffer.toString("base64");
+    return base64;
+}
+
 const saveCollaborationRoom = async (user1Id: string, user2Id: string, questionId: any, category: string, difficulty: string) => {
     try {
         const sessionId = uuidv4(); 
         const startTime: Date = new Date(); 
         const currLanguage: string = "javascript";
         const javascript: string = "";
+        const template: string = await createDefaultYJSDoc();
 
         const sessionData = {
             user1Id,
@@ -32,7 +46,8 @@ const saveCollaborationRoom = async (user1Id: string, user2Id: string, questionI
             difficulty,
             currLanguage,
             javascript,
-            startTime
+            startTime,
+            template
         };
         await redisClient.hset(`session:${sessionId}`, sessionData);
         console.log('Session saved to Redis:', sessionId);
