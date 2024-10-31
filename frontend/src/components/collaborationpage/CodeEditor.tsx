@@ -27,12 +27,14 @@ import { executeCode } from '../../services/codeexecution-service/CodeExecutionS
 
 interface CodeEditorProps {
     sessionId: string;
+    template: string;
     onConfirmSubmission: () => void;
     onCodeChange: (code: string) => void;
 }
 
 const CodeEditor: React.FC<CodeEditorProps> = ({
     sessionId,
+    template,
     onConfirmSubmission,
     onCodeChange
 }) => {
@@ -63,6 +65,9 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
             signaling: ["ws://localhost:4003"]
         });
         const type = doc.getText("monaco");
+        const decodedTemplate = base64ToUint8Array(template);
+        Y.applyUpdate(doc, decodedTemplate);
+
         const binding = new MonacoBinding(
             type,
             editorRef.current.getModel() as monaco.editor.ITextModel,
@@ -102,6 +107,16 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
             setCode(editor.getValue());
             onCodeChange(editor.getValue());
         });
+    }
+
+    const base64ToUint8Array = (base64: string) => {
+        const binaryString = atob(base64);
+        const len = binaryString.length;
+        const bytes = new Uint8Array(len);
+        for (let i = 0; i < len; i++) {
+            bytes[i] = binaryString.charCodeAt(i);
+        }
+        return bytes;
     }
 
     const handleSubmitCode = () => {

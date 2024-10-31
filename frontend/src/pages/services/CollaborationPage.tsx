@@ -40,6 +40,7 @@ const CollaborationPage = () => {
     const [partnerProfPicUrl, setPartnerProfPicUrl] = React.useState('');
     const [ownProfPicUrl, setOwnProfPicUrl] = React.useState('');
     const [sessionId, setSessionId] = React.useState('');
+    const [template, setTemplate] = React.useState('');
     const [partnerId, setPartnerId] = React.useState('');
     const [questionId, setQuestionId] = React.useState('');
     const [startTime, setStartTime] = React.useState<Date>(new Date());
@@ -112,6 +113,7 @@ const CollaborationPage = () => {
                 setQuestionId(questionId);
                 setPartnerName(data.session.partner);
                 setPartnerId(data.session.partnerId);
+                setTemplate(data.session.template);
 
                 const startTimeString = data.session.startTime;
                 const startTimeDate = new Date(startTimeString);
@@ -240,7 +242,7 @@ const CollaborationPage = () => {
 
                     {/* Code Editor */}
                     <Box width="100%">
-                        {sessionId === '' ? (
+                    {sessionId === '' || template === '' ? (
                             <Box
                                 sx={{
                                     display: 'flex',
@@ -253,6 +255,7 @@ const CollaborationPage = () => {
                         ) : (
                             <CodeEditor
                                 sessionId={sessionId}
+                                template={template}
                                 onConfirmSubmission={handleConfirmSubmit}
                                 onCodeChange={setCode}
                             />
