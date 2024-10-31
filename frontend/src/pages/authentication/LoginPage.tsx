@@ -38,7 +38,7 @@ export default function SignIn() {
                 if (verified) {
                     setLoading(true);
                     setTimeout(() => {
-                        login(response?.data.username as string, response?.data.email as string, token, response?.data.id as string, response?.data.profilePic as string)
+                        login(response?.data.username as string, response?.data.email as string, token, response?.data.id as string, response?.data.profilePic as string, response?.data.isAdmin as string)
                         window.location.href = '/dashboard';
                     }, 1000);
                 } else {

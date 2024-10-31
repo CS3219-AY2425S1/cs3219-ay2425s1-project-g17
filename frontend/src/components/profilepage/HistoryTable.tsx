@@ -127,7 +127,7 @@ const HistoryTable: React.FC<HistoryTableProps> = ({ userId, token }) => {
         }, 60000);
 
         return () => clearInterval(timer);
-    }, []);
+    }, [userId, processBackendData]);
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);

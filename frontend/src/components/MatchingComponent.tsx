@@ -81,7 +81,7 @@ const MatchingComponent = () => {
             }
         }
         fetchSessionInfo();
-    }, []);
+    }, [userId]);
 
     const handleOpen = () => setOpen(true);
     const handleClose = () => {

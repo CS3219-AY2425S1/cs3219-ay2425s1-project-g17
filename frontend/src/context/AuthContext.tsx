@@ -4,7 +4,7 @@ import { verifyToken, getUserDetails } from '../services/user-service/UserServic
 interface AuthContextType {
     token: string | null;
     isAuthenticated: boolean;
-    login: (username: string, email: string, newToken: string, id: string, profileImage: string) => void;
+    login: (username: string, email: string, newToken: string, id: string, profileImage: string, isAdmin: string) => void;
     logout: () => void;
     updateUserData: () => Promise<void>;
 }
@@ -34,13 +34,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         verifyAuthToken();
     }, [token]);
 
-    const login = (username: string, email: string, newToken: string, id: string, profileImage: string) => {
+    const login = (username: string, email: string, newToken: string, id: string, profileImage: string, isAdmin: string) => {
         setToken(newToken);
         localStorage.setItem('username', username);
         localStorage.setItem('email', email);
         localStorage.setItem('token', newToken); 
         localStorage.setItem('id', id);
-        localStorage.setItem('profileImage', profileImage)
+        localStorage.setItem('profileImage', profileImage);
+        localStorage.setItem('isAdmin', isAdmin);
         setIsAuthenticated(true);
     };
 
@@ -51,6 +52,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         localStorage.removeItem('email');
         localStorage.removeItem('id');
         localStorage.removeItem('profileImage');
+        localStorage.removeItem('isAdmin');
         setIsAuthenticated(false);
     };
 

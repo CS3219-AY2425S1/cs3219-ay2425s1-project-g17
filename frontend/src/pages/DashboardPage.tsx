@@ -5,6 +5,7 @@ import {
     Autocomplete,
     TextField,
     Typography,
+    Button
 } from '@mui/material';
 import { motion } from 'framer-motion';
 import { getAllQuestions, getFilteredQuestions, getAvailableCategories } from '../services/question-service/QuestionService';
@@ -13,6 +14,9 @@ import QuestionTable from '../components/questionpage/QuestionTable';
 import MatchingComponent from '../components/MatchingComponent';
 import TrendingQuestions from '../components/dashboardpage/TrendingQuestions';
 import AttemptedProgress from '../components/dashboardpage/AttemptedProgress';
+import UploadJsonButton from '../components/questionpage/UploadJsonButton';
+import AddQuestionButton from '../components/questionpage/AddQuestionButton';
+import EditIcon from '@mui/icons-material/Edit';
 
 interface ComplexityOption {
     label: string;
@@ -47,8 +51,10 @@ function DashboardPage() {
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
     const [availableCategories, setAvailableCategories] = React.useState<string[]>([]);
+    const [isEditMode, setIsEditMode] = React.useState(false);
 
     const username = localStorage.getItem('username');
+    const isAdmin = localStorage.getItem('isAdmin') === 'true' || false;
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
@@ -236,7 +242,7 @@ function DashboardPage() {
                                 }}
                             >
                                 <TrendingQuestions questions={allQuestions} />
-                                <AttemptedProgress />
+                                <AttemptedProgress questions={allQuestions} />
                             </Box>
                         </motion.div>
 
@@ -247,6 +253,28 @@ function DashboardPage() {
                             transition={{ duration: 0.4 }}
                         >
                             <Box sx={{ paddingTop: '20px', display: 'flex', gap: 2, alignItems: 'center' }}>
+
+                                {isAdmin && (
+                                    <Box
+                                        sx={{
+                                            display: 'flex',
+                                            flexDirection: 'row',
+                                            gap: 1
+                                        }}>
+                                        <UploadJsonButton />
+                                        <AddQuestionButton categories={categories} />
+                                        <Button
+                                            variant="contained"
+                                            color="secondary"
+                                            startIcon={< EditIcon />}
+                                            sx={{ color: 'white', fontWeight: isEditMode ? 'bold' : 'normal' }}
+                                            onClick={() => setIsEditMode(!isEditMode)}
+                                        >
+                                            {isEditMode ? 'Done' : 'Edit'}
+                                        </Button>
+                                    </Box>
+                                )}
+
                                 <Autocomplete
                                     multiple
                                     size="small"
@@ -318,7 +346,7 @@ function DashboardPage() {
                                     categories={categories}
                                     page={page}
                                     rowsPerPage={rowsPerPage}
-                                    isEditMode={false}
+                                    isEditMode={isEditMode}
                                     handleChangePage={handleChangePage}
                                     handleChangeRowsPerPage={handleChangeRowsPerPage}
                                 />

@@ -21,9 +21,7 @@ const Header: React.FC<HeaderProps> = ({
     onShuffleQuestion,
     onConfirmDisconnect
 }) => {
-
     const [isDisconnectPopupOpen, setIsDisconnectPopupOpen] = useState(false);
-    const username = localStorage.getItem('username') || '';
 
     const onDisconnect = () => {
         setIsDisconnectPopupOpen(true);
@@ -68,8 +66,8 @@ const Header: React.FC<HeaderProps> = ({
             </Typography>
 
             <Box display="flex" alignItems="center" gap={2}>
-                <Tooltip title={username}>
-                    <Avatar src={ownProfPicUrl} sx={{ bgcolor: "white" }} alt='potato' />
+                <Tooltip title="Me">
+                    <Avatar src={ownProfPicUrl} sx={{ bgcolor: "white" }}/>
                 </Tooltip>
                 <Tooltip title={partnerName}>
                 <Avatar src={partnerProfPicUrl} sx={{ bgcolor: "white" }} />
