@@ -2,7 +2,7 @@ import axios from 'axios';
 import applyInterceptors from '../middleware/Interceptor';
 
 const chatApi = axios.create({
-    baseURL: "http://localhost:4005/chat",
+    baseURL: process.env.REACT_APP_CHAT_URI ?? "http://localhost:4005/chat",
     timeout: 5000,
 });
 

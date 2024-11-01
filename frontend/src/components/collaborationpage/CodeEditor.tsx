@@ -62,7 +62,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
         editorRef.current = editor;
 
         const provider = new WebrtcProvider(sessionId, doc, {
-            signaling: ["ws://localhost:4003"]
+            signaling: [process.env.REACT_APP_COLLABORATION_WEBSOCKET_URI ?? "ws://localhost:4003"]
         });
         const type = doc.getText("monaco");
         const decodedTemplate = base64ToUint8Array(template);

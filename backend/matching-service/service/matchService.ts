@@ -2,11 +2,16 @@ import { DIFFICULTY } from '../model/matchModel';
 import { redisClient } from '../redisClient'; // Import Redis client
 import { generateToken } from "../utils/tokenGenerator"
 import axios from 'axios';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const api = axios.create({
-  baseURL: "http://collaboration-service:4003/collaboration",
+  baseURL: (process.env.AWS_ELB_URI ?? "http://collaboration-service") + ":4003/collaboration",
   timeout: 5000,
 });
+
+console.log(api.getUri);
 
 export const matchUser = async (userId: string, category: string) => {
   // Log the matching attempt

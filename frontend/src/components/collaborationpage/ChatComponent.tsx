@@ -12,7 +12,7 @@ import ChatIcon from '@mui/icons-material/Chat';
 import IconButton from '@mui/material/IconButton';
 import SendIcon from '@mui/icons-material/Send';
 
-const socket = io("http://localhost:4005");  // Update URL if different
+const socket = io(process.env.REACT_APP_CHAT_SOCKET_URI ?? "http://localhost:4005");  // Update URL if different
 
 interface ChatProps {
     sessionId: string;
