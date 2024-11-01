@@ -55,8 +55,8 @@ const CollaborationPage = () => {
 
     const handleShuffleQuestion = async () => {
         setIsLoading(true);
-        socket.emit("shuffleQuestion", sessionId);
         const shuffleRes = await shuffleQuestion(userId);
+        socket.emit("shuffleQuestion", sessionId);
         const newQuestionId = shuffleRes.question_id;
         const question = await getQuestionInfo(newQuestionId);
         setQuestion(question);
@@ -140,10 +140,12 @@ const CollaborationPage = () => {
 
     React.useEffect(() => {
         socket.on("shuffle", async (_) => {
+            setIsLoading(true);
             const data = await getSessionInfo(userId);
             const questionId = data.session.questionId;
             const question = await getQuestionInfo(questionId);
             setQuestion(question);
+            setIsLoading(false);
         });
 
         socket.on("disconnectUser", async (_) => {
