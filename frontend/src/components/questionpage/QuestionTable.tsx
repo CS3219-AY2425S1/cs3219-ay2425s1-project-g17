@@ -9,7 +9,8 @@ import {
     Paper,
     TablePagination,
     Typography,
-    IconButton
+    IconButton,
+    Box
 } from '@mui/material';
 import QuestionCard from './QuestionCard';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
@@ -77,30 +78,38 @@ const QuestionTable: React.FC<QuestionTableProps> = ({
                 <Table sx={{ minWidth: 650 }} aria-label="simple table">
                     <TableHead>
                         <TableRow>
-                        <TableCell sx={{ fontWeight: 'bold', cursor: 'pointer' }} onClick={() => handleSort('question_id')}>
-                                No
-                                <IconButton size="small">
-                                    {sortField === 'question_id' && sortDirection === 'asc' ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />}
-                                </IconButton>
+                            <TableCell sx={{ fontWeight: 'bold', cursor: 'pointer' }} onClick={() => handleSort('question_id')}>
+                                <Box display="flex" alignItems="center">
+                                    No
+                                    <IconButton size="small">
+                                        {sortField === 'question_id' && sortDirection === 'asc' ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />}
+                                    </IconButton>
+                                </Box>
                             </TableCell>
                             <TableCell sx={{ fontWeight: 'bold', cursor: 'pointer' }} onClick={() => handleSort('question_title')}>
-                                Title
-                                <IconButton size="small">
-                                    {sortField === 'question_title' && sortDirection === 'asc' ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />}
-                                </IconButton>
+                                <Box display="flex" alignItems="center">
+                                    Title
+                                    <IconButton size="small">
+                                        {sortField === 'question_title' && sortDirection === 'asc' ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />}
+                                    </IconButton>
+                                </Box>
                             </TableCell>
                             <TableCell sx={{ fontWeight: 'bold' }}>Category</TableCell>
                             <TableCell sx={{ fontWeight: 'bold', cursor: 'pointer' }} onClick={() => handleSort('question_complexity')}>
-                                Complexity
-                                <IconButton size="small">
-                                    {sortField === 'question_complexity' && sortDirection === 'asc' ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />}
-                                </IconButton>
+                                <Box display="flex" alignItems="center">
+                                    Complexity
+                                    <IconButton size="small">
+                                        {sortField === 'question_complexity' && sortDirection === 'asc' ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />}
+                                    </IconButton>
+                                </Box>
                             </TableCell>
                             <TableCell sx={{ fontWeight: 'bold', cursor: 'pointer' }} onClick={() => handleSort('question_popularity')}>
-                                Popularity
-                                <IconButton size="small">
-                                    {sortField === 'question_popularity' && sortDirection === 'asc' ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />}
-                                </IconButton>
+                                <Box display="flex" alignItems="center">
+                                    Popularity
+                                    <IconButton size="small">
+                                        {sortField === 'question_popularity' && sortDirection === 'asc' ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />}
+                                    </IconButton>
+                                </Box>
                             </TableCell>
                         </TableRow>
                     </TableHead>
