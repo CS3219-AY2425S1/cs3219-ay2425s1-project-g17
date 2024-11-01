@@ -102,17 +102,19 @@ const ChatComponent: React.FC<ChatProps> = ({ sessionId, ownProfPicUrl, partnerP
     useEffect(() => {
         async function fetchSessionMessages() {
             try {
-                const messages = await getSessionMessages(sessionId);
-                const chatLog: MessageProps[] = [];
-                for (const value of Object.values(messages)) {
-                    const { senderId, message } = JSON.parse(value as string);
-                    if (senderId == userId) {
-                        chatLog.push({ sender: 'self', content: `${message}` });
-                    } else {
-                        chatLog.push({ sender: 'other', content: `${message}` });
+                if (sessionId != '') {
+                    const messages = await getSessionMessages(sessionId);
+                    const chatLog: MessageProps[] = [];
+                    for (const value of Object.values(messages)) {
+                        const { senderId, message } = JSON.parse(value as string);
+                        if (senderId == userId) {
+                            chatLog.push({ sender: 'self', content: `${message}` });
+                        } else {
+                            chatLog.push({ sender: 'other', content: `${message}` });
+                        }
                     }
+                    setChatLog(chatLog);
                 }
-                setChatLog(chatLog);
             } catch (error) {
                 console.error('Failed to fetch messages:', error);
             }
