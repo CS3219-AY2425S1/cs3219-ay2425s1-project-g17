@@ -71,56 +71,58 @@ const HistoryTable: React.FC<HistoryTableProps> = ({ userId, token }) => {
         }
     };
 
-    const fetchPartnerUsername = async (partnerId: string) => {
-        try {
-            const data = await getUsernameById(partnerId, token);
-            return data;
-        } catch (error) {
-            console.error(`Failed to fetch username with id: ${partnerId}`, error);
-        }
-    };
-
-    const fetchQuestionDetails = async (questionId: string) => {
-        try {
-            const data = await getQuestionById(questionId);
-            return data;
-        } catch (error) {
-            console.error(`Failed to fetch question with id: ${questionId}`, error);
-        }
-    };
-
-    const processBackendData = async (id: string) => {
-        const historyData = await fetchHistoryById(id);
-        const processedData = await Promise.all(
-            (historyData?.data || []).map(async (item: BackendData, index: number) => {
-                const partnerUsername = await fetchPartnerUsername(item.partnerId);
-                const questionDetails = await fetchQuestionDetails(item.questionId);
-    
-                return {
-                    no: index + 1,
-                    partner: partnerUsername?.data || "Unknown",
-                    title: questionDetails?.question_title || "Unknown",
-                    categories: questionDetails?.question_categories || [],
-                    complexity: questionDetails?.question_complexity || "Unknown",
-                    startTime: new Date(item.startTime),
-                    endTime: new Date(item.endTime),
-                    duration: differenceInMinutes(item.endTime, item.startTime),
-                    code: item.attempt || ''
-                };
-            })
-        );
-    
-        setHistoryData(processedData);
-    };
 
     React.useEffect(() => {
+
+        const fetchPartnerUsername = async (partnerId: string) => {
+            try {
+                const data = await getUsernameById(partnerId, token);
+                return data;
+            } catch (error) {
+                console.error(`Failed to fetch username with id: ${partnerId}`, error);
+            }
+        };
+
+        const fetchQuestionDetails = async (questionId: string) => {
+            try {
+                const data = await getQuestionById(questionId);
+                return data;
+            } catch (error) {
+                console.error(`Failed to fetch question with id: ${questionId}`, error);
+            }
+        };
+
+        const processBackendData = async (id: string) => {
+            const historyData = await fetchHistoryById(id);
+            const processedData = await Promise.all(
+                (historyData?.data || []).map(async (item: BackendData, index: number) => {
+                    const partnerUsername = await fetchPartnerUsername(item.partnerId);
+                    const questionDetails = await fetchQuestionDetails(item.questionId);
+
+                    return {
+                        no: index + 1,
+                        partner: partnerUsername?.data || "Unknown",
+                        title: questionDetails?.question_title || "Unknown",
+                        categories: questionDetails?.question_categories || [],
+                        complexity: questionDetails?.question_complexity || "Unknown",
+                        startTime: new Date(item.startTime),
+                        endTime: new Date(item.endTime),
+                        duration: differenceInMinutes(item.endTime, item.startTime),
+                        code: item.attempt || ''
+                    };
+                })
+            );
+
+            setHistoryData(processedData);
+        };
+
         const fetchData = async () => {
             if (userId) {
                 await processBackendData(userId);
             }
         };
         fetchData();
-    }, [userId, processBackendData]);
+    }, [userId, token]);
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
@@ -213,10 +215,10 @@ const HistoryTable: React.FC<HistoryTableProps> = ({ userId, token }) => {
                                     <TableCell>
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                             <Tooltip title="View Code">
-                                                <IconButton 
+                                                <IconButton
                                                     size="small"
                                                     onClick={() => handleCodeClick(row)}
-                                                    sx={{ 
+                                                    sx={{
                                                         ml: 1,
                                                         color: 'white',
                                                         '&:hover': {
@@ -230,8 +232,8 @@ const HistoryTable: React.FC<HistoryTableProps> = ({ userId, token }) => {
                                         </Box>
                                     </TableCell>
                                     <TableCell align="right">
-                                        <Tooltip 
-                                            title={row.endTime.toLocaleString()} 
+                                        <Tooltip
+                                            title={row.endTime.toLocaleString()}
                                             placement="left"
                                         >
                                             <span style={{ color: 'white' }}>
@@ -302,9 +304,9 @@ const HistoryTable: React.FC<HistoryTableProps> = ({ userId, token }) => {
                                 {selectedEntry.title}
                             </Typography>
                             <Typography variant="body2" sx={{ color: 'gray', mb: 2 }}>
-                                Start: {formatDateTime(selectedEntry.startTime)} | 
+                                Start: {formatDateTime(selectedEntry.startTime)} |
                                 End: {formatDateTime(selectedEntry.endTime)} |
-                                Duration: {selectedEntry.duration} mins | 
+                                Duration: {selectedEntry.duration} mins |
                                 Partner: {selectedEntry.partner}
                             </Typography>
                             <Divider sx={{ mb: 2, bgcolor: 'gray' }} />

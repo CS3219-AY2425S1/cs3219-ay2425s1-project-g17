@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Box, Typography, Card, CardContent, CardMedia, useTheme } from '@mui/material';
+import { Container, Box, Typography, Card, CardContent, CardMedia } from '@mui/material';
 import { motion } from 'framer-motion';
 import CodeIcon from '@mui/icons-material/Code';
 import GroupIcon from '@mui/icons-material/Group';
@@ -31,7 +31,6 @@ const screenshots = [
 ];
 
 const Showcase = () => {
-  const theme = useTheme();
 
   return (
     <Container maxWidth="lg" sx={{ py: 8 }}>

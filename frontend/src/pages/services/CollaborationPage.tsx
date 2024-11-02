@@ -151,7 +151,7 @@ const CollaborationPage = () => {
         socket.on("disconnectUser", async (_) => {
             setIsDisconnectPopupOpen(true);
         });
-    }, [socket, userId]);
+    }, [userId]);
 
 
     return (
