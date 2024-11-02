@@ -4,7 +4,6 @@ on:
   workflow_dispatch: {}
   push:
     branches:
-      # - main
       - MS6
       - devops/ci
 
@@ -35,6 +34,7 @@ jobs:
 
     # Run frontend lint
     - name: Run Frontend Lint
+      working-directory: ./frontend
       run: npm run lint
    
     # Run frontend tests
