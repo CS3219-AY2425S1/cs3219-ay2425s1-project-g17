@@ -11,7 +11,6 @@ dotenv.config();
 const fetchRandomQuestion = async (difficulty: string, category: string, token: string) => {
     try {
         const apiUrl = (process.env.AWS_ELB_URI ?? "http://question-service") + `:4000/questions/random?difficulty=${difficulty}&category=${category}`;
-        console.log(apiUrl);
         const headers = { 
             Authorization: `Bearer ${token}` 
         };
@@ -86,7 +85,6 @@ const getParter = async (userId: string) => {
     try {
         const bearerToken = generateToken(userId);
         const apiUrl = (process.env.AWS_ELB_URI ?? "http://user-service") + `:4001/users/${userId}`;
-        console.log(apiUrl);
         const headers = { 
             Authorization: `Bearer ${bearerToken}` 
         };
