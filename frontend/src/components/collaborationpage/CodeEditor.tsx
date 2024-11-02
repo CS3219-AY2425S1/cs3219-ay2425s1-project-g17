@@ -48,10 +48,10 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
 
     // Boilerplate code for different languages
     const boilerplateCode: { [key: string]: string } = {
-        javascript: `function solution() {\n\t// Your code here\n}`,
-        cpp: `#include <iostream>\n\nint solution() {\n\t// Your code here\n\treturn 0;\n}`,
-        python: `def solution():\n\t# Your code here\n\tpass`,
-        java: `public class Solution {\n\tpublic static void solution() {\n\t\t// Your code here\n\t}\n}`,
+        javascript: `function solution() {\n\t// your code here\n}\n\nfunction main() {\n\tsolution();\n}\n\nmain();`,
+        python: `def solution():\n\t# your code here\n\n\ndef main():\n\tsolution()\n\n\nif __name__ == "__main__":\n\tmain()`,
+        java: `class Main {\n\tpublic static void solution() {\n\t\t// your code here\n\t}\n\n\tpublic static void main(String[] args) {\n\t\tsolution();\n\t}\n}`,
+        cpp: `#include <iostream>\nusing namespace std;\n\nvoid solution() {\n\t// your code here\n}\n\nint main() {\n\tsolution();\n\treturn 0;\n}`
     };
 
     const doc = new Y.Doc();
@@ -61,6 +61,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
     const handleEditorDidMount = async (editor: monaco.editor.IStandaloneCodeEditor, monaco: typeof import('monaco-editor')) => {
         editorRef.current = editor;
 
+        // WebRTC & Yjs setup
         const provider = new WebrtcProvider(sessionId, doc, {
             signaling: ["ws://localhost:4003"]
         });
@@ -68,46 +69,32 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
         const decodedTemplate = base64ToUint8Array(template);
         Y.applyUpdate(doc, decodedTemplate);
 
-        const binding = new MonacoBinding(
+        new MonacoBinding(
             type,
-            editorRef.current.getModel() as monaco.editor.ITextModel,
-            new Set([editorRef.current]),
+            editor.getModel() as monaco.editor.ITextModel,
+            new Set([editor]),
             provider.awareness
         );
 
-        const defaultLanguage = "noLanguage";
-        const cachedCodeData = await getCacheCode(sessionId, defaultLanguage);
+        const cachedCodeData = await getCacheCode(sessionId, language);
         const cachedCode = cachedCodeData.code;
-        const currLanguage = cachedCodeData.currLanguage;
+        const currLanguage = cachedCodeData.currLanguage || 'javascript';
 
-        // Boilerplate definitions for each language
-        const boilerplateMap: { [key: string]: string } = {
-            javascript: 'function solution() {\n  // your code here\n}',
-            python: 'def solution():\n    # your code here',
-            java: 'class Solution {\n  public void solution() {\n    // your code here\n  }\n}',
-            cpp: 'void solution() {\n  // your code here\n}'
-        };
+        // Set the language based on cache, if available
+        setLanguage(currLanguage);
 
-        // Check if the boilerplate for the current language already exists in the editor
-        const currentBoilerplate = boilerplateMap[currLanguage] || '';
-        const hasBoilerplate = editor.getValue().includes(currentBoilerplate.trim());
-
-        // Add boilerplate only if it doesn’t already exist and no cached code
-        if (!hasBoilerplate && !cachedCode && !editor.getValue()) {
-            editor.setValue(currentBoilerplate);
-        } else if (cachedCode) {
-            setCode(cachedCode);
+        // Only set initial code if editor is empty (for first load)
+        if (!editor.getValue()) {
+            const initialCode = cachedCode || boilerplateCode[currLanguage];
+            editor.setValue(initialCode);
         }
 
-        if (currLanguage !== "") {
-            setLanguage(currLanguage);
-        }
-
-        editor.onDidChangeModelContent(async () => {
+        editor.onDidChangeModelContent(() => {
             setCode(editor.getValue());
             onCodeChange(editor.getValue());
         });
     }
+
 
     const base64ToUint8Array = (base64: string) => {
         const binaryString = atob(base64);
@@ -159,16 +146,24 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
     const handleLanguageChange = async (event: SelectChangeEvent<string>) => {
         const newLanguage = event.target.value as string;
         socket.emit("changeLanguage", { sessionId, newLanguage });
-        await cacheCode(sessionId, code, language, newLanguage);
+    
         const cachedCodeData = await getCacheCode(sessionId, newLanguage);
         const cachedCode = cachedCodeData.code;
+    
         setLanguage(newLanguage);
-        if (cachedCode != null) {
+    
+        if (cachedCode) {
+            // Load cached code if available
             setCode(cachedCode);
+            editorRef.current?.setValue(cachedCode);
         } else {
-            setCode(boilerplateCode[newLanguage] || ''); // Set the boilerplate code if no cached code is available
+            // Otherwise, load the boilerplate for the new language
+            const boilerplate = boilerplateCode[newLanguage] || '';
+            setCode(boilerplate);
+            editorRef.current?.setValue(boilerplate);
         }
     };
+    
 
     React.useEffect(() => {
         // Add event listeners for refreshing or navigating away
@@ -196,6 +191,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
             setLanguage(language);
         });
     }, []);
+
 
     return (
         <>
@@ -262,11 +258,11 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
                         alignItems: 'center',
                         p: 1,
                         borderBottom: '1px solid',
-                        borderColor: 'grey.800',
+                        borderColor: 'grey.800'
                     }}
                 >
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        { isLoading ? <CircularProgress size="24px" sx={{ mr: 1 }} /> : <Terminal sx={{ mr: 1 }} />}
+                        {isLoading ? <CircularProgress size="24px" sx={{ mr: 1 }} /> : <Terminal sx={{ mr: 1 }} />}
                         <Typography variant="subtitle2">Console</Typography>
                     </Box>
                     <Button
@@ -281,14 +277,15 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
                 <Box sx={{
                     display: "flex",
                     flexDirection: "row",
-                    flexGrow: 1
+                    flexGrow: 1,
+                    overflowY: "auto"
                 }}>
                     <Paper sx={{
                         backgroundColor: '#1e1e1e',
                         color: '#fff',
                         overflowY: "auto",
                         width: "100%",
-                        height: "100%",
+                        maxHeight: "100%",
                         padding: 2,
                     }}>
                         {consoleOutput && (
@@ -304,6 +301,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
                     </Paper>
                 </Box>
             </Paper>
+
 
             {/* Snackbar and Popup Dialog */}
             <Snackbar

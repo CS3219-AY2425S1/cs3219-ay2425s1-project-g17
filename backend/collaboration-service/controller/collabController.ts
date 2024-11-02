@@ -19,7 +19,7 @@ const fetchRandomQuestion = async (difficulty: string, category: string, token: 
 };
 
 const createDefaultYJSDoc = async () => {
-    const defaultJsCode = `function solution() {\n\t// Your code here\n}`;
+    const defaultJsCode = `function solution() {\n\t// your code here\n}\n\nfunction main() {\n\tsolution();\n}\n\nmain();`;
     const defaultTextName = "monaco";
 
     const templateDocument = new Y.Doc();
