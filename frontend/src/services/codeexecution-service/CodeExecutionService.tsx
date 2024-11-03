@@ -49,12 +49,17 @@ export const executeCode = async (code: string, language: string): Promise<Execu
             );
 
             const { stdout, stderr, status } = resultResponse.data;
+            console.log("stdout: " + stdout)
+            console.log("stderr: " + stderr)
+            console.log("status: " + status.description)
 
             // Check if execution has completed
             if (status.description === "Accepted") {
                 return { output: stdout || '', error: stderr || '' };
+            } else if (status.description === "Compilation Error") {
+                return { output: '', error: "Error: Compilation Error"};
             } else if (status.description !== "In Queue" && status.description !== "Processing") {
-                return { output: '', error: `Error: ${status.description}` };
+                return { output: '', error: stderr || '' };
             }
             // Delay between polling attempts
             await new Promise(resolve => setTimeout(resolve, 1000));

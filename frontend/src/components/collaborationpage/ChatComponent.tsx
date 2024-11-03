@@ -87,10 +87,6 @@ const ChatComponent: React.FC<ChatProps> = ({ sessionId, ownProfPicUrl, partnerP
         scrollToBottom();
     }, [chatLog]);
 
-    const joinSession = async () => {
-        socket.emit('joinSession', { userId: userId, sessionId });
-    };
-
     const sendMessage = () => {
         if (sessionId && message) {
             socket.emit('sendMessage', { sessionId, message, userId, username });
@@ -100,14 +96,18 @@ const ChatComponent: React.FC<ChatProps> = ({ sessionId, ownProfPicUrl, partnerP
     };
 
     useEffect(() => {
+
+        const joinSession = async () => {
+            socket.emit('joinSession', { userId: userId, sessionId });
+        };
         async function fetchSessionMessages() {
             try {
-                if (sessionId != '') {
+                if (sessionId !== '') {
                     const messages = await getSessionMessages(sessionId);
                     const chatLog: MessageProps[] = [];
                     for (const value of Object.values(messages)) {
                         const { senderId, message } = JSON.parse(value as string);
-                        if (senderId == userId) {
+                        if (senderId === userId) {
                             chatLog.push({ sender: 'self', content: `${message}` });
                         } else {
                             chatLog.push({ sender: 'other', content: `${message}` });
@@ -119,10 +119,13 @@ const ChatComponent: React.FC<ChatProps> = ({ sessionId, ownProfPicUrl, partnerP
                 console.error('Failed to fetch messages:', error);
             }
         }
+
         joinSession();
+
         if (chatLog.length === 0) {
             fetchSessionMessages();
         }
+
     }, [chatLog.length, sessionId, userId]);
 
     return (
