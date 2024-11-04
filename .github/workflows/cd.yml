@@ -3,7 +3,7 @@ name: CD Pipeline
 on: 
   workflow_dispatch: {}
   workflow_run:
-    workflows: [Frontend CI, Backend Question Service CI, Backend User Service CI, Backend Matching Service CI, Backend Collaboration Service CI, Backend History Service CI, Backend Chat Service CI]
+    workflows: ["Frontend CI", "Backend Question Service CI", "Backend User Service CI", "Backend Matching Service CI", "Backend Collaboration Service CI", "Backend History Service CI", "Backend Chat Service CI"]
     types: [completed]
   push:
     branches:
