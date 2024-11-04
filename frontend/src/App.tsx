@@ -36,16 +36,18 @@ function App() {
       <CssBaseline />
       <AuthProvider>
         <BrowserRouter>
-          <AuthContext.Consumer>
-            {context => {
-              if (!context) {
-                return null;
-              }
+          <div data-testid="app-root">
+            <AuthContext.Consumer>
+              {context => {
+                if (!context) {
+                  return null;
+                }
 
-              const { isAuthenticated } = context;
-              return isAuthenticated ? <AuthenticatedRoutes /> : <PublicRoutes />;
-            }}
-          </AuthContext.Consumer>
+                const { isAuthenticated } = context;
+                return isAuthenticated ? <AuthenticatedRoutes /> : <PublicRoutes />;
+              }}
+            </AuthContext.Consumer>
+          </div>
         </BrowserRouter>
       </AuthProvider>
     </ThemeProvider>
@@ -54,4 +56,4 @@ function App() {
 export default App;
 
 
-  // #9AC143 green
+// #9AC143 green
