@@ -122,7 +122,7 @@ const HistoryTable: React.FC<HistoryTableProps> = ({ userId, token }) => {
             }
         };
         fetchData();
-    }, [userId, token]);
+    }, []);
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);

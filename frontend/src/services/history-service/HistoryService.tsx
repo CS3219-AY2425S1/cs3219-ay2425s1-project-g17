@@ -2,7 +2,7 @@ import axios from 'axios';
 import applyInterceptors from '../middleware/Interceptor';
 
 const api = axios.create({
-    baseURL: "http://localhost:4004/history",
+    baseURL: process.env.REACT_APP_HISTORY_URI ?? "http://localhost:4004/history",
     timeout: 5000, // Timeout after 5 seconds
 });
 

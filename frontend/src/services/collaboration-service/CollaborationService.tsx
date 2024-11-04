@@ -2,17 +2,17 @@ import axios from 'axios';
 import applyInterceptors from '../middleware/Interceptor';
 
 const collabApi = axios.create({
-    baseURL: "http://localhost:4003/collaboration",
+    baseURL: process.env.REACT_APP_COLLABORATION_URI ?? "http://localhost:4003/collaboration",
     timeout: 5000,
 });
 
 const questionApi = axios.create({
-    baseURL: "http://localhost:4000/questions",
+    baseURL: process.env.REACT_APP_QUESTION_URI ?? "http://localhost:4000/questions",
     timeout: 5000,
 });
 
 const historyApi = axios.create({
-    baseURL: "http://localhost:4004/history",
+    baseURL: process.env.REACT_APP_HISTORY_URI ?? "http://localhost:4004/history",
     timeout: 5000,
 });
 

@@ -3,11 +3,14 @@ import axios from 'axios';
 import { generateToken } from "../utils/tokenGenerator"
 import { redisClient } from "../redisClient"
 import { v4 as uuidv4 } from 'uuid';
-import * as Y from "yjs"
+import * as Y from "yjs";
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const fetchRandomQuestion = async (difficulty: string, category: string, token: string) => {
     try {
-        const apiUrl = `http://question-service:4000/questions/random?difficulty=${difficulty}&category=${category}`;
+        const apiUrl = (process.env.AWS_ELB_URI ?? "http://question-service") + `:4000/questions/random?difficulty=${difficulty}&category=${category}`;
         const headers = { 
             Authorization: `Bearer ${token}` 
         };
@@ -81,7 +84,7 @@ export const createCollaborationRoom = async (req: Request, res: Response) => {
 const getParter = async (userId: string) => {
     try {
         const bearerToken = generateToken(userId);
-        const apiUrl = `http://user-service:4001/users/${userId}`;
+        const apiUrl = (process.env.AWS_ELB_URI ?? "http://user-service") + `:4001/users/${userId}`;
         const headers = { 
             Authorization: `Bearer ${bearerToken}` 
         };

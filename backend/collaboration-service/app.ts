@@ -9,6 +9,20 @@ import { wss } from "./utils/websocket";
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
+
+// To handle CORS Errors
+app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
+  res.setHeader("Access-Control-Allow-Origin", "*"); // "*" -> Allow all links to access
+
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization",
+  );
+
+  // Continue Route Processing
+  next();
+});
+
 app.use('/collaboration', collaborationRoutes);
 
 app.get('/', (req: express.Request, res: express.Response, next: express.NextFunction) => {
