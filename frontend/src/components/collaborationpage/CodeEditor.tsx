@@ -46,6 +46,8 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
     const [consoleOutput, setConsoleOutput] = useState<string>('');
     const [consoleError, setConsoleError] = useState<string>('');
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [time, setTime] = useState<number>(0);
+    const [memory, setMemory] = useState<number>(0);
 
     // Boilerplate code for different languages
     const boilerplateCode: { [key: string]: string } = {
@@ -122,7 +124,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
         setConsoleError('');
 
         setIsLoading(true);
-        const { output, error } = await executeCode(code, language);
+        const { output, error, time, memory } = await executeCode(code, language);
         setIsLoading(false);
 
         if (output) {
@@ -131,13 +133,19 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
         if (error) {
             setConsoleError(error);
         }
-        setIsSnackbarOpen(true);
+
+        setTime(time);
+        setMemory(memory);
+        if (time && memory) {
+            setIsSnackbarOpen(true);
+        }
     };
 
 
     const handleClearConsole = () => {
         setConsoleOutput('');
         setConsoleError('');
+        setIsSnackbarOpen(true);
     };
 
     const handleCloseSnackbar = () => {
@@ -150,9 +158,9 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
         await cacheCode(sessionId, code, language, newLanguage);
         const cachedCodeData = await getCacheCode(sessionId, newLanguage);
         const cachedCode = cachedCodeData.code;
-    
+
         setLanguage(newLanguage);
-    
+
         if (cachedCode) {
             // Load cached code if available
             setCode(cachedCode);
@@ -164,7 +172,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
             editorRef.current?.setValue(boilerplate);
         }
     };
-    
+
 
     React.useEffect(() => {
         // Add event listeners for refreshing or navigating away
@@ -307,11 +315,11 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
             {/* Snackbar and Popup Dialog */}
             <Snackbar
                 open={isSnackbarOpen}
-                autoHideDuration={3000}
+                autoHideDuration={5000}
                 onClose={handleCloseSnackbar}
             >
                 <Alert onClose={handleCloseSnackbar} severity="success">
-                    Your code has been run!
+                    Code execution time: {time}ms, Memory usage: {memory}KB
                 </Alert>
             </Snackbar>
             <Popup

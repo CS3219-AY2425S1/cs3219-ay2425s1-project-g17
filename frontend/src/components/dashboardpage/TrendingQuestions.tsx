@@ -25,7 +25,7 @@ interface TrendingQuestionsProps {
 
 const TrendingQuestionsPage: React.FC<TrendingQuestionsProps> = ({ questions }) => {
 
-    const sortedQuestions = questions?.sort((a, b) => b.question_popularity - a.question_popularity).slice(0, 7);
+    const sortedQuestions = questions?.sort((a, b) => b.question_popularity - a.question_popularity).slice(0, 10);
 
     return (
         <Box
@@ -39,7 +39,7 @@ const TrendingQuestionsPage: React.FC<TrendingQuestionsProps> = ({ questions }) 
             }}
         >
             <Typography variant="h5" sx={{ marginBottom: 2, fontWeight: 'bold', color: 'white', fontSize: '18px' }}>
-                Trending Questions
+                Top 10 Trending Questions
             </Typography>
 
             <Box
