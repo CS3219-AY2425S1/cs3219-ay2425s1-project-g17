@@ -43,3 +43,5 @@ app.get('/', (req: express.Request, res: express.Response, next: express.NextFun
     message: "Hello World from matching-service"
   });
 });
+
+export {app};
