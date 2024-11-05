@@ -24,6 +24,26 @@ connectToRedis();
 
 app.use(cors());
 app.use(express.json());
+
+// To handle CORS Errors
+app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
+  res.setHeader("Access-Control-Allow-Origin", "*"); // "*" -> Allow all links to access
+
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization",
+  );
+
+  // Browsers usually send this before PUT or POST Requests
+  if (req.method === "OPTIONS") {
+    res.header("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT, PATCH");
+    return res.status(200).json({});
+  }
+
+  // Continue Route Processing
+  next();
+});
+
 app.use('/matching', matchRoutes);
 
 app.get('/', (req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -45,3 +65,4 @@ app.get('/', (req: express.Request, res: express.Response, next: express.NextFun
 });
 
 export {app};
+

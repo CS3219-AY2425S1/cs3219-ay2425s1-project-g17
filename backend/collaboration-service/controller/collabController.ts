@@ -3,11 +3,14 @@ import axios from 'axios';
 import { generateToken } from "../utils/tokenGenerator"
 import { redisClient } from "../redisClient"
 import { v4 as uuidv4 } from 'uuid';
-import * as Y from "yjs"
+import * as Y from "yjs";
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const fetchRandomQuestion = async (difficulty: string, category: string, token: string) => {
     try {
-        const apiUrl = `http://question-service:4000/questions/random?difficulty=${difficulty}&category=${category}`;
+        const apiUrl = (process.env.AWS_ELB_URI ?? "http://question-service") + `:4000/questions/random?difficulty=${difficulty}&category=${category}`;
         const headers = { 
             Authorization: `Bearer ${token}` 
         };
@@ -81,7 +84,7 @@ export const createCollaborationRoom = async (req: Request, res: Response) => {
 const getParter = async (userId: string) => {
     try {
         const bearerToken = generateToken(userId);
-        const apiUrl = `http://user-service:4001/users/${userId}`;
+        const apiUrl = (process.env.AWS_ELB_URI ?? "http://user-service") + `:4001/users/${userId}`;
         const headers = { 
             Authorization: `Bearer ${bearerToken}` 
         };
@@ -133,22 +136,15 @@ export const shuffleQuestion = async (req: Request, res: Response) => {
             res.status(440).json("Session Expired")
             return
         }
-
-        let newQuestionId = sessionData?.session.questionId;
-        let newQuestion;
-
-        const questionId = sessionData?.session.questionId;
+        
         const category = sessionData?.session.category || "Algorithms";
         const difficulty = sessionData?.session.difficulty || "EASY";
         const bearerToken = generateToken(userId);
 
-        while (newQuestionId == questionId) {
-            newQuestion = await fetchRandomQuestion(difficulty, category, bearerToken);
-            newQuestionId = newQuestion._id;
-        }
+        const newQuestion = await fetchRandomQuestion(difficulty, category, bearerToken);
 
-        await redisClient.hset(sessionId, 'questionId', newQuestionId);
-        res.status(200).json({"question_id": newQuestionId});
+        await redisClient.hset(sessionId, 'questionId', newQuestion._id);
+        res.status(200).json({"question_id": newQuestion._id});
     } catch (error) {
         console.error('Error shuffling question', error);
         res.status(400).json({ error: (error as Error).message });
