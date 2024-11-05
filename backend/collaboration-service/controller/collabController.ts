@@ -8,7 +8,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const fetchRandomQuestion = async (difficulty: string, category: string, token: string) => {
+export const fetchRandomQuestion = async (difficulty: string, category: string, token: string) => {
     try {
         const apiUrl = (process.env.AWS_ELB_URI ?? "http://question-service") + `:4000/questions/random?difficulty=${difficulty}&category=${category}`;
         const headers = { 
@@ -33,7 +33,7 @@ const createDefaultYJSDoc = async () => {
     return base64;
 }
 
-const saveCollaborationRoom = async (user1Id: string, user2Id: string, questionId: any, category: string, difficulty: string) => {
+export const saveCollaborationRoom = async (user1Id: string, user2Id: string, questionId: any, category: string, difficulty: string) => {
     try {
         const sessionId = uuidv4(); 
         const startTime: Date = new Date(); 
@@ -74,10 +74,6 @@ export const createCollaborationRoom = async (req: Request, res: Response) => {
 
         const bearerToken = generateToken(user1Id);
         const questionRes = await fetchRandomQuestion(difficulty, category, bearerToken);
-        // Uncomment when running integration test
-        // const sampleQuestionId = "6723c38e8c41de0d2ba7ea00";
-        // questionRes.question_id = sampleQuestionId;
-        
         if (questionRes.question_id == null) {
             res.status(questionRes.status).json({ error: questionRes });
         } else {
@@ -104,7 +100,7 @@ const getParter = async (userId: string) => {
     }
 }
 
-const getSessionData = async (userId: string) => {
+export const getSessionData = async (userId: string) => {
     const sessions = await redisClient.keys('session:*'); 
     for (const key of sessions) {
         const sessionData = await redisClient.hgetall(key);
