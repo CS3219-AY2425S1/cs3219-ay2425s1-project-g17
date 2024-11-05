@@ -80,4 +80,4 @@ io.on("connection", (socket) => {
     }
   });
 
-export { httpServer };
+export { app, httpServer };
