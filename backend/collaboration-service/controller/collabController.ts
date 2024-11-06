@@ -8,7 +8,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const fetchRandomQuestion = async (difficulty: string, category: string, token: string) => {
+export const fetchRandomQuestion = async (difficulty: string, category: string, token: string) => {
     try {
         const apiUrl = (process.env.AWS_ELB_URI ?? "http://question-service") + `:4000/questions/random?difficulty=${difficulty}&category=${category}`;
         const headers = { 
@@ -33,7 +33,7 @@ const createDefaultYJSDoc = async () => {
     return base64;
 }
 
-const saveCollaborationRoom = async (user1Id: string, user2Id: string, questionId: any, category: string, difficulty: string) => {
+export const saveCollaborationRoom = async (user1Id: string, user2Id: string, questionId: any, category: string, difficulty: string) => {
     try {
         const sessionId = uuidv4(); 
         const startTime: Date = new Date(); 
@@ -67,13 +67,18 @@ export const createCollaborationRoom = async (req: Request, res: Response) => {
         const category = req.body.category;
         const difficulty = req.body.difficulty;
 
+        if (user1Id === undefined || user2Id === undefined || category === undefined || difficulty === undefined) {
+            res.status(400).json({ error: "Error creating collaboration room" });
+            return;
+        }
+
         const bearerToken = generateToken(user1Id);
         const questionRes = await fetchRandomQuestion(difficulty, category, bearerToken);
         if (questionRes.question_id == null) {
             res.status(questionRes.status).json({ error: questionRes });
         } else {
             const sessionId = await saveCollaborationRoom(user1Id, user2Id, questionRes._id, category, difficulty);
-            res.status(200).json(sessionId);
+            res.status(201).json({ sessionId });
         }
     } catch (error) {
         console.error('Error creating collaboration room:', error);
@@ -95,7 +100,7 @@ const getParter = async (userId: string) => {
     }
 }
 
-const getSessionData = async (userId: string) => {
+export const getSessionData = async (userId: string) => {
     const sessions = await redisClient.keys('session:*'); 
     for (const key of sessions) {
         const sessionData = await redisClient.hgetall(key);
@@ -119,10 +124,15 @@ export const getCollaborationRoom = async (req: Request, res: Response) => {
     try {
         const userId = req.params.id;
         const sessionData = await getSessionData(userId)
+
+        if (sessionData === undefined) {
+            res.status(404).json({ error: "Collaboration room not found" });
+            return;
+        }
         res.status(200).json(sessionData);
     } catch (error) {
         console.error('Error getting collaboration room', error);
-        res.status(400).json({ error: (error as Error).message });
+        res.status(404).json({ error: (error as Error).message });
     }
 }
 
@@ -187,6 +197,11 @@ export const cacheCode = async (req: Request, res: Response) => {
         const code = req.body.code;
         const language = req.body.language;
         const newLanguage = req.body.newLanguage;
+
+        if (sessionId === undefined || code === undefined || language === undefined || newLanguage === undefined) {
+            res.status(400).json({ error: "Error caching" });
+            return;
+        }
         await redisClient.hset(sessionId, language, code); 
         await redisClient.hset(sessionId, "currLanguage", newLanguage); 
         res.status(200).json({"message": "code cached"});
