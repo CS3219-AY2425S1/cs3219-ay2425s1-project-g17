@@ -5,6 +5,15 @@ import { getUsersFromQueue } from '../service/matchService';
 
 export const requestMatch = async (req: Request, res: Response) => {
   const { userId, username, category, difficulty } = req.body;
+
+  // Null check for required fields
+  if (!userId || !username || !category || difficulty == null) {
+    return res.status(400).json({
+      success: false,
+      message: 'Missing required fields: userId, username, category, and difficulty are required.',
+    });
+  }
+  
   try {
     // Validate that the difficulty is one of the enum values
     if (!Object.values(DIFFICULTY).includes(difficulty)) {
