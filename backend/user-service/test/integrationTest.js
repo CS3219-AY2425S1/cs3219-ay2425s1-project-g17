@@ -1,9 +1,8 @@
 import request from 'supertest';
 import { expect } from 'chai';
-import mongoose from 'mongoose';
+import { mongoose, connect } from 'mongoose';
 import app from '../index.js';
 import { generateToken } from '../utils/tokenGenerator.js';
-import { connectToDB } from '../model/repository.js';
 import userModel from '../model/user-model.js';
 import dotenv from 'dotenv';
 
@@ -14,7 +13,7 @@ const invalidToken = generateToken('invalidUsername');
 
 before(async () => {
     const testUri = process.env.MONGO_URI_TEST || '';
-    connectToDB(testUri, "TEST");
+    connect(testUri);
 });
 
 after(async () => {
