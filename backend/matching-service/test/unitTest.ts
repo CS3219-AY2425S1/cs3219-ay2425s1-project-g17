@@ -57,14 +57,14 @@ describe('Matching Service Unit Tests', () => {
             expect(response.body).to.have.property('message', 'Invalid difficulty');
         });
 
-        it('should return 500 for missing required fields', async () => {
+        it('should return 400 for missing required fields', async () => {
             const response = await request(app)
                 .post('/matching/match-request')
                 .set('Authorization', `Bearer ${token1}`)
                 .send(mockRequests.incompleteRequest);
 
-            expect(response.status).to.equal(500);
-            expect(response.body).to.have.property('error');
+            expect(response.status).to.equal(400);
+            expect(response.body).to.have.property('message', 'Missing required fields: userId, username, category, and difficulty are required.');
         });
     });
 
