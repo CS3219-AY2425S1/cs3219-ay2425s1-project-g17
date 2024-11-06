@@ -146,22 +146,15 @@ export const shuffleQuestion = async (req: Request, res: Response) => {
             res.status(440).json("Session Expired")
             return
         }
-
-        let newQuestionId = sessionData?.session.questionId;
-        let newQuestion;
-
-        const questionId = sessionData?.session.questionId;
-        const category = sessionData?.session.category || "Array";
+        
+        const category = sessionData?.session.category || "Algorithms";
         const difficulty = sessionData?.session.difficulty || "EASY";
         const bearerToken = generateToken(userId);
 
-        while (newQuestionId == questionId) {
-            newQuestion = await fetchRandomQuestion(difficulty, category, bearerToken);
-            newQuestionId = newQuestion._id;
-        }
+        const newQuestion = await fetchRandomQuestion(difficulty, category, bearerToken);
 
-        await redisClient.hset(sessionId, 'questionId', newQuestionId);
-        res.status(200).json({"question_id": newQuestionId});
+        await redisClient.hset(sessionId, 'questionId', newQuestion._id);
+        res.status(200).json({"question_id": newQuestion._id});
     } catch (error) {
         console.error('Error shuffling question', error);
         res.status(400).json({ error: (error as Error).message });
