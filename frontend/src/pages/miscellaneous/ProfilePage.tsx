@@ -13,22 +13,24 @@ import {
 import EditIcon from '@mui/icons-material/Edit';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
-import HistoryTable from '../../components/profilepage/HistoryTable';
 import { AuthContext } from '../../context/AuthContext';
 import { updateUsername, updateEmail, updatePassword, deleteUser, updateProfilePicture, getSignedImageURL } from '../../services/user-service/UserService';
+import { useNavigate } from 'react-router-dom';
+import HistoryTable from '../../components/profilepage/HistoryTable';
 
 export default function ProfilePage() {
+    const navigate = useNavigate();
     const authContext = React.useContext(AuthContext);
     if (!authContext) {
         throw new Error('AuthContext must be used within an AuthProvider');
     }
 
     const { token, updateUserData, logout } = authContext;
-
+    
     // User data states
     const [username, setUsername] = React.useState('');
     const [email, setEmail] = React.useState('');
-    const [profileImageUrl, setprofileImageUrl] = React.useState('');
+    const [profileImageUrl, setProfileImageUrl] = React.useState('');
 
     // Edit states
     const [isEditingUsername, setIsEditingUsername] = React.useState(false);
@@ -54,11 +56,12 @@ export default function ProfilePage() {
 
     const handleDeleteOpen = () => setDeleteOpen(true);
     const handleDeleteClose = () => setDeleteOpen(false);
+
     const handleDelete = async () => {
         try {
             await deleteUser(localStorage.getItem('id') || '', token || '');
             logout();
-            window.location.href = '/';
+            navigate('/');
         } catch (err: any) {
             alert(err.message);
         }
@@ -66,17 +69,25 @@ export default function ProfilePage() {
 
     // Fetch user data from the server on component mount
     React.useEffect(() => {
-        async function fetchUserData() {
+        const fetchUserData = async () => {
             await updateUserData();
             const username = localStorage.getItem('username') || '';
             const email = localStorage.getItem('email') || '';
             const profileImage = localStorage.getItem('profileImage') || '';
             setUsername(username);
             setEmail(email);
-            getUserProfilePic(profileImage)
-        }
+            getUserProfilePic(profileImage);
+        };
+
         fetchUserData();
-    });
+
+        // Cleanup function
+        return () => {
+            setUsername('');
+            setEmail('');
+            setProfileImageUrl('');
+        };
+    }, [updateUserData]);
 
     const handleEditClick = (field: 'username' | 'email' | 'password') => {
         if (field === 'username') {
@@ -110,10 +121,7 @@ export default function ProfilePage() {
         }
     };
 
-    const validateEmail = (email: string) => {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
-    };
+    const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
     const validatePassword = () => {
         if (newPassword !== confirmNewPassword) {
@@ -121,31 +129,17 @@ export default function ProfilePage() {
             setPasswordErrorMessage('New passwords do not match.');
             return false;
         }
-        // Password validation
-        const validatePassword = (password: string) => {
-            // Regular expression to validate the password:
-            // - At least 6 characters long
-            // - At least one number
-            // - At least one uppercase letter
-            // - At least one lowercase letter
-            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d\W_]{6,}$/;
 
-            if (!password) {
-                setPasswordError(true);
-                setPasswordErrorMessage('Please enter a valid password.');
-                return false;
-            } else if (!passwordRegex.test(password)) {
-                setPasswordError(true);
-                setPasswordErrorMessage('Password must be at least 6 characters long, contain at least one number, one uppercase, and one lowercase letter.');
-                return false;
-            } else {
-                setPasswordError(false);
-                setPasswordErrorMessage('');
-                return true;
-            }
-        };
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d\W_]{6,}$/;
+        if (!passwordRegex.test(newPassword)) {
+            setPasswordError(true);
+            setPasswordErrorMessage('Password must be at least 6 characters long, contain at least one number, one uppercase, and one lowercase letter.');
+            return false;
+        }
 
-        return validatePassword(newPassword);
+        setPasswordError(false);
+        setPasswordErrorMessage('');
+        return true;
     };
 
     const handleSaveClick = async (field: 'username' | 'email' | 'password') => {
@@ -177,9 +171,7 @@ export default function ProfilePage() {
                 alert(err.message);
             }
         } else if (field === 'password') {
-            if (!validatePassword()) {
-                return;
-            }
+            if (!validatePassword()) return;
             try {
                 await updatePassword(id, email, token, oldPassword, newPassword);
                 setIsEditingPassword(false);
@@ -188,7 +180,6 @@ export default function ProfilePage() {
                 alert(err.message);
             }
         }
-        window.location.reload();
     };
 
     const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -196,23 +187,22 @@ export default function ProfilePage() {
         if (file) {
             try {
                 const response = await updateProfilePicture(localStorage.getItem('id') || '', file);
-                localStorage.setItem('profileImage', response?.fileName)
-                getUserProfilePic(response?.fileName)
-                window.location.reload();
+                localStorage.setItem('profileImage', response?.fileName);
+                getUserProfilePic(response?.fileName);
             } catch (err: any) {
                 alert(err.message);
             }
         }
-      };
+    };
 
-      const getUserProfilePic = async (imageName: string) => {
+    const getUserProfilePic = async (imageName: string) => {
         try {
-            const response = await getSignedImageURL(imageName)
-            setprofileImageUrl(response);
+            const response = await getSignedImageURL(imageName);
+            setProfileImageUrl(response);
         } catch (err: any) {
             alert(err.message);
         }
-    }
+    };
 
     return (
         <>

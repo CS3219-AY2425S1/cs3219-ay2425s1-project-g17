@@ -18,6 +18,7 @@ const dropdownMenuProps = {
 
 interface AddQuestionButtonProps {
     categories: string[];
+    handleQuestionUpdate: () => void;
 }
 
 interface ExampleProps {
@@ -28,7 +29,7 @@ interface ExampleProps {
 
 }
 
-const AddQuestionButton: React.FC<AddQuestionButtonProps> = ({ categories }) => {
+const AddQuestionButton: React.FC<AddQuestionButtonProps> = ({ categories, handleQuestionUpdate }) => {
     const [open, setOpen] = React.useState(false);
     const [title, setTitle] = React.useState('');
     const [description, setDescription] = React.useState('');
@@ -69,7 +70,7 @@ const AddQuestionButton: React.FC<AddQuestionButtonProps> = ({ categories }) => 
         const newQuestion = await addQuestion(title, description, example, category, complexity, popularity);
 
         if (newQuestion) {
-            window.location.reload();
+            handleQuestionUpdate();
         } else {
             alert('Failed to add question. Please try again.');
         }

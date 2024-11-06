@@ -43,6 +43,7 @@ interface QuestionTableProps {
     isEditMode: boolean;
     handleChangePage: (event: unknown, newPage: number) => void;
     handleChangeRowsPerPage: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    handleQuestionUpdate: () => void;
 }
 
 const QuestionTable: React.FC<QuestionTableProps> = ({
@@ -52,7 +53,8 @@ const QuestionTable: React.FC<QuestionTableProps> = ({
     rowsPerPage,
     isEditMode,
     handleChangePage,
-    handleChangeRowsPerPage
+    handleChangeRowsPerPage,
+    handleQuestionUpdate
 }) => {
     const [sortDirection, setSortDirection] = React.useState<'asc' | 'desc'>('asc');
     const [sortField, setSortField] = React.useState<string>('question_id');
@@ -128,6 +130,7 @@ const QuestionTable: React.FC<QuestionTableProps> = ({
                                     popularity={question.question_popularity}
                                     isEditMode={isEditMode}
                                     allCategories={categories}
+                                    handleQuestionUpdate={handleQuestionUpdate}
                                 />
                             ))}
                     </TableBody>

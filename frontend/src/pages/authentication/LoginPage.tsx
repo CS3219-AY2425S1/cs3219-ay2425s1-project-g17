@@ -3,7 +3,6 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
-import Link from '@mui/material/Link';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { Container, CircularProgress, InputAdornment, IconButton } from '@mui/material';
@@ -11,8 +10,10 @@ import { loginUser, verifyToken } from '../../services/user-service/UserService'
 import { AuthContext } from '../../context/AuthContext';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { useNavigate } from 'react-router-dom';
 
 export default function SignIn() {
+    const navigate = useNavigate();
     const authContext = React.useContext(AuthContext);
     if (!authContext) {
         throw new Error('AuthContext must be used within an AuthProvider');
@@ -39,7 +40,7 @@ export default function SignIn() {
                     setLoading(true);
                     setTimeout(() => {
                         login(response?.data.username as string, response?.data.email as string, token, response?.data.id as string, response?.data.profilePic as string, response?.data.isAdmin as string)
-                        window.location.href = '/dashboard';
+                        navigate('/dashboard');
                     }, 1000);
                 } else {
                     alert('Token verification failed.');
@@ -182,13 +183,16 @@ export default function SignIn() {
                         </Button>
                         <Typography sx={{ textAlign: 'center', marginTop: '20px' }}>
                             Don&apos;t have an account?{' '}
-                            <Link href="register" variant="body2">
+                            <span
+                                onClick={() => navigate('/register')}
+                                style={{ cursor: 'pointer', color: 'white', textDecoration: 'underline' }}
+                            >
                                 Sign up
-                            </Link>
+                            </span>
                         </Typography>
                     </Box>
                 )}
             </Box>
-        </Container>
+        </Container >
     );
 }

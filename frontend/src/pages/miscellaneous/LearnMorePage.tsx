@@ -1,6 +1,7 @@
 import React from 'react';
 import { Container, Box, Typography, Button } from '@mui/material';
 import { styled } from '@mui/system';
+import { useNavigate } from 'react-router-dom';
 
 const StyledContainer = styled(Container)(({ theme }) => ({
     display: 'flex',
@@ -25,6 +26,7 @@ const FeatureBox = styled(Box)(({ theme }) => ({
 }));
 
 const LearnMore = () => {
+    const navigate = useNavigate();
     return (
         <StyledContainer>
             <Typography variant="h4" component="h1" sx={{ marginBottom: '20px', textAlign: 'center', color: 'white', fontWeight: 'bold' }}>
@@ -73,7 +75,7 @@ const LearnMore = () => {
                 </Box>
             </Box>
 
-            <Button variant="contained" color="secondary" sx={{ marginTop: '20px', color: "white" }} href="/register">
+            <Button variant="contained" color="secondary" onClick={() => navigate('/register')} sx={{ marginTop: '20px', color: "white"}} >
                 Get Started
             </Button>
         </StyledContainer>

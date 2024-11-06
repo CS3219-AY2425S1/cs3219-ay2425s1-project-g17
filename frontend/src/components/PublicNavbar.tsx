@@ -10,13 +10,17 @@ import { useNavigate } from 'react-router-dom';
 function Navbar() {
   const navigate = useNavigate();
 
+  const handleLogoClick = () => {
+    navigate('/');
+  };
+
   return (
     <AppBar position="static">
       <Container maxWidth={false}>
         <Toolbar disableGutters>
-          <a href="/">
+          <div onClick={handleLogoClick} style={{ cursor: 'pointer' }}>
             <img src={Logo} alt="Logo" style={{ height: '50px' }} />
-          </a>
+          </div>
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
           </Box>
           <Box sx={{ flexGrow: 0, display: "flex", alignItems: "center", gap: 2 }}>

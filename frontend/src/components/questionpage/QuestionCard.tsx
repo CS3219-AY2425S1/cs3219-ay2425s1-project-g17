@@ -46,6 +46,7 @@ interface QuestionCardProps {
     popularity: number;
     isEditMode: boolean;
     allCategories: string[];
+    handleQuestionUpdate: () => void;
 }
 
 const QuestionCard: React.FC<QuestionCardProps> = ({
@@ -57,7 +58,8 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
     complexity,
     popularity,
     isEditMode,
-    allCategories
+    allCategories,
+    handleQuestionUpdate
 }) => {
     const [open, setOpen] = React.useState(false);
     const [editOpen, setEditOpen] = React.useState(false);
@@ -102,7 +104,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
                     editedPopularity,
                 );
                 setEditOpen(false);
-                window.location.reload();
+                handleQuestionUpdate();
             }
         } catch (error) {
             alert('Failed to update question. Error: ' + error);
@@ -113,7 +115,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
         try {
             await deleteQuestion(id);
             setDeleteOpen(false);
-            window.location.reload();
+            handleQuestionUpdate();
         } catch (error) {
             alert('Failed to delete the question. Error: ' + error);
         }
@@ -180,18 +182,32 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
                 >
                     {complexity}
                 </TableCell>
-                <TableCell>{popularity}</TableCell>
+                <TableCell>
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            justifyContent: 'space-between', 
+                            alignItems: 'center',
+                            width: '100%',
+                        }}
+                    >
+                        {popularity}
+                        {isEditMode && (
+                            <div>
+                                <IconButton color="primary" size="small" onClick={handleEditOpen}>
+                                    <EditIcon fontSize="small" />
+                                </IconButton>
+                                <IconButton color="error" size="small" onClick={handleDeleteOpen}>
+                                    <DeleteIcon fontSize="small" />
+                                </IconButton>
+                            </div>
+                        )}
+                    </Box>
+                </TableCell>
 
-                {isEditMode && (
-                    <TableCell>
-                        <IconButton color="primary" size="small" onClick={handleEditOpen}>
-                            <EditIcon fontSize="small" />
-                        </IconButton>
-                        <IconButton color="error" size="small" onClick={handleDeleteOpen}>
-                            <DeleteIcon fontSize="small" />
-                        </IconButton>
-                    </TableCell>
-                )}
+
+
             </TableRow>
 
             {/* View Modal */}
@@ -226,7 +242,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
                         {id + '. ' + title}
                     </Typography>
                     <div>
-                    <Markdown>{editedDescription}</Markdown>
+                        <Markdown>{editedDescription}</Markdown>
                         <Typography sx={{ mt: 2, color: 'white' }}>
                             {example?.map((example, index) => (
                                 <div key={index}>
@@ -252,7 +268,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
             {/* Edit Modal */}
             <Modal open={editOpen} onClose={handleEditClose}>
                 <Box
-                component="form"
+                    component="form"
                     sx={{
                         position: 'absolute',
                         top: '50%',
@@ -322,7 +338,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
                         type="number"
                         label="Popularity"
                         value={editedPopularity}
-                        onChange={(e) => setEditedPopularity(Number(e.target.value))}/>
+                        onChange={(e) => setEditedPopularity(Number(e.target.value))} />
 
                     {editedExample?.map((ex, index) => (
                         <Box key={index} sx={{ mt: 2 }}>
@@ -330,7 +346,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
                                 Edit Example {index + 1}
                             </Typography>
                             <TextField
-                            required
+                                required
                                 fullWidth
                                 label="Input"
                                 value={ex.input}
@@ -338,7 +354,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
                                 sx={{ mb: 2 }}
                             />
                             <TextField
-                            required
+                                required
                                 fullWidth
                                 label="Output"
                                 value={ex.output}
@@ -381,7 +397,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
                             Cancel
                         </Button>
                         <Button
-                        type="submit"
+                            type="submit"
                             variant="contained"
                             color="secondary"
                             sx={{ mr: 2, color: 'white' }}

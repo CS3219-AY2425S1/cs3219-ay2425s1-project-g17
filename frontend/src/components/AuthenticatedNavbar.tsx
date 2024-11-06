@@ -15,6 +15,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import Logo from '../assets/Logo.png';
 import { getSignedImageURL } from '../services/user-service/UserService';
 import { AuthContext } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const settings = [
   { name: 'Dashboard', icon: <DashboardIcon /> },
@@ -23,6 +24,11 @@ const settings = [
 ];
 
 function Navbar() {
+  const navigate = useNavigate();
+
+    const handleLogoClick = () => {
+        navigate('/');
+    };
   const [profileImageUrl, setprofileImageUrl] = React.useState('');
 
   const authContext = React.useContext(AuthContext);
@@ -44,7 +50,7 @@ function Navbar() {
   const handleLogout = () => {
     logout();
     handleCloseUserMenu();
-    window.location.href = '/';
+    navigate('/');
   };
 
   React.useEffect(() => {
@@ -63,9 +69,9 @@ function Navbar() {
     <AppBar position="static">
       <Container maxWidth={false}>
         <Toolbar disableGutters>
-          <a href="/dashboard">
+        <div onClick={handleLogoClick} style={{ cursor: 'pointer' }}>
             <img src={Logo} alt="Logo" style={{ height: '50px' }} />
-          </a>
+          </div>
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }} />
           <Box sx={{ flexGrow: 0, display: 'flex', alignItems: 'center', gap: 2 }}>
             <Tooltip title="Open settings">
@@ -93,8 +99,8 @@ function Navbar() {
                 <MenuItem
                   key={name}
                   onClick={name === 'Logout' ? handleLogout
-                    : name === 'Profile' ? () => window.location.href = '/profile'
-                      : name === 'Dashboard' ? () => window.location.href = '/dashboard'
+                    : name === 'Profile' ? () => navigate('/profile')
+                      : name === 'Dashboard' ? () => navigate('/dashboard')
                         : handleCloseUserMenu}
                 >
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>

@@ -77,7 +77,6 @@ const MatchingComponent = () => {
                 }
             } catch (error) {
                 setIsSession(false);
-                console.error('Failed to fetch session:', error);
             }
         }
         fetchSessionInfo();

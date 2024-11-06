@@ -52,6 +52,7 @@ function DashboardPage() {
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
     const [availableCategories, setAvailableCategories] = React.useState<string[]>([]);
     const [isEditMode, setIsEditMode] = React.useState(false);
+    const [questionsUpdated, setQuestionsUpdated] = React.useState(false);
 
     const username = localStorage.getItem('username');
     const isAdmin = localStorage.getItem('isAdmin') === 'true' || false;
@@ -187,6 +188,24 @@ function DashboardPage() {
         fetchFilteredQuestions();
     }, [selectedCategories, selectedComplexity, searchQuery]);
 
+    React.useEffect(() => {
+        async function fetchQuestions() {
+            try {
+                const data = await getAllQuestions();
+                setQuestions(data);
+                setAllQuestions(data);
+            } catch (error) {
+                console.error('Failed to fetch questions:', error);
+            }
+        }
+
+        fetchQuestions();
+    }, [questionsUpdated]);
+
+    const handleQuestionUpdate = () => {
+        setQuestionsUpdated((prev) => !prev); 
+    };
+
     return (
         <>
             <Container
@@ -261,8 +280,8 @@ function DashboardPage() {
                                             flexDirection: 'row',
                                             gap: 1
                                         }}>
-                                        <UploadJsonButton />
-                                        <AddQuestionButton categories={categories} />
+                                        <UploadJsonButton handleQuestionUpdate={handleQuestionUpdate}/>
+                                        <AddQuestionButton categories={categories} handleQuestionUpdate={handleQuestionUpdate} />
                                         <Button
                                             variant="contained"
                                             color="secondary"
@@ -349,6 +368,7 @@ function DashboardPage() {
                                     isEditMode={isEditMode}
                                     handleChangePage={handleChangePage}
                                     handleChangeRowsPerPage={handleChangeRowsPerPage}
+                                    handleQuestionUpdate={handleQuestionUpdate}
                                 />
                             </Box>
                         </motion.div>
