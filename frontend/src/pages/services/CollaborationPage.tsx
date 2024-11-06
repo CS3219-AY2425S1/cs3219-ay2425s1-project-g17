@@ -60,6 +60,7 @@ const CollaborationPage = () => {
         const newQuestionId = shuffleRes.question_id;
         const question = await getQuestionInfo(newQuestionId);
         setQuestion(question);
+        setQuestionId(newQuestionId);
         setIsLoading(false);
     };
 
@@ -145,6 +146,7 @@ const CollaborationPage = () => {
             const questionId = data.session.questionId;
             const question = await getQuestionInfo(questionId);
             setQuestion(question);
+            setQuestionId(questionId);
             setIsLoading(false);
         });
 
