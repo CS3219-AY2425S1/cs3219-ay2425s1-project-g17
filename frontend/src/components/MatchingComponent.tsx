@@ -22,7 +22,7 @@ import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { sendMatchRequest, pollMatchStatus, cancelMatchRequest } from '../services/matching-service/MatchingService';
 import { getAvailableCategories } from '../services/question-service/QuestionService';
 import { useNavigate } from 'react-router-dom';
-import { getSessionInfo } from '../services/collaboration-service/CollaborationService';
+import { isSessionActive } from '../services/collaboration-service/CollaborationService';
 
 const MatchingComponent = () => {
     const navigate = useNavigate();
@@ -71,9 +71,11 @@ const MatchingComponent = () => {
     useEffect(() => {
         async function fetchSessionInfo() {
             try {
-                const data = await getSessionInfo(userId);
+                const data = await isSessionActive(userId);
                 if (data) {
                     setIsSession(true);
+                } else {
+                    setIsSession(false);
                 }
             } catch (error) {
                 setIsSession(false);

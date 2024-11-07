@@ -35,6 +35,15 @@ async function getSessionInfo(id: string) {
     }
 }
 
+async function isSessionActive(id: string) {
+    try {
+        const response = await collabApi.get(`/${id}`);
+        return !!response.data;
+    } catch (error) {
+        return false;
+    }
+}
+
 // Function to get question details
 async function getQuestionInfo(id: string) {
     try {
@@ -103,5 +112,6 @@ export {
     disconnectUser,
     getCacheCode,
     cacheCode,
-    createHistory
+    createHistory,
+    isSessionActive
 }
