@@ -14,9 +14,10 @@ import {
     Box,
     Chip,
     Divider,
-    TablePagination
+    TablePagination,
+    CircularProgress
 } from '@mui/material';
-import { formatDistanceToNow, format, differenceInMinutes } from 'date-fns';
+import { formatDistanceToNow, format, differenceInMinutes, set } from 'date-fns';
 import SourceIcon from '@mui/icons-material/Source';
 import CloseIcon from '@mui/icons-material/Close';
 import { getHistoryById } from '../../services/history-service/HistoryService';
@@ -61,10 +62,13 @@ const HistoryTable: React.FC<HistoryTableProps> = ({ userId, token }) => {
     const [historyData, setHistoryData] = React.useState<HistoryEntry[]>([]);
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
+    const [loading, setLoading] = React.useState(true);
 
     const fetchHistoryById = async (id: string) => {
         try {
+            setLoading(true);
             const data = await getHistoryById(id);
+            setLoading(false);
             return data;
         } catch (error) {
             console.error(`Failed to fetch history with id: ${id}`, error);
@@ -246,9 +250,14 @@ const HistoryTable: React.FC<HistoryTableProps> = ({ userId, token }) => {
                         </TableBody>
                     </Table>
                 </TableContainer>
+                {loading && (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+                        <CircularProgress size="24px" />
+                    </Box>
+                )}
 
-                {historyData.length === 0 && (
-                    <Typography variant="h6" align="center" sx={{ marginTop: 4, color: "text.secondary" }}>
+                {historyData.length === 0 && !loading && (
+                    <Typography variant="body2" align="center" sx={{ marginTop: 4, color: "text.secondary" }}>
                         No history found.
                     </Typography>
                 )}
