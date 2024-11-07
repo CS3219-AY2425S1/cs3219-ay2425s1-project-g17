@@ -71,6 +71,24 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Set up env for frontend
+        if: ${{ matrix.name == 'Deploy Frontend' }}
+        run: |
+          touch .env
+          echo REACT_APP_QUESTION_URI=${{ secrets.REACT_APP_QUESTION_URI }} >> .env
+          echo REACT_APP_QUESTION_JSON_URI=${{ secrets.REACT_APP_QUESTION_JSON_URI }} >> .env
+          echo REACT_APP_USER_URI=${{ secrets.REACT_APP_USER_URI }} >> .env
+          echo REACT_APP_MATCHING_URI=${{ secrets.REACT_APP_MATCHING_URI }} >> .env
+          echo REACT_APP_COLLABORATION_URI=${{ secrets.REACT_APP_COLLABORATION_URI }} >> .env
+          echo REACT_APP_COLLABORATION_SOCKET_URI=${{ secrets.REACT_APP_COLLABORATION_SOCKET_URI }} >> .env
+          echo REACT_APP_COLLABORATION_WEBSOCKET_URI=${{ secrets.REACT_APP_COLLABORATION_WEBSOCKET_URI }} >> .env
+          echo REACT_APP_HISTORY_URI=${{ secrets.REACT_APP_HISTORY_URI }} >> .env
+          echo REACT_APP_CHAT_SOCKET_URI=${{ secrets.REACT_APP_CHAT_SOCKET_URI }} >> .env
+          echo REACT_APP_CHAT_URI=${{ secrets.REACT_APP_CHAT_URI }} >> .env
+          echo REACT_APP_RAPID_API_KEY=${{ secrets.REACT_APP_RAPID_API_KEY }} >> .env
+          echo GENERATE_SOURCEMAP=false >> .env
+          cat .env
       
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -95,19 +113,7 @@ jobs:
         if: ${{ matrix.name == 'Deploy Frontend' }}
         with:
           context: ${{ matrix.context }}
-          secret-envs:
-            REACT_APP_QUESTION_URI=${{ secrets.REACT_APP_QUESTION_URI }}
-            REACT_APP_QUESTION_JSON_URI=${{ secrets.REACT_APP_QUESTION_JSON_URI }}
-            REACT_APP_USER_URI=${{ secrets.REACT_APP_USER_URI }}
-            REACT_APP_MATCHING_URI=${{ secrets.REACT_APP_MATCHING_URI }}
-            REACT_APP_COLLABORATION_URI=${{ secrets.REACT_APP_COLLABORATION_URI }}
-            REACT_APP_COLLABORATION_SOCKET_URI=${{ secrets.REACT_APP_COLLABORATION_SOCKET_URI }}
-            REACT_APP_COLLABORATION_WEBSOCKET_URI=${{ secrets.REACT_APP_COLLABORATION_WEBSOCKET_URI }}
-            REACT_APP_HISTORY_URI=${{ secrets.REACT_APP_HISTORY_URI }}
-            REACT_APP_CHAT_SOCKET_URI=${{ secrets.REACT_APP_CHAT_SOCKET_URI }}
-            REACT_APP_CHAT_URI=${{ secrets.REACT_APP_CHAT_URI }}
-            REACT_APP_RAPID_API_KEY=${{ secrets.REACT_APP_RAPID_API_KEY }}
-            GENERATE_SOURCEMAP=false
+          secret-files: .env
           file: ${{ matrix.context }}/${{ matrix.dockerfile }}
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.repository }}:latest
