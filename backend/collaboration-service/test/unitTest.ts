@@ -71,15 +71,15 @@ describe('Collaboration Service Unit Tests', () => {
     });
 
     describe('POST /collaboration/disconnect', () => {
-        // it('should successfully disconnect the user', async () => {
-        //     const disconnectResponse = await request(app)
-        //         .post('/collaboration/disconnect')
-        //         .set('Authorization', `Bearer ${token}`)
-        //         .send({ sessionId });
+        it('should successfully disconnect the user', async () => {
+            const disconnectResponse = await request(app)
+                .post('/collaboration/disconnect')
+                .set('Authorization', `Bearer ${token}`)
+                .send({ sessionId });
 
-        //     expect(disconnectResponse.status).to.equal(200);
-        //     expect(disconnectResponse.body).to.have.property('message', 'successfully disconnected');
-        // });
+            expect(disconnectResponse.status).to.equal(200);
+            expect(disconnectResponse.body).to.have.property('message', 'successfully disconnected');
+        });
 
         it('should return 440 if missing sessionId', async () => {
             const response = await request(app)
@@ -113,15 +113,15 @@ describe('Collaboration Service Unit Tests', () => {
     });
 
     describe('POST /collaboration/cache', () => {
-        // it('should cache the code with valid request', async () => {
-        //     const response = await request(app)
-        //         .post('/collaboration/cache')
-        //         .set('Authorization', `Bearer ${token}`)
-        //         .send(mockCache);
+        it('should cache the code with valid request', async () => {
+            const response = await request(app)
+                .post('/collaboration/cache')
+                .set('Authorization', `Bearer ${token}`)
+                .send(mockCache);
 
-        //     expect(response.status).to.equal(200);
-        //     expect(response.body).to.have.property('message', 'code cached');
-        // });
+            expect(response.status).to.equal(200);
+            expect(response.body).to.have.property('message', 'code cached');
+        });
 
         it('should return 400 for missing required fields', async () => {
             const requestBody = {
