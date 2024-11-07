@@ -9,9 +9,11 @@ on:
       - devops/ci
 
 env:
-  MONGO_URI_TEST: ${{ secrets.MONGO_URI_TEST }}
+  REDIS_HOST: ${{ secrets.MATCHING_REDIS_HOST }}
+  REDIS_PORT: ${{ secrets.MATCHING_REDIS_PORT }}
+  REDIS_PASSWORD: ${{ secrets.MATCHING_REDIS_PASSWORD }}
   JWT_SECRET: ${{ secrets.JWT_SECRET }}
-
+  PORT: ${{ secrets.MATCHING_PORT }}
 jobs:
   backend-matching-service-test:
     runs-on: ubuntu-latest
