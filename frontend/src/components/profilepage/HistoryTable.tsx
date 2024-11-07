@@ -17,7 +17,7 @@ import {
     TablePagination,
     CircularProgress
 } from '@mui/material';
-import { formatDistanceToNow, format, differenceInMinutes, set } from 'date-fns';
+import { formatDistanceToNow, format, differenceInMinutes } from 'date-fns';
 import SourceIcon from '@mui/icons-material/Source';
 import CloseIcon from '@mui/icons-material/Close';
 import { getHistoryById } from '../../services/history-service/HistoryService';
@@ -258,7 +258,7 @@ const HistoryTable: React.FC<HistoryTableProps> = ({ userId, token }) => {
 
                 {historyData.length === 0 && !loading && (
                     <Typography variant="body2" align="center" sx={{ marginTop: 4, color: "text.secondary" }}>
-                        No history found.
+                        No history found. Start collaborating now!
                     </Typography>
                 )}
 
