@@ -65,6 +65,16 @@ function Navbar() {
     getUserProfilePic(localStorage.getItem('profileImage') as string);
   }, []);
 
+  const handleNavigateProfile = () => {
+    navigate('/profile');
+    handleCloseUserMenu();
+  }
+
+  const handleNavigateDashboard = () => {
+    navigate('/dashboard');
+    handleCloseUserMenu();
+  }
+
   return (
     <AppBar position="static">
       <Container maxWidth={false}>
@@ -99,8 +109,8 @@ function Navbar() {
                 <MenuItem
                   key={name}
                   onClick={name === 'Logout' ? handleLogout
-                    : name === 'Profile' ? () => navigate('/profile')
-                      : name === 'Dashboard' ? () => navigate('/dashboard')
+                    : name === 'Profile' ? handleNavigateProfile
+                      : name === 'Dashboard' ? handleNavigateDashboard
                         : handleCloseUserMenu}
                 >
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
