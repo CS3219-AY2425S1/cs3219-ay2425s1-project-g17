@@ -9,7 +9,10 @@ on:
       - devops/ci
 
 env:
-  MONGO_URI_TEST: ${{ secrets.MONGO_URI_TEST }}
+  PORT: ${{ secrets.COLLABORATION_PORT }}
+  REDIS_PASS: ${{ secrets.COLLABORATION_REDIS_PASS }}
+  REDIS_URI: ${{ secrets.COLLABORATION_REDIS_URI }}
+  REDIS_PORT: ${{ secrets.COLLABORATION_REDIS_PORT }}
   JWT_SECRET: ${{ secrets.JWT_SECRET }}
 
 jobs:
