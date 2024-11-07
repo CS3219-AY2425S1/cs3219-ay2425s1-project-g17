@@ -13,7 +13,7 @@ on:
 
 jobs:
   deploy:
-    # if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -83,31 +83,8 @@ jobs:
       
       - name: Build and push
         uses: docker/build-push-action@v6
-        if: ${{ matrix.name != 'Deploy Frontend' }}
         with:
           context: ${{ matrix.context }}
-          file: ${{ matrix.context }}/${{ matrix.dockerfile }}
-          push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.repository }}:latest
-
-      - name: Build and push for frontend
-        uses: docker/build-push-action@v6
-        if: ${{ matrix.name == 'Deploy Frontend' }}
-        with:
-          context: ${{ matrix.context }}
-          secret-envs:
-            REACT_APP_QUESTION_URI=${{ secrets.REACT_APP_QUESTION_URI }}
-            REACT_APP_QUESTION_JSON_URI=${{ secrets.REACT_APP_QUESTION_JSON_URI }}
-            REACT_APP_USER_URI=${{ secrets.REACT_APP_USER_URI }}
-            REACT_APP_MATCHING_URI=${{ secrets.REACT_APP_MATCHING_URI }}
-            REACT_APP_COLLABORATION_URI=${{ secrets.REACT_APP_COLLABORATION_URI }}
-            REACT_APP_COLLABORATION_SOCKET_URI=${{ secrets.REACT_APP_COLLABORATION_SOCKET_URI }}
-            REACT_APP_COLLABORATION_WEBSOCKET_URI=${{ secrets.REACT_APP_COLLABORATION_WEBSOCKET_URI }}
-            REACT_APP_HISTORY_URI=${{ secrets.REACT_APP_HISTORY_URI }}
-            REACT_APP_CHAT_SOCKET_URI=${{ secrets.REACT_APP_CHAT_SOCKET_URI }}
-            REACT_APP_CHAT_URI=${{ secrets.REACT_APP_CHAT_URI }}
-            REACT_APP_RAPID_API_KEY=${{ secrets.REACT_APP_RAPID_API_KEY }}
-            GENERATE_SOURCEMAP=false
           file: ${{ matrix.context }}/${{ matrix.dockerfile }}
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.repository }}:latest
