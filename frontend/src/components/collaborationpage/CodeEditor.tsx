@@ -145,7 +145,6 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
     const handleClearConsole = () => {
         setConsoleOutput('');
         setConsoleError('');
-        setIsSnackbarOpen(true);
     };
 
     const handleCloseSnackbar = () => {
