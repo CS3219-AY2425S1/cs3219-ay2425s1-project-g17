@@ -3,7 +3,6 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
-import Link from '@mui/material/Link';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { Container } from '@mui/material';
@@ -26,6 +25,10 @@ const RegisterPage = () => {
     const [showPassword, setShowPassword] = React.useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
     const navigate = useNavigate();
+
+    const handleSignInClick = () => {
+        navigate('/login');
+    };
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -257,9 +260,12 @@ const RegisterPage = () => {
                     {/* Redirect to Sign In */}
                     <Typography sx={{ textAlign: 'center', marginTop: '20px' }}>
                         Already have an account?{' '}
-                        <Link href="/login" variant="body2">
+                        <span
+                            onClick={handleSignInClick}
+                            style={{ cursor: 'pointer', color: 'white', textDecoration: 'underline' }}
+                        >
                             Sign in
-                        </Link>
+                        </span>
                     </Typography>
                 </Box>
             </Box>

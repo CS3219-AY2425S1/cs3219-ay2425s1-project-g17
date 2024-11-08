@@ -2,17 +2,23 @@ import axios from 'axios';
 import applyInterceptors from '../middleware/Interceptor';
 
 const collabApi = axios.create({
-    baseURL: "http://localhost:4003/collaboration",
+    baseURL: process.env.REACT_APP_COLLABORATION_URI ?? "http://localhost:4003/collaboration",
     timeout: 5000,
 });
 
 const questionApi = axios.create({
-    baseURL: "http://localhost:4000/questions",
+    baseURL: process.env.REACT_APP_QUESTION_URI ?? "http://localhost:4000/questions",
+    timeout: 5000,
+});
+
+const historyApi = axios.create({
+    baseURL: process.env.REACT_APP_HISTORY_URI ?? "http://localhost:4004/history",
     timeout: 5000,
 });
 
 applyInterceptors(collabApi);
 applyInterceptors(questionApi);
+applyInterceptors(historyApi);
 
 function handleAxiosError(error: any) {
     console.error('An error occurred:', error.message);
@@ -26,6 +32,15 @@ async function getSessionInfo(id: string) {
         return response.data;
     } catch (error) {
         handleAxiosError(error);
+    }
+}
+
+async function isSessionActive(id: string) {
+    try {
+        const response = await collabApi.get(`/${id}`);
+        return !!response.data;
+    } catch (error) {
+        return false;
     }
 }
 
@@ -79,11 +94,24 @@ async function cacheCode(sessionId: string, code: string, language: string, newL
     }
 }
 
+// Function to cache the code
+async function createHistory(userId: string, partnerId: string, questionId: string, startTime: Date, attempt: string) {
+    try {
+        const response = await historyApi.post(`/`, {userId, partnerId ,questionId, startTime, attempt});
+        return response.data;
+    } catch (error) {
+        handleAxiosError(error);
+    }
+}
+// Function to store in history service
+
 export {
     getSessionInfo,
     getQuestionInfo,
     shuffleQuestion,
     disconnectUser,
     getCacheCode,
-    cacheCode
+    cacheCode,
+    createHistory,
+    isSessionActive
 }

@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+// eslint-disable-next-line import/no-unresolved
 import { Editor } from "@monaco-editor/react";
 import {
     Box,
@@ -10,7 +11,8 @@ import {
     FormControl,
     Select,
     MenuItem,
-    SelectChangeEvent
+    SelectChangeEvent,
+    CircularProgress
 } from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { Terminal, Clear } from '@mui/icons-material'
@@ -22,20 +24,38 @@ import * as monaco from 'monaco-editor';
 import socket from "../../context/socket"
 import { cacheCode, getCacheCode } from '../../services/collaboration-service/CollaborationService';
 import Popup from './Popup';
+import { executeCode } from '../../services/codeexecution-service/CodeExecutionService';
 
 interface CodeEditorProps {
     sessionId: string;
+    template: string;
     onConfirmSubmission: () => void;
+    onCodeChange: (code: string) => void;
 }
 
 const CodeEditor: React.FC<CodeEditorProps> = ({
     sessionId,
-    onConfirmSubmission
+    template,
+    onConfirmSubmission,
+    onCodeChange
 }) => {
     const [language, setLanguage] = useState<string>('javascript');
     const [code, setCode] = useState<string>('');
     const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false);
     const [isSubmitPopupOpen, setIsSubmitPopupOpen] = useState(false);
+    const [consoleOutput, setConsoleOutput] = useState<string>('');
+    const [consoleError, setConsoleError] = useState<string>('');
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [time, setTime] = useState<number>(0);
+    const [memory, setMemory] = useState<number>(0);
+
+    // Boilerplate code for different languages
+    const boilerplateCode: { [key: string]: string } = {
+        javascript: `function solution() {\n\t// your code here\n}\n\nfunction main() {\n\tsolution();\n}\n\nmain();`,
+        python: `def solution():\n\t# your code here\n\n\ndef main():\n\tsolution()\n\n\nif __name__ == "__main__":\n\tmain()`,
+        java: `class Main {\n\tpublic static void solution() {\n\t\t// your code here\n\t}\n\n\tpublic static void main(String[] args) {\n\t\tsolution();\n\t}\n}`,
+        cpp: `#include <iostream>\nusing namespace std;\n\nvoid solution() {\n\t// your code here\n}\n\nint main() {\n\tsolution();\n\treturn 0;\n}`
+    };
 
     const doc = new Y.Doc();
 
@@ -44,33 +64,49 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
     const handleEditorDidMount = async (editor: monaco.editor.IStandaloneCodeEditor, monaco: typeof import('monaco-editor')) => {
         editorRef.current = editor;
 
+        // WebRTC & Yjs setup
         const provider = new WebrtcProvider(sessionId, doc, {
-            signaling: ["ws://localhost:4003"]
+            signaling: [process.env.REACT_APP_COLLABORATION_WEBSOCKET_URI ?? "ws://localhost:4003"]
         });
         const type = doc.getText("monaco");
-        const binding = new MonacoBinding(
-            type, 
-            editorRef.current.getModel() as monaco.editor.ITextModel, 
-            new Set([editorRef.current]), 
+        const decodedTemplate = base64ToUint8Array(template);
+        Y.applyUpdate(doc, decodedTemplate);
+
+        new MonacoBinding(
+            type,
+            editor.getModel() as monaco.editor.ITextModel,
+            new Set([editor]),
             provider.awareness
         );
 
-        const defaultLanguage = "noLanguage";
-        const cachedCodeData = await getCacheCode(sessionId, defaultLanguage);
+        const cachedCodeData = await getCacheCode(sessionId, language);
         const cachedCode = cachedCodeData.code;
-        const currLanguage = cachedCodeData.currLanguage;
+        const currLanguage = cachedCodeData.currLanguage || 'javascript';
 
-        if (cachedCode != "") {
-            setCode(cachedCode);
+        // Set the language based on cache, if available
+        setLanguage(currLanguage);
+
+        // Only set initial code if editor is empty (for first load)
+        if (!editor.getValue()) {
+            const initialCode = cachedCode || boilerplateCode[currLanguage];
+            editor.setValue(initialCode);
         }
 
-        if (currLanguage != "") {
-            setLanguage(currLanguage);
-        }
-
-        editor.onDidChangeModelContent(async () => {
+        editor.onDidChangeModelContent(() => {
             setCode(editor.getValue());
+            onCodeChange(editor.getValue());
         });
+    }
+
+
+    const base64ToUint8Array = (base64: string) => {
+        const binaryString = atob(base64);
+        const len = binaryString.length;
+        const bytes = new Uint8Array(len);
+        for (let i = 0; i < len; i++) {
+            bytes[i] = binaryString.charCodeAt(i);
+        }
+        return bytes;
     }
 
     const handleSubmitCode = () => {
@@ -82,46 +118,29 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
         setIsSubmitPopupOpen(false);
     }
 
-    
-    const handleRunCode = () => {
+
+    const handleRunCode = async () => {
         setConsoleOutput('');
         setConsoleError('');
 
-        if (language === 'javascript') {
-            try {
-                // Temporarily override console.log to capture its output
-                const logOutput: string[] = [];
-                const originalConsoleLog = console.log;
+        setIsLoading(true);
+        const { output, error, time, memory } = await executeCode(code, language);
+        setIsLoading(false);
 
-                console.log = (msg: any) => {
-                    if (typeof msg === 'object') {
-                        logOutput.push(JSON.stringify(msg));
-                    } else {
-                        logOutput.push(msg.toString());
-                    }
-                };
-
-                // Evaluate the code
-                eval(code);
-
-                // Restore original console.log after execution
-                console.log = originalConsoleLog;
-
-                // Set the captured log output
-                setConsoleOutput(logOutput.join('\n') || "Code executed successfully");
-
-            } catch (err: any) {
-                setConsoleError(`${err}`);
-            }
-        } else {
-            setConsoleError('Code execution is only supported for JavaScript.');
+        if (output) {
+            setConsoleOutput(output);
+        }
+        if (error) {
+            setConsoleError(error);
         }
 
-        setIsSnackbarOpen(true);
+        setTime(time);
+        setMemory(memory);
+        if (time && memory) {
+            setIsSnackbarOpen(true);
+        }
     };
 
-    const [consoleOutput, setConsoleOutput] = useState<string>('');
-    const [consoleError, setConsoleError] = useState<string>('');
 
     const handleClearConsole = () => {
         setConsoleOutput('');
@@ -134,17 +153,25 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
 
     const handleLanguageChange = async (event: SelectChangeEvent<string>) => {
         const newLanguage = event.target.value as string;
-        socket.emit("changeLanguage", {sessionId, newLanguage});
+        socket.emit("changeLanguage", { sessionId, newLanguage });
         await cacheCode(sessionId, code, language, newLanguage);
         const cachedCodeData = await getCacheCode(sessionId, newLanguage);
         const cachedCode = cachedCodeData.code;
+
         setLanguage(newLanguage);
-        if (cachedCode != null) {
+
+        if (cachedCode) {
+            // Load cached code if available
             setCode(cachedCode);
+            editorRef.current?.setValue(cachedCode);
         } else {
-            setCode('');
+            // Otherwise, load the boilerplate for the new language
+            const boilerplate = boilerplateCode[newLanguage] || '';
+            setCode(boilerplate);
+            editorRef.current?.setValue(boilerplate);
         }
     };
+
 
     React.useEffect(() => {
         // Add event listeners for refreshing or navigating away
@@ -171,7 +198,8 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
         socket.on("changeLanguage", async (language) => {
             setLanguage(language);
         });
-      }, [socket]);
+    }, []);
+
 
     return (
         <>
@@ -195,9 +223,9 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
                     <Box display="flex" justifyContent="right" padding={1} gap={2}>
                         <Button
                             variant="contained"
-                            color="success"
+                            color="primary"
                             onClick={handleRunCode}
-                            sx={{ marginRight: '8px', textTransform: 'none', color: 'white' }}
+                            sx={{ textTransform: 'none', color: 'black' }}
                             startIcon={<PlayArrowIcon />}
                         >
                             Run
@@ -238,11 +266,11 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
                         alignItems: 'center',
                         p: 1,
                         borderBottom: '1px solid',
-                        borderColor: 'grey.800',
+                        borderColor: 'grey.800'
                     }}
                 >
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <Terminal sx={{ mr: 1 }} />
+                        {isLoading ? <CircularProgress size="24px" sx={{ mr: 1 }} /> : <Terminal sx={{ mr: 1 }} />}
                         <Typography variant="subtitle2">Console</Typography>
                     </Box>
                     <Button
@@ -257,14 +285,15 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
                 <Box sx={{
                     display: "flex",
                     flexDirection: "row",
-                    flexGrow: 1
+                    flexGrow: 1,
+                    overflowY: "auto"
                 }}>
                     <Paper sx={{
                         backgroundColor: '#1e1e1e',
                         color: '#fff',
                         overflowY: "auto",
                         width: "100%",
-                        height: "100%",
+                        maxHeight: "100%",
                         padding: 2,
                     }}>
                         {consoleOutput && (
@@ -281,23 +310,25 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
                 </Box>
             </Paper>
 
+
             {/* Snackbar and Popup Dialog */}
             <Snackbar
                 open={isSnackbarOpen}
-                autoHideDuration={3000}
+                autoHideDuration={5000}
                 onClose={handleCloseSnackbar}
             >
                 <Alert onClose={handleCloseSnackbar} severity="success">
-                    Your code has been run!
+                    Code execution time: {time}ms, Memory usage: {memory}KB
                 </Alert>
             </Snackbar>
             <Popup
                 isOpen={isSubmitPopupOpen}
                 onConfirmDisconnect={onConfirmSubmission}
-                onCloseDisconnect ={handleCloseSubmitPopup}
-                title="Submit"
-                description="Are you sure you want to submit? Once submitted, you won’t be able to make further changes."
-                option={["Cancel", "Confirm"]}
+                onCloseDisconnect={handleCloseSubmitPopup}
+                title="Submit code?"
+                description="Once submitted, no further changes can be made, and the session will close for both participants."
+                option={["Cancel", "Submit"]}
+                button_color='secondary'
             />
         </>
     );

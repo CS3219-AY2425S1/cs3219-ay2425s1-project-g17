@@ -3,7 +3,6 @@ import { Route, Routes, Navigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 
 import Navbar from "../components/AuthenticatedNavbar";
-import QuestionPage from "../pages/services/QuestionPage";
 import NotFoundPage from "../pages/miscellaneous/NotFoundPage";
 import ProfilePage from "../pages/miscellaneous/ProfilePage";
 import DashboardPage from "../pages/DashboardPage";
@@ -32,7 +31,6 @@ export const AuthenticatedRoutes = () => {
             <Routes>
                 <Route path="/" element={<DashboardPage />} />
                 <Route path="/dashboard" element={<DashboardPage />} />
-                <Route path="/questions" element={<QuestionPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/collaboration" element={<CollaborationPage />} />
                 <Route path="/login"/>

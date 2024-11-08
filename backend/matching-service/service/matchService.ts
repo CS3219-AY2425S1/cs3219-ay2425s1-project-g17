@@ -1,9 +1,13 @@
 import { DIFFICULTY } from '../model/matchModel';
 import { redisClient } from '../redisClient'; // Import Redis client
+import { generateToken } from "../utils/tokenGenerator"
 import axios from 'axios';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const api = axios.create({
-  baseURL: "http://collaboration-service:4003/collaboration",
+  baseURL: process.env.AWS_COLLAB_URI ?? "http://collaboration-service:4003/collaboration",
   timeout: 5000,
 });
 
@@ -167,7 +171,12 @@ export function handleAxiosError(error: any) {
 
 export async function sendDetailsToCollab(user1Id: string, user2Id: string, category: string, difficulty: string) {
   try {
-      await api.post('/', {user1Id, user2Id, category, difficulty});
+      const bearerToken = generateToken(user1Id);
+      await api.post('/', {user1Id, user2Id, category, difficulty}, {
+        headers: {
+          Authorization: `Bearer ${bearerToken}`,
+        },
+      });
   } catch (error) {
       throw new Error(handleAxiosError(error));
   }

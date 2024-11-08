@@ -1,8 +1,10 @@
 import React from 'react';
-import { Button, Container, Typography, Box, Paper } from '@mui/material';
+import { Button, Container, Typography, Paper } from '@mui/material';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 
 const CallToAction: React.FC = () => {
+    const navigate = useNavigate();
     return (
         <Container>
             <Paper
@@ -36,7 +38,7 @@ const CallToAction: React.FC = () => {
                             color: 'white',
                         }}
                         onClick={() => {
-                            window.location.href = '/register';
+                            navigate('/register');
                         }}
                     >
                         Sign Up, It's Free

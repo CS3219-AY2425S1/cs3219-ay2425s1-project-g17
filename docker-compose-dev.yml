@@ -1,0 +1,106 @@
+# Setting the project name
+name: PeerPrep
+
+# Define the services and applications that make up your application.
+services:
+  frontend:
+    build: 
+      context: ./frontend # Path to the directory containing the Dockerfile for building the frontend image.
+      dockerfile: Dockerfile # Specified Dockerfile for building the frontend image.
+    container_name: frontend # Defining the name of the container.
+    ports:
+      - "3000:3000" # Maps port 3000 on the host to port 3000 in the container, making the app accessible on the host.
+    restart: unless-stopped # Restarts the container irrespective of the exit code but stops restarting when the service is stopped or removed.
+    env_file:
+      - ./frontend/.env # Specifying the .env file for frontend
+    networks:
+      - frontend-network # Connects the frontend to the 'frontend-network' network.
+    volumes:
+      - ./frontend:/app # Bind mount the local frontend folder to the container's app directory
+      - /app/node_modules # Exclude node_modules so Docker doesn't overwrite it
+    environment:
+      - CHOKIDAR_USEPOLLING=true # Required for hot reloading in some systems
+      - WATCHPACK_POLLING=true
+    stdin_open: true
+    tty: true
+
+  question-service:
+    build:
+      context: ./backend/question-service # Path to the directory containing the Dockerfile for building the question-service image.
+    container_name: question-service # Defining the name of the container.
+    ports:
+      - "4000:4000" # Maps port 4000 on the host to port 4000 in the container, making the app accessible on the host.
+    env_file:
+      - ./backend/question-service/.env # Specifying the .env file for question-service
+    restart: unless-stopped # Restarts the container irrespective of the exit code but stops restarting when the service is stopped or removed.
+    networks:
+      - backend-network # Connects the question-service to the 'backend-network' network.
+
+  user-service:
+    build: 
+      context: ./backend/user-service # Path to the directory containing the Dockerfile for building the user-service image.
+    container_name: user-service # Defining the name of the container.
+    ports:
+      - "4001:4001" # Maps port 4001 on the host to port 4001 in the container, making the app accessible on the host.
+    env_file:
+      - ./backend/user-service/.env # Specifying the .env file for user-service
+    restart: unless-stopped # Restarts the container irrespective of the exit code but stops restarting when the service is stopped or removed.
+    networks:
+      - backend-network # Connects the user-service to the 'backend-network' network.
+      
+  matching-service:
+    build: 
+      context: ./backend/matching-service # Path to the directory containing the Dockerfile for building the matching-service image.
+    container_name: matching-service # Defining the name of the container.
+    ports:
+      - "4002:4002" # Maps port 4002 on the host to port 4002 in the container, making the app accessible on the host.
+    env_file:
+      - ./backend/matching-service/.env # Specifying the .env file for matching-service
+    restart: unless-stopped # Restarts the container irrespective of the exit code but stops restarting when the service is stopped or removed.
+    networks:
+      - backend-network # Connects the matching-service to the 'backend-network' network.
+      
+  collaboration-service:
+    build: 
+      context: ./backend/collaboration-service # Path to the directory containing the Dockerfile for building the collaboration-service image.
+    container_name: collaboration-service # Defining the name of the container.
+    depends_on:
+      - question-service # Specifying that matching-service requires question-service for communication
+    ports:
+      - "4003:4003" # Maps port 4003 on the host to port 4003 in the container, making the app accessible on the host.
+    env_file:
+      - ./backend/collaboration-service/.env # Specifying the .env file for collaboration-service
+    restart: unless-stopped # Restarts the container irrespective of the exit code but stops restarting when the service is stopped or removed.
+    networks:
+      - backend-network # Connects the collaboration-service to the 'backend-network' network.
+
+  history-service:
+    build: 
+      context: ./backend/history-service # Path to the directory containing the Dockerfile for building the history-service image.
+    container_name: history-service # Defining the name of the container.
+    ports:
+      - "4004:4004" # Maps port 4004 on the host to port 4004 in the container, making the app accessible on the host.
+    env_file:
+      - ./backend/history-service/.env # Specifying the .env file for history-service
+    restart: unless-stopped # Restarts the container irrespective of the exit code but stops restarting when the service is stopped or removed.
+    networks:
+      - backend-network # Connects the history-service to the 'backend-network' network.
+
+  chat-service:
+    build: 
+      context: ./backend/chat-service # Path to the directory containing the Dockerfile for building the chat-service image.
+    container_name: chat-service # Defining the name of the container.
+    ports:
+      - "4005:4005" # Maps port 4005 on the host to port 4005 in the container, making the app accessible on the host.
+    env_file:
+      - ./backend/chat-service/.env # Specifying the .env file for chat-service
+    restart: unless-stopped # Restarts the container irrespective of the exit code but stops restarting when the service is stopped or removed.
+    networks:
+      - backend-network # Connects the chat-service to the 'backend-network' network.
+
+networks:
+  frontend-network: # Defines a network named 'frontend-network'
+    driver: bridge # Uses the bridge driver for the network, which is the default and most common network type in Docker.
+
+  backend-network: # Defines a network named 'backend-network'
+    driver: bridge # Uses the bridge driver for the network, which is the default and most common network type in Docker.

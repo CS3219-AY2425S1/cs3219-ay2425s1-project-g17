@@ -9,15 +9,13 @@ import Container from '@mui/material/Container';
 import Avatar from '@mui/material/Avatar';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
-import Badge from '@mui/material/Badge';
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import PeopleIcon from '@mui/icons-material/People';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import LogoutIcon from '@mui/icons-material/Logout';
 import Logo from '../assets/Logo.png';
 import { getSignedImageURL } from '../services/user-service/UserService';
 import { AuthContext } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const settings = [
   { name: 'Dashboard', icon: <DashboardIcon /> },
@@ -26,9 +24,12 @@ const settings = [
 ];
 
 function Navbar() {
+  const navigate = useNavigate();
+
+    const handleLogoClick = () => {
+        navigate('/');
+    };
   const [profileImageUrl, setprofileImageUrl] = React.useState('');
-  const [notificationCount, setNotificationCount] = React.useState(3);
-  const [friendRequestCount, setFriendRequestCount] = React.useState(5);
 
   const authContext = React.useContext(AuthContext);
   if (!authContext) {
@@ -49,7 +50,7 @@ function Navbar() {
   const handleLogout = () => {
     logout();
     handleCloseUserMenu();
-    window.location.href = '/';
+    navigate('/');
   };
 
   React.useEffect(() => {
@@ -64,37 +65,25 @@ function Navbar() {
     getUserProfilePic(localStorage.getItem('profileImage') as string);
   }, []);
 
+  const handleNavigateProfile = () => {
+    navigate('/profile');
+    handleCloseUserMenu();
+  }
+
+  const handleNavigateDashboard = () => {
+    navigate('/dashboard');
+    handleCloseUserMenu();
+  }
+
   return (
     <AppBar position="static">
       <Container maxWidth={false}>
         <Toolbar disableGutters>
-          <a href="/dashboard">
+        <div onClick={handleLogoClick} style={{ cursor: 'pointer' }}>
             <img src={Logo} alt="Logo" style={{ height: '50px' }} />
-          </a>
+          </div>
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }} />
           <Box sx={{ flexGrow: 0, display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Box sx={{
-              backgroundColor: 'rgba(255, 255, 255, 0.1)', 
-              borderRadius: '50%',
-              padding: '2px',
-            }}>
-              <IconButton color="inherit">
-                <Badge badgeContent={friendRequestCount} color="error">
-                  <PeopleIcon />
-                </Badge>
-              </IconButton>
-            </Box>
-            <Box sx={{
-              backgroundColor: 'rgba(255, 255, 255, 0.1)',
-              borderRadius: '50%', 
-              padding: '2px', 
-            }}>
-              <IconButton color="inherit">
-                <Badge badgeContent={notificationCount} color="error">
-                  <NotificationsIcon />
-                </Badge>
-              </IconButton>
-            </Box>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <Avatar src={profileImageUrl} sx={{ bgcolor: "white" }} />
@@ -120,8 +109,8 @@ function Navbar() {
                 <MenuItem
                   key={name}
                   onClick={name === 'Logout' ? handleLogout
-                    : name === 'Profile' ? () => window.location.href = '/profile'
-                      : name === 'Dashboard' ? () => window.location.href = '/dashboard'
+                    : name === 'Profile' ? handleNavigateProfile
+                      : name === 'Dashboard' ? handleNavigateDashboard
                         : handleCloseUserMenu}
                 >
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>

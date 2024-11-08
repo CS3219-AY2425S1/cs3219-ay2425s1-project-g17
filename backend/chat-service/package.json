@@ -1,0 +1,36 @@
+{
+    "name": "chat-service",
+    "version": "1.0.0",
+    "description": "",
+    "main": "dist/server.js",
+    "scripts": {
+        "build": "tsc",
+        "start": "node dist/server.js",
+        "unit": "mocha 'dist/test/unitTest.js' --timeout 5000 --exit",
+        "integration": "mocha 'dist/test/integrationTest.js' --timeout 5000 --exit",
+        "test": "mocha 'dist/test/*.js' --timeout 5000 --exit"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "@types/express": "^5.0.0",
+        "@types/jsonwebtoken": "^9.0.7",
+        "@types/node": "^22.7.9",
+        "@types/uuid": "^10.0.0",
+        "@types/ws": "^8.5.12",
+        "dotenv": "^16.4.5",
+        "typescript": "^5.6.2"
+    },
+    "dependencies": {
+        "axios": "^1.7.7",
+        "body-parser": "^1.20.3",
+        "dotenv": "^10.0.0",
+        "express": "^4.21.1",
+        "ioredis": "^5.4.1",
+        "jsonwebtoken": "^9.0.2",
+        "mocha": "^10.8.2",
+        "socket.io": "^4.8.0",
+        "uuid": "^10.0.0"
+    }
+}

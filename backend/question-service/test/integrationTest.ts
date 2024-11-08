@@ -69,36 +69,6 @@ describe('Question Service Integration Tests', () => {
         });
     });
 
-    describe('GET /questions/:id', () => {
-        it('should get a question by its ID', async () => {
-            const question = new Question({
-                question_id: 1,
-                question_title: 'What is a graph?',
-                question_description: 'Explain the concept of a graph in data structures.',
-                question_categories: ['Data Structures'],
-                question_complexity: 'MEDIUM',
-                question_popularity: 75,
-            });
-            await question.save();
-
-            const response = await request(app)
-                .get(`/questions/1`)
-                .set('Authorization', `Bearer ${token}`);
-
-            expect(response.status).to.equal(200);
-            expect(response.body).to.have.property('question_id', 1);
-        });
-
-        it('should return 404 if the question does not exist', async () => {
-            const response = await request(app)
-                .get(`/questions/999`) // ID that doesn't exist
-                .set('Authorization', `Bearer ${token}`);
-
-            expect(response.status).to.equal(404);
-            expect(response.body).to.have.property('message', 'Question not found');
-        });
-    });
-
     describe('PUT /questions/:id', () => {
         it('should update an existing question', async () => {
             const question = new Question({

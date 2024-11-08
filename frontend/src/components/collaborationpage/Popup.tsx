@@ -13,6 +13,7 @@ interface PopupProps {
     onConfirmDisconnect: () => void;
     onCloseDisconnect: () => void;
     option: (string | null)[];
+    button_color?: 'inherit' | 'primary' | 'secondary' | 'success' | 'error' | 'info' | 'warning';
 }
 
 const DisconnectPopup: React.FC<PopupProps> = ({
@@ -21,7 +22,8 @@ const DisconnectPopup: React.FC<PopupProps> = ({
     description,
     onConfirmDisconnect,
     onCloseDisconnect,
-    option
+    option,
+    button_color='error' as 'inherit' | 'primary' | 'secondary' | 'success' | 'error' | 'info' | 'warning'
 }) => {
     return (
         <Modal open={isOpen}>
@@ -31,7 +33,7 @@ const DisconnectPopup: React.FC<PopupProps> = ({
                     top: '50%',
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
-                    width: 400,
+                    width: "35%",
                     bgcolor: 'background.paper',
                     boxShadow: 24,
                     p: 4,
@@ -48,7 +50,7 @@ const DisconnectPopup: React.FC<PopupProps> = ({
                     {!!option[0] && (<Button variant="outlined" onClick={onCloseDisconnect}>
                         {option[0]}
                     </Button>)}
-                    {!!option[1] && (<Button variant="contained" onClick={onConfirmDisconnect} color="error">
+                    {!!option[1] && (<Button variant="contained" onClick={onConfirmDisconnect} color={button_color} sx={{ color: 'white'}}>
                         {option[1]}
                     </Button>)}
                 </Box>

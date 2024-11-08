@@ -9,7 +9,7 @@ const token = generateToken('tester123');
 
 const mockQuestions = [
     {
-        question_id: 1,
+        question_id: '111111111',
         question_title: 'What is an array?',
         question_description: 'Explain the concept of an array in programming.',
         question_categories: ['Data Structures'],
@@ -17,6 +17,7 @@ const mockQuestions = [
         question_popularity: 60,
     },
     {
+        id: '222222222',
         question_id: 2,
         question_title: 'What is a linked list?',
         question_description: 'Explain the concept of a linked list in programming.',
@@ -207,7 +208,7 @@ describe('Question Service Unit Tests', () => {
                 .set('Authorization', `Bearer ${token}`);
 
             expect(response.status).to.equal(200);
-            expect(response.body).to.have.property('question_id', 1);
+            expect(response.body).to.have.property('question_id', '111111111');
         });
 
         it('should return 400 if difficulty or category is missing', async () => {

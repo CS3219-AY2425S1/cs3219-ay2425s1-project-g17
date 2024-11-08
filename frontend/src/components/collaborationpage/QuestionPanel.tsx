@@ -45,7 +45,7 @@ const QuestionPanel: React.FC<QuestionPanelProps>  = ({
                 bgcolor: 'background.paper',
                 boxShadow: 24,
                 p: 2,
-                height: '90vh',
+                height: '100%',
                 overflowY: 'auto',
             }}
         >
@@ -91,7 +91,7 @@ const QuestionPanel: React.FC<QuestionPanelProps>  = ({
             </Box>
             <Box sx={{ mt: 2, color: 'white' }}>
                 {example?.map((eg, index) => (
-                    <Box key={eg.id} sx={{ mt: 2 }}>
+                    <Box key={index} sx={{ mt: 2 }}>
                         <Typography sx={{ color: 'white', fontFamily: 'JetBrains Mono, monospace', fontSize: '12px' }}>
                             Example {index + 1}
                         </Typography>
