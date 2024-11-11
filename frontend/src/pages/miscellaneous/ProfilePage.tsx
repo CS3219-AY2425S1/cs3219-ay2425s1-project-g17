@@ -18,7 +18,15 @@ import { updateUsername, updateEmail, updatePassword, deleteUser, updateProfileP
 import { useNavigate } from 'react-router-dom';
 import HistoryTable from '../../components/profilepage/HistoryTable';
 
-export default function ProfilePage() {
+interface ProfilePageProps {
+
+    setHeaderProfileImageUrl: (url: string) => void;
+
+}
+
+
+
+const ProfilePage: React.FC<ProfilePageProps> = ({ setHeaderProfileImageUrl }) => {
     const navigate = useNavigate();
     const authContext = React.useContext(AuthContext);
     if (!authContext) {
@@ -26,7 +34,7 @@ export default function ProfilePage() {
     }
 
     const { token, updateUserData, logout } = authContext;
-    
+
     // User data states
     const [username, setUsername] = React.useState('');
     const [email, setEmail] = React.useState('');
@@ -67,7 +75,16 @@ export default function ProfilePage() {
         }
     };
 
-    // Fetch user data from the server on component mount
+    const getUserProfilePic = React.useCallback(async (imageName: string) => {
+        try {
+            const response = await getSignedImageURL(imageName);
+            setProfileImageUrl(response);
+            setHeaderProfileImageUrl(response);
+        } catch (err: any) {
+            alert(err.message);
+        }
+    }, [setHeaderProfileImageUrl]);
+
     React.useEffect(() => {
         const fetchUserData = async () => {
             await updateUserData();
@@ -81,13 +98,13 @@ export default function ProfilePage() {
 
         fetchUserData();
 
-        // Cleanup function
         return () => {
             setUsername('');
             setEmail('');
             setProfileImageUrl('');
         };
-    }, [updateUserData]);
+    }, [updateUserData, getUserProfilePic]);
+
 
     const handleEditClick = (field: 'username' | 'email' | 'password') => {
         if (field === 'username') {
@@ -195,15 +212,6 @@ export default function ProfilePage() {
         }
     };
 
-    const getUserProfilePic = async (imageName: string) => {
-        try {
-            const response = await getSignedImageURL(imageName);
-            setProfileImageUrl(response);
-        } catch (err: any) {
-            alert(err.message);
-        }
-    };
-
     return (
         <>
             <Container
@@ -233,41 +241,41 @@ export default function ProfilePage() {
                         }}
                     >
 
-                    <Box 
-                        position="relative"
-                        display="inline-block"
-                    >
-                        <Avatar 
-                            src={profileImageUrl} 
-                            sx={{ height: "18vh", width: "18vh" }} 
-                        />
-                        <input
-                            accept="image/*"
-                            style={{ display: 'none' }}
-                            id="icon-button-file"
-                            type="file"
-                            onChange={handleImageChange}
-                        />
-                        <label
-                            htmlFor="icon-button-file"
+                        <Box
+                            position="relative"
+                            display="inline-block"
                         >
-                            <IconButton 
-                                color="secondary" 
-                                component="span" 
-                                sx={{ 
-                                    position: 'absolute', 
-                                    bottom: 0, 
-                                    right: 0, 
-                                    backgroundColor: 'white', '&:hover': {
-                                        backgroundColor: 'lightgray',
-                                    }
-                                }}
+                            <Avatar
+                                src={profileImageUrl}
+                                sx={{ height: "18vh", width: "18vh" }}
+                            />
+                            <input
+                                accept="image/*"
+                                style={{ display: 'none' }}
+                                id="icon-button-file"
+                                type="file"
+                                onChange={handleImageChange}
+                            />
+                            <label
+                                htmlFor="icon-button-file"
                             >
-                                <EditIcon />
-                            </IconButton>
-                        </label>
-                     </Box>
-                         <Box>
+                                <IconButton
+                                    color="secondary"
+                                    component="span"
+                                    sx={{
+                                        position: 'absolute',
+                                        bottom: 0,
+                                        right: 0,
+                                        backgroundColor: 'white', '&:hover': {
+                                            backgroundColor: 'lightgray',
+                                        }
+                                    }}
+                                >
+                                    <EditIcon />
+                                </IconButton>
+                            </label>
+                        </Box>
+                        <Box>
                             <Typography variant="h6" sx={{ textAlign: "center", padding: "5px" }}>
                                 <b>{username}</b>
                             </Typography>
@@ -456,8 +464,8 @@ export default function ProfilePage() {
                 </Box>
 
                 <Box>
-                    <HistoryTable 
-                        userId={localStorage.getItem('id') || ''} 
+                    <HistoryTable
+                        userId={localStorage.getItem('id') || ''}
                         token={localStorage.getItem('token') || ''}
                     />
                 </Box>
@@ -497,3 +505,5 @@ export default function ProfilePage() {
         </>
     );
 }
+
+export default ProfilePage;

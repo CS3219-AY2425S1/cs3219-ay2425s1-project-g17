@@ -13,7 +13,6 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import LogoutIcon from '@mui/icons-material/Logout';
 import Logo from '../assets/Logo.png';
-import { getSignedImageURL } from '../services/user-service/UserService';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
@@ -23,13 +22,20 @@ const settings = [
   { name: 'Logout', icon: <LogoutIcon /> },
 ];
 
-function Navbar() {
+interface NavbarProps {
+
+  profileImageUrl: string;
+
+}
+
+
+
+const Navbar: React.FC<NavbarProps> = ({ profileImageUrl }) => {
   const navigate = useNavigate();
 
-    const handleLogoClick = () => {
-        navigate('/');
-    };
-  const [profileImageUrl, setprofileImageUrl] = React.useState('');
+  const handleLogoClick = () => {
+    navigate('/');
+  };
 
   const authContext = React.useContext(AuthContext);
   if (!authContext) {
@@ -53,18 +59,6 @@ function Navbar() {
     navigate('/');
   };
 
-  React.useEffect(() => {
-    const getUserProfilePic = async (imageName: string) => {
-      try {
-        const response = await getSignedImageURL(imageName);
-        setprofileImageUrl(response);
-      } catch (err: any) {
-        alert(err.message);
-      }
-    };
-    getUserProfilePic(localStorage.getItem('profileImage') as string);
-  }, []);
-
   const handleNavigateProfile = () => {
     navigate('/profile');
     handleCloseUserMenu();
@@ -79,7 +73,7 @@ function Navbar() {
     <AppBar position="static">
       <Container maxWidth={false}>
         <Toolbar disableGutters>
-        <div onClick={handleLogoClick} style={{ cursor: 'pointer' }}>
+          <div onClick={handleLogoClick} style={{ cursor: 'pointer' }}>
             <img src={Logo} alt="Logo" style={{ height: '50px' }} />
           </div>
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }} />
