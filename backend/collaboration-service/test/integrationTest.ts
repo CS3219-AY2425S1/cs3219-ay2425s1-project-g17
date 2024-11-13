@@ -28,8 +28,8 @@ describe('Collaboration API Integration Test', () => {
             const res = await request(app)
                 .post('/collaboration')
                 .send({
-                    user1Id: '672a03f80657911f23eea4e6',
-                    user2Id: '6728d580d5156fbb9a177b1e',
+                    user1Id: '11111111',
+                    user2Id: '22222222',
                     category: 'EASY',
                     difficulty: 'Array'
                 })
@@ -43,7 +43,7 @@ describe('Collaboration API Integration Test', () => {
             const res = await request(app)
                 .post('/collaboration')
                 .send({
-                    user2Id: '6728d580d5156fbb9a177b1e',
+                    user2Id: '22222222',
                     category: 'EASYX',
                     difficulty: 'Array'
                 })
@@ -56,7 +56,7 @@ describe('Collaboration API Integration Test', () => {
     describe('POST /collaboration/disconnect', () => {
         it('should return 200 and delete the collaboration session', async () => {
             const sessionId = "testSession";
-            await redisClient.hset(sessionId, "user1Id", '123');
+            await redisClient.hset(sessionId, "user1Id", '11111111');
 
             const res = await request(app)
                 .post('/collaboration/disconnect')
@@ -85,7 +85,7 @@ describe('Collaboration API Integration Test', () => {
     describe('POST /collaboration/cache', () => {
         it('should return 200 and cache the message', async () => {
             const sessionId = "testSession";
-            await redisClient.hset(sessionId, "user1Id", '123');
+            await redisClient.hset(sessionId, "user1Id", '11111111');
 
             const res = await request(app)
                 .post('/collaboration/cache')
@@ -118,15 +118,15 @@ describe('Collaboration API Integration Test', () => {
             const res_collab = await request(app)
                 .post('/collaboration')
                 .send({
-                    user1Id: '6728d49fd5156fbb9a177b00',
-                    user2Id: '6728d580d5156fbb9a177b1e',
+                    user1Id: '11111111',
+                    user2Id: '22222222',
                     category: 'EASY',
                     difficulty: 'Array'
                 })
                 .set('Authorization', `Bearer ${token}`);
 
             const res = await request(app)
-                .get(`/collaboration/6728d49fd5156fbb9a177b00`)
+                .get(`/collaboration/11111111`)
                 .set('Authorization', `Bearer ${token}`);
 
             expect(res.status).to.equal(200);
@@ -147,15 +147,15 @@ describe('Collaboration API Integration Test', () => {
             const res_collab = await request(app)
                 .post('/collaboration')
                 .send({
-                    user1Id: '6728d49fd5156fbb9a177b00',
-                    user2Id: '6728d580d5156fbb9a177b1e',
+                    user1Id: '11111111',
+                    user2Id: '22222222',
                     category: 'EASY',
                     difficulty: 'Array'
                 })
                 .set('Authorization', `Bearer ${token}`);
 
             const res = await request(app)
-                .get(`/collaboration/shuffle/6728d49fd5156fbb9a177b00`)
+                .get(`/collaboration/shuffle/11111111`)
                 .set('Authorization', `Bearer ${token}`);
 
             expect(res.status).to.equal(200);
