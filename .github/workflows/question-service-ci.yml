@@ -1,0 +1,48 @@
+name: Backend Question Service CI
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches:
+      - main
+      - MS6
+      - devops/ci
+
+env:
+  MONGO_URI_TEST: ${{ secrets.MONGO_URI_TEST }}
+  JWT_SECRET: ${{ secrets.JWT_SECRET }}
+
+jobs:
+  backend-question-service-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: './backend/question-service/package-lock.json'
+
+    # Install dependencies
+    - name: Install Backend Question Service Dependencies
+      working-directory: ./backend/question-service
+      run: npm ci
+
+    # Compile code
+    - name: Compile Backend Question Service Code
+      working-directory: ./backend/question-service
+      run: npm run build
+
+    # Run question service unit tests
+    - name: Run Backend Question Service Unit Tests
+      working-directory: ./backend/question-service
+      run: npm run unit
+
+    # Run question service integration tests
+    - name: Run Backend Question Service Integration Tests
+      working-directory: ./backend/question-service
+      run: npm run integration
